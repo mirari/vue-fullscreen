@@ -8,5 +8,6 @@ example-dist
 .eslintignore
 .eslintrc.js
 .gitignore
+.idea
 _config.yml
 vue-fullscreen.iml
