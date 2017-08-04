@@ -1,12 +1,12 @@
 {
   "name": "vue-fullscreen",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A simple Vue.js component for fullscreen",
   "main": "dist/vue-fullscreen.min.js",
   "scripts": {
     "example": "cross-env NODE_ENV=production node build/build.js",
     "dev": "cross-env NODE_ENV=development node build/dev-server.js",
-    "gh": "npm run example && node build/deploy",
+    "gh": "node build/deploy",
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs",
     "release": "webpack --progress --hide-modules --config  ./build/webpack.release.js && cross-env NODE_ENV=production webpack --progress --hide-modules --config  ./build/webpack.release.min.js"
   },

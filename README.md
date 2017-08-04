@@ -1,8 +1,10 @@
 # vue-fullscreen
 A simple Vue.js component for fullscreen
 
+## [Live demo](http://mirari.github.io/vue-fullscreen/)
 
-# Install & and Usage
+
+## Install & and Usage
 Install from GitHub via NPM
 ```bash
 npm install mirari/vue-fullscreen
@@ -38,7 +40,7 @@ To use the vue-fullscreen component in your templates, simply import it, and reg
 
 **Caution:** Because of the browser security function, you can only set the `fullscreen` property by a user gesture. (*e.g.* a click callback)
 
-#Available options
+##Available options
 #### Props
 
 | Option          | Description                              | Default value |
