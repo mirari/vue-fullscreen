@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import Fullscreen from 'src/components/Fullscreen'
+import Fullscreen from 'src'
 import echarts from 'echarts'
 
 let chart = null

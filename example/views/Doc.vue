@@ -2,7 +2,7 @@
   <div>
     <h1 class="page-header">Install & and Usage</h1>
     <p>Install from GitHub via NPM</p>
-    <pre><code class="prismjs language-bash">npm install mirari/vue-fullscreen</code></pre>
+    <pre><code class="prismjs language-bash">npm install vue-fullscreen</code></pre>
     <p>To use the vue-fullscreen component in your templates, simply import it, and register it with your component.</p>
     <pre class="prismjs"><code class="language-markup">&lt;template&gt;
   &lt;div id="app"&gt;

@@ -7,7 +7,7 @@ A simple Vue.js component for fullscreen
 ## Install & and Usage
 Install from GitHub via NPM
 ```bash
-npm install mirari/vue-fullscreen
+npm install vue-fullscreen
 ```
 To use the vue-fullscreen component in your templates, simply import it, and register it with your component.
 
