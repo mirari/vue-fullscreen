@@ -1,37 +1,64 @@
-## Welcome to GitHub Pages
+# vue-fullscreen
+A simple Vue.js component for fullscreen
 
-You can use the [editor on GitHub](https://github.com/mirari/vue-fullscreen/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+# Install & and Usage
+Install from GitHub via NPM
+```bash
+npm install mirari/vue-fullscreen
+```
+To use the vue-fullscreen component in your templates, simply import it, and register it with your component.
 
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```vue
+<template>
+  <div id="app">
+    <fullscreen :fullscreen.sync="fullscreen">
+      Content
+    </fullscreen>
+    <button type="button" @click="toggle" >Fullscreen</button>
+  </div>
+</template>
+<script>
+  import Fullscreen from "vue-fullscreen"
+  export default {
+    components: {Fullscreen},
+    methods: {
+      toggle () {
+        this.fullscreen = !this.fullscreen
+      }
+    },
+    data() {
+      return {
+        fullscreen: false
+      }
+    }
+  }
+</script>
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+**Caution:** Because of the browser security function, you can only set the `fullscreen` property by a user gesture. (*e.g.* a click callback)
 
-### Jekyll Themes
+#Available options
+#### Props
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/mirari/vue-fullscreen/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+| Option          | Description                              | Default value |
+| --------------- | ---------------------------------------- | ------------- |
+| fullscreen      | Just change it to toggle fullscreen mode. Use `.sync` to synchronize the parent's value | false         |
+| background      | The background style of wrapper, only available for fullscreen mode | #333          |
+| fullscreenClass | Similar to the former, the class will be added to the wrapper when fullscreen mode is on | 'fullscreen'  |
 
-### Support or Contact
+#### Events
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+| Event name | Description                              | Arguments              |
+| ---------- | ---------------------------------------- | ---------------------- |
+| change     | will be triggered when the fullscreen mode changed | (isFullscreen:boolean) |
+
+#### Methods
+
+Except for the `.sync` modifier, you can call these methods after getting components by `refs`.
+
+| Method name | Description                              | Arguments                 |
+| ----------- | ---------------------------------------- | ------------------------- |
+| toggle      | toggle the fullscreen mode. You can pass `value` to force enter or exit fullscreen mode | (value:Boolean)(optional) |
+| enter       | toggle the fullscreen mode               | none                      |
+| exit        | toggle the fullscreen mode               | none                      |
