@@ -1,6 +1,8 @@
 # vue-fullscreen
 A simple Vue.js component for fullscreen
 
+[![npm version](https://badge.fury.io/js/vue-fullscreen.svg)](https://badge.fury.io/js/vue-fullscreen)
+
 ## [Live demo](http://mirari.github.io/vue-fullscreen/)
 
 
@@ -40,7 +42,9 @@ To use the vue-fullscreen component in your templates, simply import it, and reg
 
 **Caution:** Because of the browser security function, you can only set the `fullscreen` property by a user gesture. (*e.g.* a click callback)
 
+
 ##Available options
+
 #### Props
 
 | Option          | Description                              | Default value |
