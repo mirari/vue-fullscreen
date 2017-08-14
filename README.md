@@ -16,10 +16,10 @@ To use the vue-fullscreen component in your templates, simply import it, and reg
 ```vue
 <template>
   <div id="app">
-    <fullscreen :fullscreen.sync="fullscreen">
+    <fullscreen ref="fullscreen" :fullscreen.sync="fullscreen">
       Content
     </fullscreen>
-    <button type="button" @click="toggle" >Fullscreen</button>
+    <button type="button" @click="enter" >Fullscreen</button>
   </div>
 </template>
 <script>
@@ -27,8 +27,8 @@ To use the vue-fullscreen component in your templates, simply import it, and reg
   export default {
     components: {Fullscreen},
     methods: {
-      toggle () {
-        this.fullscreen = !this.fullscreen
+      enter () {
+        this.$refs.fullscreen.enter();
       }
     },
     data() {
