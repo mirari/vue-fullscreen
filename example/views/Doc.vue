@@ -6,7 +6,7 @@
     <p>To use the vue-fullscreen component in your templates, simply import it, and register it with your component.</p>
     <pre class="prismjs"><code class="language-markup">&lt;template&gt;
   &lt;div id="app"&gt;
-    &lt;fullscreen :fullscreen.sync="fullscreen"&gt;
+    &lt;fullscreen ref="fullscreen"&gt;
       Content
     &lt;/fullscreen&gt;
     &lt;button type="button" @click="toggle" &gt;Fullscreen&lt;/button&gt;
@@ -18,7 +18,7 @@
     components: {Fullscreen},
     methods: {
       toggle () {
-        this.fullscreen = !this.fullscreen
+        this.$refs['fullscreen'].toggle()
       }
     },
     data() {

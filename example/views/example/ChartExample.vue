@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <fullscreen class="wrapper" @change="fullscreenChange" :fullscreen.sync="fullscreen" background="#EEE">
+    <fullscreen class="wrapper" @change="fullscreenChange" :fullscreen.sync="fullscreen" ref="fullscreen" background="#EEE">
       <div class="chart-container"></div>
       <button type="button" class="btn btn-default btn-map-fullscreen" @click="toggleFullScreen">
         <i class="mdi" :class="[fullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen']"></i>
@@ -143,7 +143,7 @@ export default {
 
   methods: {
     toggleFullScreen () {
-      this.fullscreen = !this.fullscreen
+      this.$refs['fullscreen'].toggle()
     },
     fullscreenChange (fullscreen) {
 /*

@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <fullscreen class="wrapper" @change="fullscreenChange" :fullscreen.sync="fullscreen">
+    <fullscreen class="wrapper" @change="fullscreenChange" :fullscreen.sync="fullscreen" ref="fullscreen">
       <div class="map-container"></div>
       <div class="car-search"></div>
       <button type="button" class="btn btn-default btn-map-fullscreen" @click="toggleFullScreen">
@@ -30,7 +30,8 @@ export default {
 
   methods: {
     toggleFullScreen () {
-      this.fullscreen = !this.fullscreen
+//      this.fullscreen = !this.fullscreen
+      this.$refs['fullscreen'].toggle()
     },
     fullscreenChange (fullscreen) {
       map.checkResize()
