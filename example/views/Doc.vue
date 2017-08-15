@@ -28,8 +28,36 @@
     }
   }</code><code class="language-markup">
 &lt;/script&gt;</code></pre>
-    <p><b>Caution:</b>  Because of the browser security function, you can only set the <code>fullscreen</code> property by a user gesture. (e.g. a click callback)</p>
+    <p><b>Caution:</b>  Because of the browser security function, you can only call these methods by a user gesture. (e.g. a click callback)</p>
     <h1 class="page-header">Available options</h1>
+    <h4>Methods</h4>
+    <p>You can call these methods after getting components by <code>refs</code>.</p>
+    <table class="table table-bordered">
+      <thead class="text-center">
+      <tr>
+        <th>Method name</th>
+        <th>Description</th>
+        <th>Arguments</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>toggle</td>
+        <td>toggle the fullscreen mode. You can pass <code>value</code> to force enter or exit fullscreen mode</td>
+        <td>(value:Boolean)(optional)</td>
+      </tr>
+      <tr>
+        <td>enter</td>
+        <td>enter the fullscreen mode</td>
+        <td>none</td>
+      </tr>
+      <tr>
+        <td>exit</td>
+        <td>exit the fullscreen mode</td>
+        <td>none</td>
+      </tr>
+      </tbody>
+    </table>
     <h4>Props</h4>
     <table class="table table-bordered">
       <thead class="text-center">
@@ -42,7 +70,7 @@
       <tbody>
       <tr>
         <td>fullscreen</td>
-        <td>Just change it to toggle fullscreen mode. Use <code>.sync</code> to synchronize the parent's value</td>
+        <td>Use <code>.sync</code> to synchronize the parent's value. You can change it to toggle fullscreen mode too, but <b>cannot</b> work in Firefox, because it has stricter constraints with async operation.</td>
         <td>false</td>
       </tr>
       <tr>
@@ -71,34 +99,6 @@
         <td>change</td>
         <td>will be triggered when the fullscreen mode changed</td>
         <td>(isFullscreen:boolean)</td>
-      </tr>
-      </tbody>
-    </table>
-    <h4>Methods</h4>
-    <p>Except for the <code>.sync</code> modifier, you can call these methods after getting components by <code>refs</code>.</p>
-    <table class="table table-bordered">
-      <thead class="text-center">
-      <tr>
-        <th>Method name</th>
-        <th>Description</th>
-        <th>Arguments</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-        <td>toggle</td>
-        <td>toggle the fullscreen mode. You can pass <code>value</code> to force enter or exit fullscreen mode</td>
-        <td>(value:Boolean)(optional)</td>
-      </tr>
-      <tr>
-        <td>enter</td>
-        <td>toggle the fullscreen mode</td>
-        <td>none</td>
-      </tr>
-      <tr>
-        <td>exit</td>
-        <td>toggle the fullscreen mode</td>
-        <td>none</td>
       </tr>
       </tbody>
     </table>

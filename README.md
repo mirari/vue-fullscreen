@@ -40,15 +40,23 @@ To use the vue-fullscreen component in your templates, simply import it, and reg
 </script>
 ```
 
-**Caution:** Because of the browser security function, you can only set the `fullscreen` property by a user gesture. (*e.g.* a click callback)
+**Caution:** Because of the browser security function, you can only call these methods by a user gesture. (*e.g.* a click callback)
 
 ## Available options
+
+#### Methods
+
+| Method name | Description                              | Arguments                 |
+| ----------- | ---------------------------------------- | ------------------------- |
+| toggle      | toggle the fullscreen mode. You can pass `value` to force enter or exit fullscreen mode | (value:Boolean)(optional) |
+| enter       | enter the fullscreen mode               | none                      |
+| exit        | exit the fullscreen mode               | none                      |
 
 #### Props
 
 | Option          | Description                              | Default value |
 | --------------- | ---------------------------------------- | ------------- |
-| fullscreen      | Just change it to toggle fullscreen mode. Use `.sync` to synchronize the parent's value | false         |
+| fullscreen      | Use `.sync` to synchronize the parent's value. You can change it to toggle fullscreen mode too, but **cannot** work in Firefox, because it has stricter constraints with async operation.   | false         |
 | background      | The background style of wrapper, only available for fullscreen mode | #333          |
 | fullscreenClass | Similar to the former, the class will be added to the wrapper when fullscreen mode is on | 'fullscreen'  |
 
@@ -57,13 +65,3 @@ To use the vue-fullscreen component in your templates, simply import it, and reg
 | Event name | Description                              | Arguments              |
 | ---------- | ---------------------------------------- | ---------------------- |
 | change     | will be triggered when the fullscreen mode changed | (isFullscreen:boolean) |
-
-#### Methods
-
-Except for the `.sync` modifier, you can call these methods after getting components by `refs`.
-
-| Method name | Description                              | Arguments                 |
-| ----------- | ---------------------------------------- | ------------------------- |
-| toggle      | toggle the fullscreen mode. You can pass `value` to force enter or exit fullscreen mode | (value:Boolean)(optional) |
-| enter       | toggle the fullscreen mode               | none                      |
-| exit        | toggle the fullscreen mode               | none                      |
