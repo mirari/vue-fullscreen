@@ -18,7 +18,7 @@ To use `vue-fullscreen`, simply import it, and it will register with vue globall
 ```html
 <template>
   <div id="app">
-    <fullscreen ref="fullscreen" :fullscreen.sync="fullscreen">
+    <fullscreen :fullscreen.sync="fullscreen">
       Content
     </fullscreen>
     <button type="button" @click="toggle" >Fullscreen</button>
@@ -29,7 +29,7 @@ To use `vue-fullscreen`, simply import it, and it will register with vue globall
   export default {
     methods: {
       toggle () {
-        this.$refs['fullscreen'].toggle()
+        this.fullscreen = !this.fullscreen
       }
     },
     data() {
@@ -176,6 +176,7 @@ The background style of wrapper, only available when fullscreen mode is on and `
     methods: {
       toggle () {
         this.$refs['fullscreen'].toggle()
+        // this.fullscreen = !this.fullscreen
       }
     },
     data() {
@@ -217,7 +218,19 @@ exit the fullscreen mode.
 - Type: `Boolean`
 - Default: `false`
 
-Use `.sync` to synchronize the parent's value. You can change it to toggle fullscreen mode too, but **cannot** work in Firefox, because it has stricter constraints with async operation.
+Use `.sync` to synchronize the parent's value. You can change it to toggle fullscreen mode too.
+**Caution:** Changing it may not work in Firefox, because it has stricter constraints with async operation.
+But you can try to add `babel-polyfill` to the `vendor` in `webpack` like this:
+```javascript
+module.exports = {
+  entry: {
+    app: './example/main.js',
+    vendor: ['babel-polyfill', 'vue']
+  },
+  ...
+}
+```
+Then it works, but I don't know why. ╮(╯▽╰)╭
 
 #### fullscreenClass
 

@@ -17,7 +17,8 @@ var markdown = require('markdown-it')({
 
 module.exports = {
   entry: {
-    app: './example/main.js'
+    app: './example/main.js',
+    vendor: ['babel-polyfill', 'vue']
   },
   output: {
     path: config.build.assetsRoot,
@@ -55,8 +56,7 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         include: projectRoot,
-        // /node_modules\/(?!vue-bulma-.*)/
-        exclude: [new RegExp(`node_modules\\${path.sep}(?!vue-bulma-.*)`)]
+        exclude: [/node_modules/]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
