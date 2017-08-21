@@ -13,6 +13,19 @@
         <doc class="col-md-12 markdown-body"></doc>
       </div>
     </div>
+    <footer class="footer">
+      <div class="container">
+        <h4>
+          <a href="https://mirari.cc" target="_blank" title="mirari.cc">
+            mirari.cc
+          </a>
+          ·  GitHub
+          <a href="https://github.com/mirari" target="_blank" title="GitHub">
+            @mirari
+          </a>
+        </h4>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -36,5 +49,17 @@ export default {
   .jumbotron {
     color: white;
     background: #41b883;
+  }
+
+  .footer {
+    margin-top: 30px;
+    padding: 20px;
+    color: white;
+    background: #41b883;
+    text-align: center;
+
+    a {
+      color: white;
+    }
   }
 </style>
