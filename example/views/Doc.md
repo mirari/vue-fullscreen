@@ -1,11 +1,3 @@
-# vue-fullscreen
-A simple Vue.js component for fullscreen
-
-[![npm version](https://badge.fury.io/js/vue-fullscreen.svg)](https://badge.fury.io/js/vue-fullscreen)
-
-## [Live demo](http://mirari.github.io/vue-fullscreen/)
-
-
 ## Installation 
 Install from GitHub via NPM
 ```bash

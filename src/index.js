@@ -1,2 +1,3 @@
-import Fullscreen from './components/Fullscreen.vue'
-export default Fullscreen
+import Vue from 'vue'
+import Fullscreen from './plugin'
+Vue.use(Fullscreen)

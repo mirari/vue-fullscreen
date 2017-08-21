@@ -8,53 +8,7 @@
   </div>
 </template>
 <script>
-  // These helper functions available only to our plugin scope.
-  function supportFullScreen () {
-    const doc = document.documentElement
-
-    return ('requestFullscreen' in doc) ||
-      ('mozRequestFullScreen' in doc && document.mozFullScreenEnabled) ||
-      ('webkitRequestFullScreen' in doc)
-  }
-
-  function requestFullScreen (elem) {
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen()
-    } else if (elem.mozRequestFullScreen) {
-      elem.mozRequestFullScreen()
-    } else if (elem.webkitRequestFullScreen) {
-      elem.webkitRequestFullScreen(global.Element.ALLOW_KEYBOARD_INPUT)
-    }
-  }
-
-  function fullScreenStatus () {
-    return document.fullscreen ||
-      document.mozFullScreen ||
-      document.webkitIsFullScreen ||
-      false
-  }
-
-  function cancelFullScreen () {
-    if (document.exitFullscreen) {
-      document.exitFullscreen()
-    } else if (document.mozCancelFullScreen) {
-      document.mozCancelFullScreen()
-    } else if (document.webkitCancelFullScreen) {
-      document.webkitCancelFullScreen()
-    }
-  }
-
-  function onFullScreenEvent (callback) {
-    document.addEventListener('fullscreenchange', callback)
-    document.addEventListener('mozfullscreenchange', callback)
-    document.addEventListener('webkitfullscreenchange', callback)
-  }
-
-  function offFullScreenEvent (callback) {
-    document.removeEventListener('fullscreenchange', callback)
-    document.removeEventListener('mozfullscreenchange', callback)
-    document.removeEventListener('webkitfullscreenchange', callback)
-  }
+  import {supportFullScreen, fullScreenStatus, requestFullScreen, cancelFullScreen, onFullScreenEvent, offFullScreenEvent} from './utils'
 
   export default {
     props: {

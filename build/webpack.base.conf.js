@@ -2,6 +2,18 @@ var path = require('path')
 var config = require('../config')
 var utils = require('./utils')
 var projectRoot = path.resolve(__dirname, '../')
+var hljs = require('highlight.js')
+var markdown = require('markdown-it')({
+  html: false,
+  highlight: function (str, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(lang, str).value
+      } catch (__) {}
+    }
+    return '' // use external default escaping
+  }
+})
 
 module.exports = {
   entry: {
@@ -61,6 +73,11 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
+      },
+      {
+        test: /\.md$/,
+        loader: 'vue-markdown-loader',
+        options: markdown
       }
     ]
   },

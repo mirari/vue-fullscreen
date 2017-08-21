@@ -3,11 +3,11 @@
     <h1 class="page-header">Demo</h1>
     <div class="row" style="margin-bottom: 20px;">
       <div class="col-md-6">
-        <a href="https://github.com/mirari/vue-fullscreen/blob/master/example/views/example/MapExample.vue" target="_blank">Source</a>
+        <p><a href="https://github.com/mirari/vue-fullscreen/blob/master/example/views/example/MapExample.vue" target="_blank">Source</a></p>
         <map-example></map-example>
       </div>
       <div class="col-md-6">
-        <a href="https://github.com/mirari/vue-fullscreen/blob/master/example/views/example/ChartExample.vue" target="_blank">Source</a>
+        <p><a href="https://github.com/mirari/vue-fullscreen/blob/master/example/views/example/ChartExample.vue" target="_blank">Source</a></p>
         <chart-example></chart-example>
       </div>
     </div>

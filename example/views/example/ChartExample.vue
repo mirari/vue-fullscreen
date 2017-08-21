@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import Fullscreen from 'src'
+import Fullscreen from 'src/component.vue'
 import echarts from 'echarts'
 
 let chart = null
