@@ -219,6 +219,7 @@ exit the fullscreen mode.
 - Default: `false`
 
 Use `.sync` to synchronize the parent's value. You can change it to toggle fullscreen mode too.
+
 **Caution:** Changing it may not work in Firefox, because it has stricter constraints with async operation.
 But you can try to add `babel-polyfill` to the `vendor` in `webpack` like this:
 ```javascript
@@ -230,7 +231,9 @@ module.exports = {
   ...
 }
 ```
-Then it works, but I don't know why. ╮(╯▽╰)╭
+Then it works, though I don't know why. ╮(╯▽╰)╭
+
+
 
 #### fullscreenClass
 
