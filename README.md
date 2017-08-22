@@ -5,6 +5,8 @@ A simple Vue.js component for fullscreen
 
 ## [Live demo](http://mirari.github.io/vue-fullscreen/)
 
+## Browser support
+[Full Screen API](http://caniuse.com/fullscreen)
 
 ## Installation 
 Install from GitHub via NPM
@@ -220,8 +222,8 @@ exit the fullscreen mode.
 
 Use `.sync` to synchronize the parent's value. You can change it to toggle fullscreen mode too.
 
-**Caution:** Changing it may not work in Firefox, because it has stricter constraints with async operation.
-But you can try to add `babel-polyfill` to the `vendor` in `webpack` like this:
+**Caution:** Changing it may not work in Firefox and IE11, it may be that they handle async operation specially.
+But in Firefox you can try to add `babel-polyfill` to the `vendor` in `webpack` like this:
 ```javascript
 module.exports = {
   entry: {
@@ -233,6 +235,7 @@ module.exports = {
 ```
 Then it works, though I don't know why. ╮(╯▽╰)╭
 
+I have no idea how to fix it in IE11 yet.
 
 
 #### fullscreenClass
