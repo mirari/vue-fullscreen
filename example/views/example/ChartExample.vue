@@ -143,8 +143,8 @@ export default {
 
   methods: {
     toggleFullScreen () {
-//      this.$refs['fullscreen'].toggle()
-      this.fullscreen = !this.fullscreen
+      this.$refs['fullscreen'].toggle()
+//      this.fullscreen = !this.fullscreen
     },
     fullscreenChange (fullscreen) {
 /*

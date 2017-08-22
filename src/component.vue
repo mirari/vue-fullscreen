@@ -8,7 +8,7 @@
   </div>
 </template>
 <script>
-  import {supportFullScreen, fullScreenStatus, requestFullScreen, cancelFullScreen, onFullScreenEvent, offFullScreenEvent} from './utils'
+  import {supportFullScreen, fullScreenStatus, requestFullscreen, exitFullscreen, onFullScreenEvent, offFullScreenEvent} from './utils'
 
   export default {
     props: {
@@ -62,13 +62,13 @@
           return
         }
         onFullScreenEvent(this.fullScreenCallback)
-        requestFullScreen(this.$el)
+        requestFullscreen(this.$el)
       },
       exit () {
         if (!this.supportFullScreen) {
           return
         }
-        cancelFullScreen()
+        exitFullscreen()
       },
       shadeClick (e) {
         if (e.target === this.$el) {

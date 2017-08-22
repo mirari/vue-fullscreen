@@ -1,8 +1,8 @@
 import {
   supportFullScreen,
   fullScreenStatus,
-  requestFullScreen,
-  cancelFullScreen,
+  requestFullscreen,
+  exitFullscreen,
   onFullScreenEvent,
   offFullScreenEvent
 } from './utils'
@@ -54,7 +54,7 @@ function enter (target = document.body, options) {
     wrapper.appendChild(el)
     wrapper.addEventListener('click', function (event) {
       if (event.target === this) {
-        cancelFullScreen()
+        exitFullscreen()
       }
     })
   }
@@ -81,7 +81,7 @@ function enter (target = document.body, options) {
   }
 
   onFullScreenEvent(fullScreenCallback)
-  requestFullScreen(options.wrap ? wrapper : el)
+  requestFullscreen(options.wrap ? wrapper : el)
 }
 
 function exit () {
@@ -91,7 +91,7 @@ function exit () {
   if (!getState()) {
     return
   }
-  cancelFullScreen()
+  exitFullscreen()
 }
 
 export default {
