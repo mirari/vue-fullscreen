@@ -4,7 +4,8 @@ var utils = require('./utils')
 var projectRoot = path.resolve(__dirname, '../')
 var hljs = require('highlight.js')
 var markdown = require('markdown-it')({
-  html: false,
+  html: true,
+  preventExtract: true,
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {

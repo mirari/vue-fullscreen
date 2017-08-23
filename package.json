@@ -77,7 +77,7 @@
     "vue": "^2.4.1",
     "vue-html-loader": "^1.2.3",
     "vue-loader": "^11.1.4",
-    "vue-markdown-loader": "^2.0.0",
+    "vue-markdown-loader": "^2.1.0",
     "vue-template-compiler": "^2.2.2",
     "webpack": "^2.2.1",
     "webpack-dev-middleware": "^1.9.0",
