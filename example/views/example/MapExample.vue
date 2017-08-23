@@ -10,7 +10,9 @@
 </template>
 
 <script>
-import 'src'
+import fullscreen from 'src'
+import Vue from 'vue'
+Vue.use(fullscreen)
 import bmapLoader from './bmap-loader'
 let BMap = null
 let map = null

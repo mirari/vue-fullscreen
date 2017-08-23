@@ -7,8 +7,7 @@ const merge = require('webpack-merge')
 
 module.exports = {
   entry: {
-    'vue-fullscreen': './src/index.js',
-    vendor: ['babel-polyfill', 'vue']
+    'vue-fullscreen': './src/index.js'
   },
   output: {
     filename: './dist/[name].js',

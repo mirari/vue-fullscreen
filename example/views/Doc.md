@@ -8,7 +8,7 @@ npm install vue-fullscreen
 ```
 ## Usage
 
-To use `vue-fullscreen`, simply import it, and it will register with vue globally.
+To use `vue-fullscreen`, simply import it, and call `Vue.use()` to install.
 
 ```html
 <template>
@@ -20,7 +20,9 @@ To use `vue-fullscreen`, simply import it, and it will register with vue globall
   </div>
 </template>
 <script>
-  import 'vue-fullscreen'
+  import fullscreen from 'vue-fullscreen'
+  import Vue from 'vue'
+  Vue.use(fullscreen)
   export default {
     methods: {
       toggle () {
@@ -52,7 +54,9 @@ In your vue component, You can use `this.$fullscreen` to get the instance.
   </div>
 </template>
 <script>
-import "vue-fullscreen"
+import fullscreen from 'vue-fullscreen'
+import Vue from 'vue'
+Vue.use(fullscreen)
 export default {
   methods: {
     toggle () {
@@ -271,7 +275,7 @@ If you need to avoid name conflict, you can import it like this:
   </div>
 </template>
 <script>
-import Fullscreen from 'vue-fullscreen/plugin'
+import Fullscreen from 'vue-fullscreen'
 import Vue from 'vue'
 Vue.use(Fullscreen, {name: 'fs'})
 export default {
