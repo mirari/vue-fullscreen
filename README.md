@@ -128,6 +128,14 @@ enter the fullscreen mode.
 exit the fullscreen mode.
 
 
+#### getState()
+
+get the fullscreen state.
+
+- Type: `Boolean`
+
+**Caution:** The action is asynchronous, you can not get the expected state immediately following the calling method.     
+
 
 ### Options
 
@@ -213,9 +221,18 @@ Toggle the fullscreen mode.You can pass `force` to force enter or exit fullscree
 
 enter the fullscreen mode.
 
-#### exit
+#### exit()
 
 exit the fullscreen mode.
+
+#### getState()
+
+get the fullscreen state.
+
+- Type: `Boolean`
+
+**Caution:** The action is asynchronous, you can not get the expected state immediately following the calling method.
+
 
 
 

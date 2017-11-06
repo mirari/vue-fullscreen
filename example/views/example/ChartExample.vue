@@ -143,6 +143,7 @@ export default {
 
   methods: {
     toggleFullScreen () {
+//      console.log(this.$refs['fullscreen'].getState())
       this.$refs['fullscreen'].toggle()
 //      this.fullscreen = !this.fullscreen
     },

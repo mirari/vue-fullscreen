@@ -70,6 +70,9 @@
         }
         exitFullscreen()
       },
+      getState () {
+        return fullScreenStatus()
+      },
       shadeClick (e) {
         if (e.target === this.$el) {
           this.exit()

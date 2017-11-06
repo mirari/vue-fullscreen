@@ -373,6 +373,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       }
       __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* exitFullscreen */])();
     },
+    getState: function getState() {
+      return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fullScreenStatus */])();
+    },
     shadeClick: function shadeClick(e) {
       if (e.target === this.$el) {
         this.exit();
