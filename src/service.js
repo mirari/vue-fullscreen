@@ -1,4 +1,5 @@
 import {
+  extend,
   supportFullScreen,
   fullScreenStatus,
   requestFullscreen,
@@ -39,7 +40,7 @@ function enter (target = document.body, options) {
   if (getState()) {
     return
   }
-  options = Object.assign({}, defaults, options)
+  options = extend(true, {}, defaults, options)
 
   const el = target
   let wrapper

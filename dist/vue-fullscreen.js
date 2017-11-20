@@ -81,12 +81,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = supportFullScreen;
-/* harmony export (immutable) */ __webpack_exports__["b"] = fullScreenStatus;
-/* harmony export (immutable) */ __webpack_exports__["f"] = requestFullscreen;
-/* harmony export (immutable) */ __webpack_exports__["c"] = exitFullscreen;
-/* harmony export (immutable) */ __webpack_exports__["e"] = onFullScreenEvent;
-/* harmony export (immutable) */ __webpack_exports__["d"] = offFullScreenEvent;
+/* harmony export (immutable) */ __webpack_exports__["b"] = supportFullScreen;
+/* harmony export (immutable) */ __webpack_exports__["c"] = fullScreenStatus;
+/* harmony export (immutable) */ __webpack_exports__["g"] = requestFullscreen;
+/* harmony export (immutable) */ __webpack_exports__["d"] = exitFullscreen;
+/* harmony export (immutable) */ __webpack_exports__["f"] = onFullScreenEvent;
+/* harmony export (immutable) */ __webpack_exports__["e"] = offFullScreenEvent;
+/* harmony export (immutable) */ __webpack_exports__["a"] = extend;
 function supportFullScreen() {
   var doc = document.documentElement;
 
@@ -143,6 +144,37 @@ function offFullScreenEvent(callback) {
   document.removeEventListener('webkitfullscreenchange', callback);
 }
 
+function extend() {
+  var extended = {};
+  var deep = false;
+  var i = 0;
+  var length = arguments.length;
+
+  if (Object.prototype.toString.call(arguments[0]) === '[object Boolean]') {
+    deep = arguments[0];
+    i++;
+  }
+
+  function merge(obj) {
+    for (var prop in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+        if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
+          extended[prop] = extend(true, extended[prop], obj[prop]);
+        } else {
+          extended[prop] = obj[prop];
+        }
+      }
+    }
+  }
+
+  for (; i < length; i++) {
+    var obj = arguments[i];
+    merge(obj);
+  }
+
+  return extended;
+}
+
 /***/ }),
 /* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -158,10 +190,10 @@ var defaults = {
   fullscreenClass: 'fullscreen'
 };
 
-var support = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* supportFullScreen */])();
+var support = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* supportFullScreen */])();
 
 function getState() {
-  return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fullScreenStatus */])();
+  return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* fullScreenStatus */])();
 }
 
 function toggle(target, options, force) {
@@ -185,7 +217,7 @@ function enter() {
   if (getState()) {
     return;
   }
-  options = Object.assign({}, defaults, options);
+  options = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* extend */])(true, {}, defaults, options);
 
   var el = target;
   var wrapper = void 0;
@@ -200,7 +232,7 @@ function enter() {
     wrapper.appendChild(el);
     wrapper.addEventListener('click', function (event) {
       if (event.target === this) {
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* exitFullscreen */])();
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* exitFullscreen */])();
       }
     });
   }
@@ -210,7 +242,7 @@ function enter() {
   function fullScreenCallback() {
     var isFullscreen = getState();
     if (!isFullscreen) {
-      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* offFullScreenEvent */])(fullScreenCallback);
+      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* offFullScreenEvent */])(fullScreenCallback);
 
       el.classList.remove(options.fullscreenClass);
 
@@ -225,8 +257,8 @@ function enter() {
     }
   }
 
-  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* onFullScreenEvent */])(fullScreenCallback);
-  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* requestFullscreen */])(options.wrap ? wrapper : el);
+  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* onFullScreenEvent */])(fullScreenCallback);
+  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* requestFullscreen */])(options.wrap ? wrapper : el);
 }
 
 function exit() {
@@ -236,7 +268,7 @@ function exit() {
   if (!getState()) {
     return;
   }
-  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* exitFullscreen */])();
+  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* exitFullscreen */])();
 }
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -289,6 +321,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__component_vue__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__component_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__component_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__service__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils__ = __webpack_require__(0);
+
 
 
 
@@ -297,7 +331,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     var opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     var name = opts.name || 'fullscreen';
-    Vue.component(name, Object.assign(__WEBPACK_IMPORTED_MODULE_0__component_vue___default.a, { name: name }));
+    Vue.component(name, __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__utils__["a" /* extend */])(__WEBPACK_IMPORTED_MODULE_0__component_vue___default.a, { name: name }));
     Vue.prototype['$' + name] = __WEBPACK_IMPORTED_MODULE_1__service__["a" /* default */];
   }
 });
@@ -351,7 +385,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   methods: {
     toggle: function toggle(value) {
       if (value === undefined) {
-        if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fullScreenStatus */])()) {
+        if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* fullScreenStatus */])()) {
           this.exit();
         } else {
           this.enter();
@@ -364,17 +398,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       if (!this.supportFullScreen) {
         return;
       }
-      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* onFullScreenEvent */])(this.fullScreenCallback);
-      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* requestFullscreen */])(this.$el);
+      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* onFullScreenEvent */])(this.fullScreenCallback);
+      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* requestFullscreen */])(this.$el);
     },
     exit: function exit() {
       if (!this.supportFullScreen) {
         return;
       }
-      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* exitFullscreen */])();
+      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* exitFullscreen */])();
     },
     getState: function getState() {
-      return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fullScreenStatus */])();
+      return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* fullScreenStatus */])();
     },
     shadeClick: function shadeClick(e) {
       if (e.target === this.$el) {
@@ -382,9 +416,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       }
     },
     fullScreenCallback: function fullScreenCallback() {
-      this.isFullscreen = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fullScreenStatus */])();
+      this.isFullscreen = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* fullScreenStatus */])();
       if (!this.isFullscreen) {
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* offFullScreenEvent */])(this.fullScreenCallback);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* offFullScreenEvent */])(this.fullScreenCallback);
       }
       this.$emit('change', this.isFullscreen);
       this.$emit('update:fullscreen', this.isFullscreen);
@@ -393,14 +427,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
   watch: {
     fullscreen: function fullscreen(value) {
-      if (value !== __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* fullScreenStatus */])()) {
+      if (value !== __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* fullScreenStatus */])()) {
         value ? this.enter() : this.exit();
       }
     }
   },
 
   created: function created() {
-    this.supportFullScreen = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* supportFullScreen */])();
+    this.supportFullScreen = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* supportFullScreen */])();
   }
 });
 
