@@ -5,6 +5,10 @@ A simple Vue.js component for fullscreen
 
 ## [Live demo](http://mirari.github.io/vue-fullscreen/)
 
+## Quick Example
+- [Usage with v-for](https://codepen.io/mirari/pen/LmJRxK)
+- [Usage with modal](https://codepen.io/mirari/pen/vjzXJN)
+
 ## [中文文档](http://mirari.cc/2017/08/14/%E5%85%A8%E5%B1%8F%E5%88%87%E6%8D%A2%E7%BB%84%E4%BB%B6vue-fullscreen/)
 
 ## Browser support
@@ -22,7 +26,7 @@ To use `vue-fullscreen`, simply import it, and call `Vue.use()` to install.
 ```html
 <template>
   <div id="app">
-    <fullscreen :fullscreen.sync="fullscreen">
+    <fullscreen ref="fullscreen" :fullscreen.sync="fullscreen">
       Content
     </fullscreen>
     <button type="button" @click="toggle" >Fullscreen</button>
@@ -35,7 +39,8 @@ To use `vue-fullscreen`, simply import it, and call `Vue.use()` to install.
   export default {
     methods: {
       toggle () {
-        this.fullscreen = !this.fullscreen
+        this.$refs['fullscreen'].toggle() // recommended
+        // this.fullscreen = !this.fullscreen // deprecated
       }
     },
     data() {
@@ -47,8 +52,9 @@ To use `vue-fullscreen`, simply import it, and call `Vue.use()` to install.
 </script>
 ```
 
-**Caution:** Because of the browser security function, you can only call these methods by a user gesture. (*e.g.* a click callback)
+**Caution:** Because of the browser security function, you can only call these methods by a user gesture(`click` or `keypress`).
 
+**Caution:** Since the prop watcher can not be a sync action now, the browser will intercept the subsequent operation of the callback. I recommend you to call the method directly by `refs` instead of changing the prop.
 
 ## Use as plugin
 In your vue component, You can use `this.$fullscreen` to get the instance.
