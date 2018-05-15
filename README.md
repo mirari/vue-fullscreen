@@ -26,9 +26,14 @@ To use `vue-fullscreen`, simply import it, and call `Vue.use()` to install.
 ```html
 <template>
   <div id="app">
-    <fullscreen ref="fullscreen" :fullscreen.sync="fullscreen">
+    <fullscreen ref="fullscreen" @change="fullscreenChange">
       Content
     </fullscreen>
+    <!--  deprecated
+      <fullscreen :fullscreen.sync="fullscreen">
+        Content
+      </fullscreen>
+    -->
     <button type="button" @click="toggle" >Fullscreen</button>
   </div>
 </template>
@@ -41,6 +46,9 @@ To use `vue-fullscreen`, simply import it, and call `Vue.use()` to install.
       toggle () {
         this.$refs['fullscreen'].toggle() // recommended
         // this.fullscreen = !this.fullscreen // deprecated
+      },
+      fullscreenChange (fullscreen) {
+        this.fullscreen = fullscreen
       }
     },
     data() {
@@ -54,7 +62,7 @@ To use `vue-fullscreen`, simply import it, and call `Vue.use()` to install.
 
 **Caution:** Because of the browser security function, you can only call these methods by a user gesture(`click` or `keypress`).
 
-**Caution:** Since the prop watcher can not be a sync action now, the browser will intercept the subsequent operation of the callback. I recommend you to call the method directly by `refs` instead of changing the prop.
+**Caution:** Since the prop watcher can not be a sync action now, the browser will intercept the subsequent operation of the callback. I recommend you to call the method directly by `refs` instead of changing the prop like the old version.
 
 ## Use as plugin
 In your vue component, You can use `this.$fullscreen` to get the instance.
@@ -185,7 +193,7 @@ The background style of wrapper, only available when fullscreen mode is on and `
 ```html
 <template>
   <div id="app">
-    <fullscreen ref="fullscreen" :fullscreen.sync="fullscreen">
+    <fullscreen ref="fullscreen" @change="fullscreenChange">
       Content
     </fullscreen>
     <button type="button" @click="toggle" >Fullscreen</button>
@@ -198,7 +206,9 @@ The background style of wrapper, only available when fullscreen mode is on and `
     methods: {
       toggle () {
         this.$refs['fullscreen'].toggle()
-        // this.fullscreen = !this.fullscreen
+      },
+      fullscreenChange (fullscreen) {
+        this.fullscreen = fullscreen
       }
     },
     data() {
@@ -244,30 +254,6 @@ get the fullscreen state.
 
 ### Props
 
-#### fullscreen
-
-- Type: `Boolean`
-- Default: `false`
-
-Use `.sync` to synchronize the parent's value. You can change it to toggle fullscreen mode too.
-
-**Caution:** Changing it may not work in Firefox and IE11, it may be that they handle async operation specially.
-
-But in Firefox you can try to add `babel-polyfill` to the `vendor` in `webpack` like this:
-```javascript
-module.exports = {
-  entry: {
-    app: './example/main.js',
-    vendor: ['babel-polyfill', 'vue']
-  },
-  ...
-}
-```
-Then it works, though I don't know why. ╮(╯▽╰)╭
-
-I have no idea how to fix it in IE11 yet.
-
-
 #### fullscreenClass
 
 - Type: `String`
@@ -297,7 +283,7 @@ If you need to avoid name conflict, you can import it like this:
 ```html
 <template>
   <div id="app">
-    <fs ref="fullscreen" :fullscreen.sync="fullscreen">
+    <fs ref="fullscreen">
       Content
     </fs>
     <div class="example">
