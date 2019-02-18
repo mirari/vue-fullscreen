@@ -402,7 +402,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* requestFullscreen */])(this.$el);
     },
     exit: function exit() {
-      if (!this.supportFullScreen) {
+      if (!this.supportFullScreen || !this.getState()) {
         return;
       }
       __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* exitFullscreen */])();
