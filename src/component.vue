@@ -65,7 +65,7 @@
         requestFullscreen(this.$el)
       },
       exit () {
-        if (!this.supportFullScreen) {
+        if (!this.supportFullScreen || !this.getState()) {
           return
         }
         exitFullscreen()
