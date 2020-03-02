@@ -28,8 +28,8 @@ export default {
 
   methods: {
     toggleFullScreen () {
-//      this.fullscreen = !this.fullscreen
-//      this.$refs['fullscreen'].toggle()
+      //      this.fullscreen = !this.fullscreen
+      //      this.$refs['fullscreen'].toggle()
 
       this.$fullscreen.toggle(this.$el.querySelector('.map-example'), {
         wrap: false,

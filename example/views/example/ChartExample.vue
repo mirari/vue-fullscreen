@@ -143,12 +143,12 @@ export default {
 
   methods: {
     toggleFullScreen () {
-//      console.log(this.$refs['fullscreen'].getState())
+      //    console.log(this.$refs['fullscreen'].getState())
       this.$refs['fullscreen'].toggle()
-//      this.fullscreen = !this.fullscreen
+      //    this.fullscreen = !this.fullscreen
     },
     fullscreenChange (fullscreen) {
-/*
+      /*
       chart.dispose()
       if (fullscreen) {
         chart = echarts.init($chart, 'dark')
