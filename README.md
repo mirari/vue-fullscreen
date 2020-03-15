@@ -150,6 +150,12 @@ get the fullscreen state.
 
 **Caution:** The action is asynchronous, you can not get the expected state immediately following the calling method.     
 
+#### isSupported()
+
+check browser support for the fullscreen API.
+
+- Type: `Boolean`
+
 
 ### Options
 

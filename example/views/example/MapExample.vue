@@ -2,7 +2,7 @@
   <div class="box">
     <div class="map-example" @change="fullscreenChange" :fullscreen.sync="fullscreen" ref="fullscreen">
       <div class="map-container"></div>
-      <button type="button" class="btn btn-default btn-map-fullscreen" @click="toggleFullScreen">
+      <button v-if="$fullscreen.isSupported()" type="button" class="btn btn-default btn-map-fullscreen" @click="toggleFullScreen">
         <i class="mdi" :class="[fullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen']"></i>
       </button>
     </div>
