@@ -21,6 +21,10 @@ function getState () {
   return fullScreenStatus()
 }
 
+function isSupported () {
+  return support
+}
+
 function toggle (target, options, force) {
   if (!support) {
     return
@@ -97,6 +101,7 @@ function exit () {
 
 export default {
   getState,
+  isSupported,
   toggle,
   enter,
   exit
