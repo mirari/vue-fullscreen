@@ -1,6 +1,6 @@
 {
   "name": "vue-fullscreen",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "A simple Vue.js component for fullscreen",
   "main": "dist/vue-fullscreen.min.js",
   "scripts": {
@@ -70,6 +70,7 @@
     "progress-bar-webpack-plugin": "^1.9.1",
     "sass-loader": "^6.0.3",
     "serve-favicon": "^2.4.1",
+    "shelljs": "^0.8.3",
     "style-loader": "^0.13.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
@@ -83,5 +84,7 @@
     "webpack-dev-middleware": "^1.9.0",
     "webpack-hot-middleware": "^2.14.0",
     "webpack-merge": "^4.0.0"
+  },
+  "dependencies": {
   }
 }

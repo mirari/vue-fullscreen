@@ -14,7 +14,7 @@ A simple Vue.js component for fullscreen
 ## Browser support
 [Full Screen API](http://caniuse.com/fullscreen)
 
-## Installation 
+## Installation
 Install from GitHub via NPM
 ```bash
 npm install vue-fullscreen
@@ -103,7 +103,7 @@ export default {
 
 
 
-### Methods
+### Methods & Attributes
 
 #### toggle([target, options, force])
 
@@ -148,9 +148,9 @@ get the fullscreen state.
 
 - Type: `Boolean`
 
-**Caution:** The action is asynchronous, you can not get the expected state immediately following the calling method.     
+**Caution:** The action is asynchronous, you can not get the expected state immediately following the calling method.
 
-#### isSupported()
+#### support
 
 check browser support for the fullscreen API.
 
