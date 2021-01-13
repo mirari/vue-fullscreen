@@ -185,6 +185,7 @@ function extend() {
 
 var defaults = {
   wrap: true,
+  exitOnClickWrapper: true,
   background: '#333',
   callback: function callback() {},
   fullscreenClass: 'fullscreen'
@@ -230,11 +231,13 @@ function enter() {
 
     el.parentNode.insertBefore(wrapper, el);
     wrapper.appendChild(el);
-    wrapper.addEventListener('click', function (event) {
-      if (event.target === this) {
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* exitFullscreen */])();
-      }
-    });
+    if (options.exitOnClickWrapper) {
+      wrapper.addEventListener('click', function (event) {
+        if (event.target === this) {
+          __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* exitFullscreen */])();
+        }
+      });
+    }
   }
 
   el.classList.add(options.fullscreenClass);
@@ -293,7 +296,7 @@ var Component = __webpack_require__(5)(
   /* cssModules */
   null
 )
-Component.options.__file = "D:\\Workspaces\\Git\\vue-fullscreen\\src\\component.vue"
+Component.options.__file = "D:\\Workspaces\\Web\\Git\\vue-fullscreen\\src\\component.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] component.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -350,6 +353,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
+    exitOnClickWrapper: {
+      type: Boolean,
+      default: true
+    },
     background: {
       type: String,
       default: '#333'
@@ -413,7 +420,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
     shadeClick: function shadeClick(e) {
       if (e.target === this.$el) {
-        this.exit();
+        if (this.exitOnClickWrapper) {
+          this.exit();
+        }
       }
     },
     fullScreenCallback: function fullScreenCallback() {
@@ -506,7 +515,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     style: (_vm.isFullscreen ? [_vm.wrapperStyle] : []),
     on: {
       "click": function($event) {
-        return _vm.shadeClick($event)
+        _vm.shadeClick($event)
       }
     }
   }, [_vm._t("default")], 2)

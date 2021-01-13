@@ -12,6 +12,10 @@
 
   export default {
     props: {
+      exitOnClickWrapper: {
+        type: Boolean,
+        default: true
+      },
       background: {
         type: String,
         default: '#333'
@@ -75,7 +79,9 @@
       },
       shadeClick (e) {
         if (e.target === this.$el) {
-          this.exit()
+          if (this.exitOnClickWrapper) {
+            this.exit()
+          }
         }
       },
       fullScreenCallback () {

@@ -10,6 +10,7 @@ import {
 
 const defaults = {
   wrap: true,
+  exitOnClickWrapper: true,
   background: '#333',
   callback: () => {},
   fullscreenClass: 'fullscreen'
@@ -53,11 +54,13 @@ function enter (target = document.body, options) {
 
     el.parentNode.insertBefore(wrapper, el)
     wrapper.appendChild(el)
-    wrapper.addEventListener('click', function (event) {
-      if (event.target === this) {
-        exitFullscreen()
-      }
-    })
+    if (options.exitOnClickWrapper) {
+      wrapper.addEventListener('click', function (event) {
+        if (event.target === this) {
+          exitFullscreen()
+        }
+      })
+    }
   }
 
   el.classList.add(options.fullscreenClass)

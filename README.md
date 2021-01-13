@@ -180,6 +180,13 @@ The class will be added to target element when fullscreen mode is on.
 
 If `true`, the target element will be wrapped up in a background `div`, and you can set the background color.
 
+### exitOnClickWrapper
+
+- Type: `Boolean`
+- Default: `true`
+
+If `true`, clicking wrapper will exit fullscreen.
+
 ### background
 
 - Type: `String`
@@ -260,7 +267,7 @@ get the fullscreen state.
 
 ### Props
 
-#### fullscreenClass
+#### fullscreen-class
 
 - Type: `String`
 - Default: `fullscreen`
@@ -273,6 +280,13 @@ The class will be added to the component when fullscreen mode is on.
 - Default: `#333`
 
 The background style of component, only available when fullscreen mode is on.
+
+#### exit-on-click-wrapper
+
+- Type: `Boolean`
+- Default: `true`
+
+If `true`, clicking wrapper will exit fullscreen.
 
 ### Events
 

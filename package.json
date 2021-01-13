@@ -1,6 +1,6 @@
 {
   "name": "vue-fullscreen",
-  "version": "2.1.6",
+  "version": "2.2.0",
   "description": "A simple Vue.js component for fullscreen",
   "main": "dist/vue-fullscreen.min.js",
   "scripts": {
