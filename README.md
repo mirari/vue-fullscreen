@@ -8,6 +8,7 @@ A simple Vue.js component for fullscreen
 ## Quick Example
 - [Usage with v-for](https://codepen.io/mirari/pen/LmJRxK)
 - [Usage with modal](https://codepen.io/mirari/pen/vjzXJN)
+- [Run in iPhone & Component properties](https://codepen.io/mirari/pen/VwmEaRX)
 
 ## [中文文档](http://mirari.cc/2017/08/14/%E5%85%A8%E5%B1%8F%E5%88%87%E6%8D%A2%E7%BB%84%E4%BB%B6vue-fullscreen/)
 
