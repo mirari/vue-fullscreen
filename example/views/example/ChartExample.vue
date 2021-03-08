@@ -1,8 +1,16 @@
 <template>
   <div class="box">
-    <fullscreen class="wrapper" @change="fullscreenChange" :fullscreen.sync="fullscreen" ref="fullscreen" background="#EEE">
+    <fullscreen
+      ref="fullscreen"
+      class="wrapper"
+      background="#C7EDCC"
+      :fullscreen.sync="fullscreen"
+      :page-only="pageOnly"
+      :exit-on-click-wrapper="exitOnClickWrapper"
+      @change="fullscreenChange"
+    >
       <div class="chart-container"></div>
-      <button v-if="$fullscreen.support" type="button" class="btn btn-default btn-map-fullscreen" @click="toggleFullScreen">
+      <button type="button" class="btn btn-default btn-map-fullscreen" @click="toggleFullScreen">
         <i class="mdi" :class="[fullscreen ? 'mdi-fullscreen-exit' : 'mdi-fullscreen']"></i>
       </button>
     </fullscreen>
@@ -134,6 +142,8 @@ export default {
 
   data () {
     return {
+      exitOnClickWrapper: false,
+      pageOnly: false,
       fullscreen: false
     }
   },
@@ -145,7 +155,8 @@ export default {
     toggleFullScreen () {
       //    console.log(this.$refs['fullscreen'].getState())
       this.$refs['fullscreen'].toggle()
-      //    this.fullscreen = !this.fullscreen
+      // The following script may not work on some browsers
+      // this.fullscreen = !this.fullscreen
     },
     fullscreenChange (fullscreen) {
       /*
@@ -157,7 +168,7 @@ export default {
         chart = echarts.init($chart)
         chart.setOption(option)
       }
-*/
+      */
       this.$nextTick(() => {
         chart.resize()
       })

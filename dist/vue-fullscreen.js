@@ -296,7 +296,7 @@ var Component = __webpack_require__(5)(
   /* cssModules */
   null
 )
-Component.options.__file = "D:\\Workspaces\\Web\\Git\\vue-fullscreen\\src\\component.vue"
+Component.options.__file = "/Users/mirari/works/web/vue-fullscreen/src/component.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] component.vue: functional components are not supported with templates, they should use render functions.")}
 
@@ -368,32 +368,58 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     fullscreen: {
       type: Boolean,
       default: false
+    },
+    pageOnly: {
+      type: Boolean,
+      default: false
     }
   },
 
   data: function data() {
     return {
-      supportFullScreen: false,
+      support: false,
       isFullscreen: false
     };
   },
 
 
   computed: {
+    isPageOnly: function isPageOnly() {
+      return this.pageOnly || !this.support;
+    },
+    wrapperClass: function wrapperClass() {
+      var wrapperClass = [];
+      if (this.isFullscreen) {
+        wrapperClass.push(this.fullscreenClass);
+      }
+      return wrapperClass;
+    },
     wrapperStyle: function wrapperStyle() {
-      return {
-        'background': this.background,
-        'overflow-y': 'auto',
-        'width': '100%',
-        'height': '100%'
-      };
+      var wrapperStyle = {};
+      if (this.isFullscreen) {
+        wrapperStyle = {
+          'background': this.background,
+          'overflow-y': 'auto',
+          'width': '100%',
+          'height': '100%'
+        };
+        if (this.isPageOnly) {
+          wrapperStyle['position'] = 'fixed !important';
+          wrapperStyle['z-index'] = '100000 !important';
+          wrapperStyle['left'] = '0';
+          wrapperStyle['top'] = '0';
+          wrapperStyle['width'] = '100% !important';
+          wrapperStyle['height'] = '100% !important';
+        }
+      }
+      return wrapperStyle;
     }
   },
 
   methods: {
     toggle: function toggle(value) {
       if (value === undefined) {
-        if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* fullScreenStatus */])()) {
+        if (this.getState()) {
           this.exit();
         } else {
           this.enter();
@@ -403,19 +429,29 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       }
     },
     enter: function enter() {
-      if (!this.supportFullScreen) {
-        return;
+      if (this.isPageOnly) {
+        this.isFullscreen = true;
+        this.onChangeFullScreen();
+      } else {
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* onFullScreenEvent */])(this.fullScreenCallback);
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* requestFullscreen */])(this.$el);
       }
-      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* onFullScreenEvent */])(this.fullScreenCallback);
-      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["g" /* requestFullscreen */])(this.$el);
     },
     exit: function exit() {
-      if (!this.supportFullScreen || !this.getState()) {
+      if (!this.getState()) {
         return;
       }
-      __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* exitFullscreen */])();
+      if (this.isPageOnly) {
+        this.isFullscreen = false;
+        this.onChangeFullScreen();
+      } else {
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* exitFullscreen */])();
+      }
     },
     getState: function getState() {
+      if (this.isPageOnly) {
+        return this.isFullscreen;
+      }
       return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* fullScreenStatus */])();
     },
     shadeClick: function shadeClick(e) {
@@ -430,6 +466,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       if (!this.isFullscreen) {
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* offFullScreenEvent */])(this.fullScreenCallback);
       }
+      this.onChangeFullScreen();
+    },
+    onChangeFullScreen: function onChangeFullScreen() {
       this.$emit('change', this.isFullscreen);
       this.$emit('update:fullscreen', this.isFullscreen);
     }
@@ -444,7 +483,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   },
 
   created: function created() {
-    this.supportFullScreen = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* supportFullScreen */])();
+    this.support = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* supportFullScreen */])();
   }
 });
 
@@ -511,11 +550,11 @@ module.exports = function normalizeComponent (
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
-    class: _vm.isFullscreen ? [_vm.fullscreenClass] : [],
-    style: (_vm.isFullscreen ? [_vm.wrapperStyle] : []),
+    class: _vm.wrapperClass,
+    style: (_vm.wrapperStyle),
     on: {
       "click": function($event) {
-        _vm.shadeClick($event)
+        return _vm.shadeClick($event)
       }
     }
   }, [_vm._t("default")], 2)

@@ -288,6 +288,15 @@ The background style of component, only available when fullscreen mode is on.
 
 If `true`, clicking wrapper will exit fullscreen.
 
+#### page-only
+
+- Type: `Boolean`
+- Default: `false`
+
+If `true`, only fill the page with current element.
+
+**Note:** If the browser does not support full-screen Api, this option will be automatically enabled.
+
 ### Events
 
 #### change
