@@ -220,6 +220,10 @@ function enter() {
   }
   options = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* extend */])(true, {}, defaults, options);
 
+  if (target === document.body) {
+    options.wrap = false;
+  }
+
   var el = target;
   var wrapper = void 0;
   if (options.wrap) {
@@ -296,7 +300,7 @@ var Component = __webpack_require__(5)(
   /* cssModules */
   null
 )
-Component.options.__file = "/Users/mirari/works/web/vue-fullscreen/src/component.vue"
+Component.options.__file = "D:\\Workspaces\\Git\\vue-fullscreen\\src\\component.vue"
 if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
 if (Component.options.functional) {console.error("[vue-loader] component.vue: functional components are not supported with templates, they should use render functions.")}
 

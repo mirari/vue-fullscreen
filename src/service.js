@@ -43,6 +43,10 @@ function enter (target = document.body, options) {
   }
   options = extend(true, {}, defaults, options)
 
+  if (target === document.body) {
+    options.wrap = false
+  }
+
   const el = target
   let wrapper
   if (options.wrap) {
