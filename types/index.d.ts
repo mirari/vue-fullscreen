@@ -9,11 +9,11 @@ type VueFullScreenOptions = {
 };
 declare class VueFullscreen {
   toggle(
-    target: Element,
+    target?: Element,
     options?: VueFullScreenOptions,
     force?: boolean | undefined
   ): void;
-  enter(target: Element, options?: VueFullScreenOptions): void;
+  enter(target?: Element, options?: VueFullScreenOptions): void;
   exit(): void;
   getState(): boolean;
   support: boolean;
