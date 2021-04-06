@@ -3,6 +3,7 @@
   "version": "2.3.2",
   "description": "A simple Vue.js component for fullscreen",
   "main": "dist/vue-fullscreen.min.js",
+  "types": "src/index.d.ts",
   "scripts": {
     "dev": "cross-env NODE_ENV=development node build/dev-server.js",
     "release": "webpack --progress --hide-modules --config  ./build/webpack.release.js && cross-env NODE_ENV=production webpack --progress --hide-modules --config  ./build/webpack.release.min.js",
