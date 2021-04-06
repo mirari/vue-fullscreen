@@ -19,7 +19,16 @@ declare class VueFullscreen {
   support: boolean;
 }
 
-export declare function install(vue: typeof Vue, url: string): void;
+declare namespace VueFullscreenPlugin {
+  export interface InstallationOptions {
+    name: string;
+  }
+
+  export function install(vue: typeof Vue, options?: InstallationOptions): void;
+}
+
+export default VueFullscreenPlugin;
+
 declare module "vue/types/vue" {
   interface Vue {
     $fullscreen: VueFullscreen;
