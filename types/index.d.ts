@@ -1,3 +1,5 @@
+import Vue from "vue";
+
 type VueFullScreenOptions = {
   callback?: (fullscreen: boolean) => void;
   fullscreenClass?: string;
@@ -5,8 +7,7 @@ type VueFullScreenOptions = {
   exitOnClickWrapper?: boolean;
   background?: string;
 };
-
-interface VueFullscreen {
+declare class VueFullscreen {
   toggle(
     target: Element,
     options?: VueFullScreenOptions,
@@ -18,4 +19,9 @@ interface VueFullscreen {
   support: boolean;
 }
 
-export default VueFullscreen;
+export declare function install(vue: typeof Vue, url: string): void;
+declare module "vue/types/vue" {
+  interface Vue {
+    $fullscreen: VueFullscreen;
+  }
+}
