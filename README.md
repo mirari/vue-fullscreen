@@ -214,9 +214,10 @@ The background style of wrapper, only available when fullscreen mode is on and `
   </div>
 </template>
 <script>
-  import Fullscreen from "vue-fullscreen/src/component.vue"
+  import fullscreen from 'vue-fullscreen'
+  import Vue from 'vue'
+  Vue.use(fullscreen)
   export default {
-    components: {Fullscreen},
     methods: {
       toggle () {
         this.$refs['fullscreen'].toggle()
