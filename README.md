@@ -1,7 +1,16 @@
 # vue-fullscreen
 A simple Vue.js component for fullscreen
 
-[![npm version](https://badge.fury.io/js/vue-fullscreen.svg)](https://badge.fury.io/js/vue-fullscreen)
+[![npm version](https://img.shields.io/npm/v/vue-fullscreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
+[![language](https://img.shields.io/badge/language-Vue2-brightgreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
+
+[![npm version](https://img.shields.io/npm/v/vue-fullscreen/next.svg)](https://www.npmjs.com/package/vue-fullscreen)
+[![language](https://img.shields.io/badge/language-Vue3-brightgreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
+
+[![npm download](https://img.shields.io/npm/dw/vue-fullscreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://mit-license.org/)
+
+## [vue-fullscreen for vue2](https://github.com/mirari/vue-fullscreen/tree/v3)
 
 ## [Live demo](http://mirari.github.io/vue-fullscreen/)
 
@@ -13,9 +22,11 @@ A simple Vue.js component for fullscreen
 ## [中文文档](http://mirari.cc/2017/08/14/%E5%85%A8%E5%B1%8F%E5%88%87%E6%8D%A2%E7%BB%84%E4%BB%B6vue-fullscreen/)
 
 ## Browser support
+
 [Full Screen API](http://caniuse.com/fullscreen)
 
 ## Installation
+
 Install from GitHub via NPM
 ```bash
 npm install vue-fullscreen
@@ -66,6 +77,7 @@ To use `vue-fullscreen`, simply import it, and call `Vue.use()` to install.
 **Caution:** Since the prop watcher can not be a sync action now, the browser will intercept the subsequent operation of the callback. I recommend you to call the method directly by `refs` instead of changing the prop like the old version.
 
 ## Use as plugin
+
 In your vue component, You can use `this.$fullscreen` to get the instance.
 
 ```html
@@ -101,7 +113,6 @@ export default {
 }
 </script>
 ```
-
 
 
 ### Methods & Attributes
