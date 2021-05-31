@@ -10,7 +10,7 @@ A simple Vue.js component for fullscreen
 [![npm download](https://img.shields.io/npm/dw/vue-fullscreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
 [![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://mit-license.org/)
 
-## [vue-fullscreen for vue2](https://github.com/mirari/vue-fullscreen/tree/v3)
+## [vue-fullscreen for vue3](https://github.com/mirari/vue-fullscreen/tree/v3)
 
 ## [Live demo](http://mirari.github.io/vue-fullscreen/)
 
