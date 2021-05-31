@@ -3,7 +3,7 @@
     <div
       ref="wrapper"
       v-bind="$attrs"
-      :style="isFullscreen && wrapperStyle"
+      :style="isFullscreen ? wrapperStyle : undefined"
       :class="{[fullscreenClass]: isFullscreen}"
       @click="shadeClick($event)"
       @keyup="exit"
@@ -55,14 +55,14 @@ export default defineComponent({
       isEnabled: sf.isEnabled,
     })
 
-    const wrapperStyle = {
+    const wrapperStyle = `{
       'position': 'fixed !important',
       'z-index': '100000 !important',
       'left': '0 !important',
       'top': '0 !important',
       'width': '100% !important',
       'height': '100% !important',
-    }
+    }`
 
     const isPageOnly = computed(() => {
       // 如果不支持浏览器全屏，改用网页全屏
@@ -83,7 +83,7 @@ export default defineComponent({
       onChangeFullScreen()
     }
     // 按键回调
-    function keypressCallback(e) {
+    function keypressCallback(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         exit()
       }
@@ -131,7 +131,7 @@ export default defineComponent({
       }
     }
 
-    function shadeClick(e) {
+    function shadeClick(e: Event) {
       if (e.target === wrapper.value) {
         if (props.exitOnClickWrapper) {
           exit()

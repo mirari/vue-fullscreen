@@ -11,8 +11,8 @@
       <button type="button" class="button" @click="toggle">
         {{ fullscreen ? 'exit fullscreen' : 'request fullscreen' }}
       </button>
-      <img v-show="!fullscreen" src="//picsum.photos/640/360">
-      <img v-show="fullscreen" src="//picsum.photos/1280/720">
+      <img v-show="!fullscreen" :src="'//picsum.photos/640/360'">
+      <img v-show="fullscreen" :src="'//picsum.photos/1280/720'">
     </div>
   </div>
 </template>
