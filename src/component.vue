@@ -21,7 +21,7 @@ import {
 } from 'vue'
 import screenfull, { Screenfull } from 'screenfull'
 
-const sf = screenfull
+const sf = screenfull as Screenfull
 
 export default defineComponent({
   props: {

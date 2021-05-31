@@ -1,7 +1,7 @@
 import screenfull, { Screenfull } from 'screenfull'
 import { assign } from './util'
 
-const sf = <Screenfull>screenfull
+const sf = screenfull as Screenfull
 
 interface ApiOptions {
   callback?: (fullscreen: boolean) => void
