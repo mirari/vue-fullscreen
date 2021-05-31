@@ -1,0 +1,45 @@
+<template>
+  <div>
+    <h1 class="title">
+      Demo
+    </h1>
+    <hr />
+    <div style="margin-bottom: 6em">
+      <h2 class="title is-4">
+        Component
+      </h2>
+      <p class="subtitle">
+        <a
+          href="https://github.com/mirari/vue-fullscreen/blob/next/example/views/example/ComponentExample.vue"
+          target="_blank"
+        >Source</a>
+      </p>
+      <component-example />
+    </div>
+    <div>
+      <h2 class="title is-4">
+        Api
+      </h2>
+      <p class="subtitle">
+        <a
+          href="https://github.com/mirari/vue-fullscreen/blob/next/example/views/example/ApiExample.vue"
+          target="_blank"
+        >Source</a>
+      </p>
+      <api-example />
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+import ComponentExample from './ComponentExample.vue'
+import ApiExample from './ApiExample.vue'
+
+export default defineComponent({
+  components: {
+    ComponentExample,
+    ApiExample,
+  },
+})
+</script>
