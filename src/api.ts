@@ -61,14 +61,15 @@ function resetElement(api: VueFullscreenApi) {
     // 移除全屏class
     target.classList.remove(api.options.fullscreenClass)
 
-    if (api.options.teleport) {
-      if (parentNode) {
-        // 还原位置并移除样式
+    if (api.options.teleport || api.options.pageOnly) {
+      if (api.options.teleport && parentNode) {
+        // 还原位置
         parentNode.insertBefore(target, token)
         parentNode.removeChild(token)
-        if (target.__styleCache) {
-          setStyle(target!, target.__styleCache)
-        }
+      }
+      // 移除样式
+      if (target.__styleCache) {
+        setStyle(target, target.__styleCache)
       }
     }
   }

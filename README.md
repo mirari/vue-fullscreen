@@ -2,7 +2,6 @@
 
 A simple Vue.js component for fullscreen, based on [screenfull.js](https://github.com/sindresorhus/screenfull.js)
 
-
 [![npm version](https://img.shields.io/npm/v/vue-fullscreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
 [![language](https://img.shields.io/badge/language-Vue2-brightgreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
 
@@ -348,6 +347,7 @@ This event fires when the fullscreen mode changed.
 - Default: `fullscreen`
 
 If you need to avoid name conflict, you can import it like this:
+
 ```ts
 import { createApp } from 'vue'
 import VueFullscreen from 'vue-fullscreen'
