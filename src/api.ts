@@ -7,12 +7,14 @@ interface ApiOptions {
   callback?: (fullscreen: boolean) => void
   fullscreenClass?: string
   teleport?: boolean
+  pageOnly?: boolean
 }
 
 class VueFullscreenApiOptions {
   callback?: (fullscreen: boolean) => void
   fullscreenClass = 'fullscreen'
   teleport = false
+  pageOnly = false
   constructor(options?: ApiOptions) {
     if (options) {
       assign(this, options)
@@ -21,125 +23,174 @@ class VueFullscreenApiOptions {
 }
 
 interface VueFullscreenApi {
-  /**
-   * Attempts to toggle fullscreen using the target element
-   *
-   * @param target - Target element to enter fullscreen, defaults to `document.body`
-   * @param options - The fullscreen options
-   * @param force - `true` to force enter, `false` to exit fullscreen
-   */
+  options: VueFullscreenApiOptions
+  element: Element | null
   toggle(
     target?: Element,
     options?: ApiOptions,
     force?: boolean | undefined
   ): Promise<void>
-
-  /**
-   * Attempts to enter fullscreen using the target element
-   *
-   * @param target - Target element to enter fullscreen, defaults to `document.body`
-   * @param options - The fullscreen options
-   */
   request(target?: Element, options?: ApiOptions): Promise<void>
-  /**
-   * Exits fullscreen
-   */
   exit(): Promise<void>
-  /**
-   * Gets the fullscreen state
-   */
   isFullscreen: boolean
-  /**
-   * Check browser support for the fullscreen API
-   */
   isEnabled: boolean
 }
 
+interface FullscreenStyle {
+  position: string
+  left: string
+  top: string
+  width: string
+  height: string
+}
+
+let token: Comment
+let parentNode: (Node & ParentNode) | null
+
+function setStyle(element: Element, style: FullscreenStyle) {
+  element.style.position = style.position
+  element.style.left = style.left
+  element.style.top = style.top
+  element.style.width = style.width
+  element.style.height = style.height
+}
+
+function resetElement(api: VueFullscreenApi) {
+  const target = api.element
+  if (target) {
+    // 移除全屏class
+    target.classList.remove(api.options.fullscreenClass)
+
+    if (api.options.teleport) {
+      if (parentNode) {
+        // 还原位置并移除样式
+        parentNode.insertBefore(target, token)
+        parentNode.removeChild(token)
+        if (target.__styleCache) {
+          setStyle(target!, target.__styleCache)
+        }
+      }
+    }
+  }
+}
+
 const api: VueFullscreenApi = {
+  options: new VueFullscreenApiOptions(),
+  element: null,
   isFullscreen: false,
-  isEnabled: true,
+  isEnabled: sf.isEnabled,
   toggle(target?: Element,
     options?: ApiOptions,
     force?: boolean | undefined) {
     if (force === undefined) {
       // 如果已经是全屏状态，则退出
-      return !sf.isFullscreen ? this.request(target, options) : this.exit()
+      return !this.isFullscreen ? this.request(target, options) : this.exit()
     }
     else {
       return force ? this.request(target, options) : this.exit()
     }
   },
   request(target?: Element, options?: ApiOptions) {
-    if (sf.isFullscreen) {
+    if (this.isFullscreen) {
       return Promise.resolve()
     }
+    // 默认全屏对象为body
     if (!target) {
       target = document.body
     }
-    const currentOptions = new VueFullscreenApiOptions(options)
+    this.options = new VueFullscreenApiOptions(options)
 
+    // body不可teleport
     if (target === document.body) {
-      currentOptions.teleport = false
+      this.options.teleport = false
     }
-
+    // 不支持全屏api则自动启用网页全屏
+    if (!sf.isEnabled) {
+      this.options.pageOnly = true
+    }
     // 添加全屏class
-    target.classList.add(currentOptions.fullscreenClass)
-
-    let token: Comment
-    const parentNode = target.parentNode
-    if (currentOptions.teleport) {
-      token = document.createComment('fullscreen-token')
-      parentNode!.insertBefore(token, target)
-      document.body.appendChild(target)
+    target.classList.add(this.options.fullscreenClass)
+    // teleport或者网页全屏时，为目标元素添加全屏样式
+    if (this.options.teleport || this.options.pageOnly) {
+      const { position, left, top, width, height } = target.style
+      target.__styleCache = { position, left, top, width, height }
+      setStyle(target, {
+        position: 'fixed',
+        left: '0',
+        top: '0',
+        width: '100%',
+        height: '100%',
+      })
     }
-
-    // 全屏api事件回调
-    const fullScreenCallback = () => {
-      if (!sf.isFullscreen) {
-        // 退出全屏时解绑回调
-        sf.off('change', fullScreenCallback)
-
-        target?.classList.remove(currentOptions.fullscreenClass)
-
-        if (currentOptions.teleport) {
-          parentNode!.insertBefore(target!, token)
-          parentNode!.removeChild(token)
+    // teleport：将目标元素挪到body下，并在原地留一个标记用于还原
+    if (this.options.teleport) {
+      parentNode = target.parentNode
+      if (parentNode) {
+        token = document.createComment('fullscreen-token')
+        parentNode.insertBefore(token, target)
+        document.body.appendChild(target)
+      }
+    }
+    if (this.options.pageOnly) {
+      // 网页全屏模式
+      // 按键回调
+      const keypressCallback = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          document.removeEventListener('keyup', keypressCallback)
+          this.exit()
         }
       }
-      if (currentOptions.callback) {
-        currentOptions.callback(sf.isFullscreen)
+      this.isFullscreen = true
+      this.element = target
+      document.removeEventListener('keyup', keypressCallback)
+      document.addEventListener('keyup', keypressCallback)
+      if (this.options.callback) {
+        this.options.callback(this.isFullscreen)
       }
-    }
-    sf.on('change', fullScreenCallback)
-
-    return sf.request(target)
-  },
-  exit() {
-    if (!sf.isFullscreen) {
       return Promise.resolve()
     }
-    return sf.exit()
+    else {
+      // 全屏api模式
+      // 全屏api事件回调
+      const fullScreenCallback = () => {
+        if (!sf.isFullscreen) {
+          // 退出全屏时解绑回调
+          sf.off('change', fullScreenCallback)
+          resetElement(this)
+        }
+        this.isFullscreen = sf.isFullscreen
+        if (!this.options.teleport) {
+          this.element = sf.element
+        }
+        else {
+          this.element = target || null
+        }
+        if (this.options.callback) {
+          this.options.callback(sf.isFullscreen)
+        }
+      }
+      sf.on('change', fullScreenCallback)
+
+      return sf.request(this.options.teleport ? document.body : target)
+    }
+  },
+  exit() {
+    if (!this.isFullscreen) {
+      return Promise.resolve()
+    }
+    if (this.options.pageOnly) {
+      resetElement(this)
+      this.isFullscreen = false
+      this.element = null
+      if (this.options.callback) {
+        this.options.callback(this.isFullscreen)
+      }
+      return Promise.resolve()
+    }
+    else {
+      return sf.exit()
+    }
   },
 }
-
-Object.defineProperties(api, {
-  isFullscreen: {
-    get() {
-      return sf.isFullscreen
-    },
-  },
-  element: {
-    enumerable: true,
-    get() {
-      return sf.element
-    },
-  },
-  isEnabled: {
-    enumerable: true,
-    get() {
-      return sf.isEnabled
-    },
-  },
-})
 
 export default api

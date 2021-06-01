@@ -45,10 +45,6 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    zIndex: {
-      type: Number,
-      default: 10,
-    },
   },
   emits: ['change', 'update:fullscreen'],
   setup(props, { emit }) {
@@ -60,14 +56,13 @@ export default defineComponent({
     })
 
     const wrapperStyle = computed(() => {
-      return state.isFullscreen
+      return props.teleport && state.isFullscreen
         ? {
-          'position': 'fixed',
-          'z-index': props.zIndex,
-          'left': '0',
-          'top': '0',
-          'width': '100%',
-          'height': '100%',
+          position: 'fixed',
+          left: '0',
+          top: '0',
+          width: '100%',
+          height: '100%',
         } as CSSProperties
         : undefined
     })
@@ -120,6 +115,7 @@ export default defineComponent({
         document.addEventListener('keyup', keypressCallback)
       }
       else {
+        sf.off('change', fullScreenCallback)
         sf.on('change', fullScreenCallback)
         sf.request(props.teleport ? document.body : wrapper.value)
       }

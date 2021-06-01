@@ -11,6 +11,7 @@ declare namespace VueFullscreen {
     callback?: (fullscreen: boolean) => void
     fullscreenClass?: string
     teleport?: boolean
+    pageOnly?: boolean
   }
 
   export interface VueFullscreenApi {

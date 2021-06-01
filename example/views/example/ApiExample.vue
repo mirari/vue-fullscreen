@@ -2,6 +2,13 @@
   <div ref="root">
     <label class="checkbox">
       <input
+        v-model="pageOnly"
+        type="checkbox"
+        name="button"
+      > pageOnly
+    </label>
+    <label class="checkbox">
+      <input
         v-model="teleport"
         type="checkbox"
         name="button"
@@ -11,8 +18,8 @@
       <button type="button" class="button" @click="toggle">
         {{ fullscreen ? 'exit fullscreen' : 'request fullscreen' }}
       </button>
-      <img v-show="!fullscreen" :src="'//picsum.photos/640/360'">
-      <img v-show="fullscreen" :src="'//picsum.photos/1280/720'">
+      <img v-show="!fullscreen" :src="'//picsum.photos/640/360?random=2'">
+      <img v-show="fullscreen" :src="'//picsum.photos/1280/720?random=2'">
     </div>
   </div>
 </template>
@@ -33,12 +40,16 @@ export default defineComponent({
     const state = reactive({
       fullscreen: false,
       teleport: true,
+      pageOnly: true,
     })
     async function toggle() {
       await fullscreen.toggle(root.value.querySelector('.fullscreen-wrapper'), {
         teleport: state.teleport,
+        pageOnly: state.pageOnly,
         callback: (isFullscreen) => {
           state.fullscreen = isFullscreen
+          console.log(fullscreen.element)
+          console.log(fullscreen.isFullscreen)
         },
       })
       state.fullscreen = fullscreen.isFullscreen

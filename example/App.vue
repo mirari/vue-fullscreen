@@ -68,3 +68,9 @@ export default defineComponent({
   },
 })
 </script>
+<style lang="scss">
+  .fullscreen {
+    z-index: 10000;
+    background: cyan;
+  }
+</style>
