@@ -327,13 +327,14 @@ If you need to avoid name conflict, you can import it like this:
 ```html
 <template>
   <div id="app">
-    <fs ref="fullscreen">
-      Content
+    <fs :fullscreen.sync="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
+      content
     </fs>
-    <div class="example">
-      Content
-    </div>
     <button type="button" @click="toggle" >Fullscreen</button>
+    <div class="fullscreen-wrapper">
+      content
+    </div>
+    <button type="button" @click="toggleApi" >FullscreenApi</button>
   </div>
 </template>
 <script>
@@ -343,19 +344,22 @@ Vue.use(Fullscreen, {name: 'fs'})
 export default {
   methods: {
     toggle () {
-      this.$refs['fullscreen'].toggle()
-      this.$fs.toggle(this.$el.querySelector('.example'), {
-        wrap: false,
-        callback: this.fullscreenChange
+      this.fullscreen = !this.fullscreen
+    },
+    toggleApi() {
+      this.$fs.toggle(this.$el.querySelector('.fullscreen-wrapper'), {
+        teleport: this.teleport,
+        callback: (isFullscreen) => {
+          this.fullscreen = isFullscreen
+        },
       })
     },
-    fullscreenChange (fullscreen) {
-      this.fullscreen = fullscreen
-    }
   },
   data() {
     return {
-      fullscreen: false
+      fullscreen: false,
+      teleport: true,
+      pageOnly: false,
     }
   }
 }
