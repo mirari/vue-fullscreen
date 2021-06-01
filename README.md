@@ -244,7 +244,7 @@ You can simply import the component and register it locally.
 ```html
 <template>
   <div id="app">
-    <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
+    <fullscreen :fullscreen.sync="fullscreen" :teleport="teleport" :page-only="pageOnly" >
       Content
     </fullscreen>
     <button type="button" @click="toggle" >Fullscreen</button>
