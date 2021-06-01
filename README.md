@@ -1,5 +1,6 @@
 # vue-fullscreen
-A simple Vue.js component for fullscreen
+
+A simple Vue.js component for fullscreen.
 
 [![npm version](https://img.shields.io/npm/v/vue-fullscreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
 [![language](https://img.shields.io/badge/language-Vue2-brightgreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
@@ -318,7 +319,13 @@ If `true`, only fill the page with current element.
 
 This event fires when the fullscreen mode changed.
 
-## No conflict
+
+## Plugin options
+
+### name
+
+- Type: `String`
+- Default: `fullscreen`
 
 If you need to avoid name conflict, you can import it like this:
 
