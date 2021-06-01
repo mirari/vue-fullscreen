@@ -1,6 +1,6 @@
 # vue-fullscreen
 
-A simple Vue.js component for fullscreen.
+A simple Vue.js component for fullscreen, based on [screenfull.js](https://github.com/sindresorhus/screenfull.js)
 
 [![npm version](https://img.shields.io/npm/v/vue-fullscreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
 [![language](https://img.shields.io/badge/language-Vue2-brightgreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
@@ -16,6 +16,7 @@ A simple Vue.js component for fullscreen.
 ## [Live demo](http://mirari.github.io/vue-fullscreen/)
 
 ## Quick Example
+
 - [Usage with v-for](https://codepen.io/mirari/pen/LmJRxK)
 - [Usage with modal](https://codepen.io/mirari/pen/vjzXJN)
 - [Run in iPhone & Component properties](https://codepen.io/mirari/pen/VwmEaRX)
@@ -180,7 +181,7 @@ enter the fullscreen mode.
 exit the fullscreen mode.
 
 
-#### getState()
+#### isFullscreen
 
 get the fullscreen state.
 
