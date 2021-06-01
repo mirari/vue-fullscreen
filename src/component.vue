@@ -85,6 +85,16 @@ export default {
         sf.on('change', this.fullScreenCallback)
         sf.request(this.teleport ? document.body : this.$el)
       }
+      if (this.teleport) {
+        // teleport：将目标元素挪到body下，并在原地留一个标记用于还原
+        if (this.$el.parentNode === document.body) {
+          return
+        }
+        this.__parentNode = this.$el.parentNode
+        this.__token = document.createComment('fullscreen-token')
+        this.__parentNode.insertBefore(this.__token, this.$el)
+        document.body.appendChild(this.$el)
+      }
     },
     exit () {
       if (!this.isFullscreen) {
@@ -121,6 +131,13 @@ export default {
     },
     // isFullscreen变化时，上报事件
     onChangeFullScreen () {
+      if (!this.isFullscreen) {
+        if (this.teleport && this.__parentNode) {
+          // 还原位置
+          this.__parentNode.insertBefore(this.$el, this.__token)
+          this.__parentNode.removeChild(this.__token)
+        }
+      }
       this.$emit('change', this.isFullscreen)
       this.$emit('update:fullscreen', this.isFullscreen)
     }
