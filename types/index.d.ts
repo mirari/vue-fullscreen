@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import type screenfull from 'screenfull'
+import type { Screenfull as ScreenfullType } from 'screenfull'
 import type { Component } from 'vue'
 
 type VueFullScreenOptions = {
@@ -8,7 +8,7 @@ type VueFullScreenOptions = {
   teleport?: boolean;
   pageOnly?: boolean;
 };
-declare class VueFullscreen {
+declare class VueFullscreenApi {
   /**
    * Attempts to toggle fullscreen using the target element
    *
@@ -42,22 +42,26 @@ declare class VueFullscreen {
   isEnabled: boolean;
 }
 
-declare namespace VueFullscreenPlugin {
+declare namespace VueFullscreen {
   export interface InstallationOptions {
     name: string;
   }
 
-  export function install(vue: Vue, options?: InstallationOptions): void;
+  export function install(vue: typeof Vue, options?: InstallationOptions): void;
 }
-
-export default VueFullscreenPlugin;
-
-export type Screenfull = screenfull.Screenfull
-export type api = VueFullScreenOptions
-export type component = Component
 
 declare module "vue/types/vue" {
   interface Vue {
-    $fullscreen: VueFullscreen;
+    $fullscreen: VueFullscreenApi;
   }
 }
+
+export type screenfull = ScreenfullType
+
+export type api = VueFullScreenOptions
+
+export type component = Component
+
+export default VueFullscreen;
+
+

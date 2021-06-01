@@ -39,7 +39,7 @@ export default {
   data () {
     return {
       isFullscreen: false,
-      isEnabled: sf.isEnabled
+      isEnabled: false
     }
   },
 
