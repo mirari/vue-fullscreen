@@ -2,5 +2,6 @@
 node_modules
 npm-debug.log
 .idea
+dist
 example-dist
 .vue-fullscreen.iml
