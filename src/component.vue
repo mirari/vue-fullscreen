@@ -3,7 +3,7 @@
     <div
       ref="wrapper"
       v-bind="$attrs"
-      :style="isFullscreen ? wrapperStyle : undefined"
+      :style="wrapperStyle"
       :class="{[fullscreenClass]: isFullscreen}"
       @click="shadeClick($event)"
       @keyup="exit"
@@ -17,7 +17,7 @@ import {
   ref,
   computed,
   watch,
-  defineComponent, toRefs, reactive,
+  defineComponent, toRefs, reactive, CSSProperties,
 } from 'vue'
 import screenfull, { Screenfull } from 'screenfull'
 
@@ -45,6 +45,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    zIndex: {
+      type: Number,
+      default: 10,
+    },
   },
   emits: ['change', 'update:fullscreen'],
   setup(props, { emit }) {
@@ -55,14 +59,18 @@ export default defineComponent({
       isEnabled: sf.isEnabled,
     })
 
-    const wrapperStyle = `{
-      'position': 'fixed !important',
-      'z-index': '100000 !important',
-      'left': '0 !important',
-      'top': '0 !important',
-      'width': '100% !important',
-      'height': '100% !important',
-    }`
+    const wrapperStyle = computed(() => {
+      return state.isFullscreen
+        ? {
+          'position': 'fixed',
+          'z-index': props.zIndex,
+          'left': '0',
+          'top': '0',
+          'width': '100%',
+          'height': '100%',
+        } as CSSProperties
+        : undefined
+    })
 
     const isPageOnly = computed(() => {
       // 如果不支持浏览器全屏，改用网页全屏
@@ -113,7 +121,7 @@ export default defineComponent({
       }
       else {
         sf.on('change', fullScreenCallback)
-        sf.request(wrapper.value)
+        sf.request(props.teleport ? document.body : wrapper.value)
       }
     }
 
