@@ -10,7 +10,7 @@
       </h2>
       <p class="subtitle">
         <a
-          href="https://github.com/mirari/vue-fullscreen/blob/next/example/views/example/ComponentExample.vue"
+          href="https://github.com/mirari/vue-fullscreen/blob/v3/example/views/example/ComponentExample.vue"
           target="_blank"
         >Source</a>
       </p>
@@ -22,7 +22,7 @@
       </h2>
       <p class="subtitle">
         <a
-          href="https://github.com/mirari/vue-fullscreen/blob/next/example/views/example/ApiExample.vue"
+          href="https://github.com/mirari/vue-fullscreen/blob/v3/example/views/example/ApiExample.vue"
           target="_blank"
         >Source</a>
       </p>
