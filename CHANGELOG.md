@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.5](https://github.com/mirari/vue-fullscreen/compare/v3.0.4...v3.0.5) (2021-06-01)
+
+
+### Bug Fixes
+
+* **component:** fix wrapper style in teleport mode; update readme ([8c81c38](https://github.com/mirari/vue-fullscreen/commit/8c81c38c5f1c04fd9a93587166b55e935554e6b9))
+
 ### [3.0.4](https://github.com/mirari/vue-fullscreen/compare/v3.0.3...v3.0.4) (2021-06-01)
 
 
