@@ -17,11 +17,12 @@ A simple Vue.js component for fullscreen, based on [screenfull.js](https://githu
 ## [Live demo](http://mirari.github.io/vue3-fullscreen/)
 
 ## Quick Example
+
 - [component](https://codepen.io/mirari/pen/LYWeNZM)
 - [api](https://codepen.io/mirari/pen/abJENpa)
 - [vue-fullscreen in iPhone & options](https://codepen.io/mirari/pen/abJEVNe)
 
-## [中文文档](http://mirari.cc/2017/08/14/%E5%85%A8%E5%B1%8F%E5%88%87%E6%8D%A2%E7%BB%84%E4%BB%B6vue-fullscreen/)
+## [中文文档](https://mirari.cc/2021/06/01/Vue3%E5%85%A8%E5%B1%8F%E5%88%87%E6%8D%A2%E7%BB%84%E4%BB%B6vue-fullscreen/)
 
 ## Browser support
 
@@ -175,7 +176,7 @@ Toggle the fullscreen mode.
 
 
 
-#### enter([target, options])
+#### request([target, options])
 
 enter the fullscreen mode.
 
@@ -208,6 +209,12 @@ check browser support for the fullscreen API.
 
 - Type: `Boolean`
 
+#### element
+
+get the fullscreen element.
+
+- Type: `Element | null`
+
 
 ### Options
 
@@ -239,7 +246,7 @@ If `true`, only fill the page with current element.
 - Type: `Boolean`
 - Default: `true`
 
-If `true`, the target element will be appended to `document.body`.
+If `true`, the target element will be appended to `document.body` when it is fullscreen.
 
 This can avoid some pop-ups not being displayed.
 
@@ -264,7 +271,7 @@ You can simply import the component and register it locally too.
     toRefs,
     reactive,
   } from 'vue'
-  import { component } from '../../../src'
+  import { component } from 'vue-fullscreen'
 
   export default defineComponent({
     name: 'ComponentExample',
