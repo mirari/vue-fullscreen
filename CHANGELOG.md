@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.6](https://github.com/mirari/vue-fullscreen/compare/v3.0.5...v3.0.6) (2021-06-01)
+
+
+### Bug Fixes
+
+* **api:** fix api style ([af4a11b](https://github.com/mirari/vue-fullscreen/commit/af4a11bea9b7552db7d40d83c5acbb87d27125b2))
+
 ### [3.0.5](https://github.com/mirari/vue-fullscreen/compare/v3.0.4...v3.0.5) (2021-06-01)
 
 
