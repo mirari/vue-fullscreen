@@ -29,7 +29,7 @@ A simple Vue.js component for fullscreen, based on [screenfull.js](https://githu
 
 ## Installation
 
-Install from GitHub via NPM
+Install from NPM
 
 ```bash
 npm install vue-fullscreen@next
