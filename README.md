@@ -224,6 +224,15 @@ It will be called when the fullscreen mode changed.
 
 The class will be added to target element when fullscreen mode is on.
 
+#### pageOnly
+
+- Type: `Boolean`
+- Default: `false`
+
+If `true`, only fill the page with current element.
+
+**Note:** If the browser does not support full-screen Api, this option will be automatically enabled.
+
 ### teleport
 
 - Type: `Boolean`
