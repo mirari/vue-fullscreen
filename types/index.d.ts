@@ -1,11 +1,12 @@
-import Vue from "vue";
+import Vue from 'vue'
+import type screenfull from 'screenfull'
+import type { Component } from 'vue'
 
 type VueFullScreenOptions = {
   callback?: (fullscreen: boolean) => void;
   fullscreenClass?: string;
-  wrap?: boolean;
-  exitOnClickWrapper?: boolean;
-  background?: string;
+  teleport?: boolean;
+  pageOnly?: boolean;
 };
 declare class VueFullscreen {
   /**
@@ -26,7 +27,7 @@ declare class VueFullscreen {
    * @param target - Target element to enter fullscreen, defaults to `document.body`
    * @param options - The fullscreen options
    */
-  enter(target?: Element, options?: VueFullScreenOptions): void;
+  request(target?: Element, options?: VueFullScreenOptions): void;
   /**
    * Exits fullscreen
    */
@@ -34,11 +35,11 @@ declare class VueFullscreen {
   /**
    * Gets the fullscreen state
    */
-  getState(): boolean;
+  isFullscreen: boolean;
   /**
    * Check browser support for the fullscreen API
    */
-  support: boolean;
+  isEnabled: boolean;
 }
 
 declare namespace VueFullscreenPlugin {
@@ -46,10 +47,14 @@ declare namespace VueFullscreenPlugin {
     name: string;
   }
 
-  export function install(vue: typeof Vue, options?: InstallationOptions): void;
+  export function install(vue: Vue, options?: InstallationOptions): void;
 }
 
 export default VueFullscreenPlugin;
+
+export type Screenfull = screenfull.Screenfull
+export type api = VueFullScreenOptions
+export type component = Component
 
 declare module "vue/types/vue" {
   interface Vue {

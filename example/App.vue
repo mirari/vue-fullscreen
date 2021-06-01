@@ -46,6 +46,11 @@ export default {
   $mdi-font-path: '~mdi/fonts/';
   @import "~mdi/scss/materialdesignicons.scss";
 
+  .fullscreen {
+    z-index: 10000;
+    background: cyan;
+  }
+
   .jumbotron {
     color: white;
     background: #41b883;

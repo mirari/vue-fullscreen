@@ -1,15 +1,15 @@
 {
   "name": "vue-fullscreen",
-  "version": "2.3.5",
+  "version": "2.4.0-beta",
   "description": "A simple Vue.js component for fullscreen",
   "main": "dist/vue-fullscreen.min.js",
   "types": "types/index.d.ts",
   "scripts": {
     "dev": "cross-env NODE_ENV=development node build/dev-server.js",
-    "release": "webpack --progress --hide-modules --config  ./build/webpack.release.js && cross-env NODE_ENV=production webpack --progress --hide-modules --config  ./build/webpack.release.min.js",
+    "build": "webpack --progress --hide-modules --config  ./build/webpack.release.js && cross-env NODE_ENV=production webpack --progress --hide-modules --config  ./build/webpack.release.min.js",
     "example": "cross-env NODE_ENV=production node build/build.js",
-    "gh": "node build/deploy",
-    "publish": "npm publish"
+    "publish": "npm run build && npm publish",
+    "publish:beta": "npm run build && npm publish --tag beta"
   },
   "repository": {
     "type": "git",
@@ -45,7 +45,6 @@
     "connect-history-api-fallback": "^1.3.0",
     "cross-env": "^3.1.3",
     "css-loader": "^0.27.1",
-    "echarts": "^3.6.2",
     "electron-devtools-installer": "^2.0.1",
     "eslint": "^4.18.2",
     "eslint-config-standard": "^7.0.1",
@@ -87,5 +86,6 @@
     "webpack-merge": "^4.0.0"
   },
   "dependencies": {
+    "screenfull": "^5.1.0"
   }
 }

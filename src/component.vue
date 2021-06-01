@@ -1,149 +1,141 @@
 <template>
-  <div :style="wrapperStyle"
-       :class="wrapperClass"
-       @click="shadeClick($event)"
+  <div
+    ref="wrapper"
+    v-bind="$attrs"
+    :style="wrapperStyle"
+    :class="{[fullscreenClass]: isFullscreen}"
+    @click="shadeClick($event)"
+    @keyup="exit"
   >
-    <slot>
-    </slot>
+    <slot />
   </div>
 </template>
 <script>
-  import {supportFullScreen, fullScreenStatus, requestFullscreen, exitFullscreen, onFullScreenEvent, offFullScreenEvent} from './utils'
-
-  export default {
-    props: {
-      exitOnClickWrapper: {
-        type: Boolean,
-        default: true
-      },
-      background: {
-        type: String,
-        default: '#333'
-      },
-      fullscreenClass: {
-        type: String,
-        default: 'fullscreen'
-      },
-      fullscreen: {
-        type: Boolean,
-        default: false
-      },
-      pageOnly: {
-        type: Boolean,
-        default: false
-      }
+import sf from 'screenfull'
+export default {
+  props: {
+    fullscreen: {
+      type: Boolean,
+      default: false
     },
-
-    data () {
-      return {
-        support: false,
-        isFullscreen: false
-      }
+    exitOnClickWrapper: {
+      type: Boolean,
+      default: true
     },
-
-    computed: {
-      isPageOnly () {
-        return this.pageOnly || !this.support
-      },
-      wrapperClass () {
-        const wrapperClass = []
-        if (this.isFullscreen) {
-          wrapperClass.push(this.fullscreenClass)
-        }
-        return wrapperClass
-      },
-      wrapperStyle () {
-        let wrapperStyle = {}
-        if (this.isFullscreen) {
-          wrapperStyle = {
-            'background': this.background,
-            'overflow-y': 'auto',
-            'width': '100%',
-            'height': '100%'
-          }
-          if (this.isPageOnly) {
-            wrapperStyle['position'] = 'fixed !important'
-            wrapperStyle['z-index'] = '100000 !important'
-            wrapperStyle['left'] = '0'
-            wrapperStyle['top'] = '0'
-            wrapperStyle['width'] = '100% !important'
-            wrapperStyle['height'] = '100% !important'
-          }
-        }
-        return wrapperStyle
-      }
+    fullscreenClass: {
+      type: String,
+      default: 'fullscreen'
     },
-
-    methods: {
-      toggle (value) {
-        if (value === undefined) {
-          // 如果已经是全屏状态，则退出
-          if (this.getState()) {
-            this.exit()
-          } else {
-            this.enter()
-          }
-        } else {
-          value ? this.enter() : this.exit()
-        }
-      },
-      enter () {
-        if (this.isPageOnly) {
-          this.isFullscreen = true
-          this.onChangeFullScreen()
-        } else {
-          onFullScreenEvent(this.fullScreenCallback)
-          requestFullscreen(this.$el)
-        }
-      },
-      exit () {
-        if (!this.getState()) {
-          return
-        }
-        if (this.isPageOnly) {
-          this.isFullscreen = false
-          this.onChangeFullScreen()
-        } else {
-          exitFullscreen()
-        }
-      },
-      getState () {
-        if (this.isPageOnly) {
-          return this.isFullscreen
-        }
-        return fullScreenStatus()
-      },
-      shadeClick (e) {
-        if (e.target === this.$el) {
-          if (this.exitOnClickWrapper) {
-            this.exit()
-          }
-        }
-      },
-      fullScreenCallback () {
-        this.isFullscreen = fullScreenStatus()
-        if (!this.isFullscreen) {
-          // 退出全屏时解绑回调
-          offFullScreenEvent(this.fullScreenCallback)
-        }
-        this.onChangeFullScreen()
-      },
-      onChangeFullScreen () {
-        this.$emit('change', this.isFullscreen)
-        this.$emit('update:fullscreen', this.isFullscreen)
-      }
+    pageOnly: {
+      type: Boolean,
+      default: false
     },
-
-    watch: {
-      fullscreen (value) {
-        if (value !== fullScreenStatus()) {
-          value ? this.enter() : this.exit()
-        }
-      }
-    },
-
-    created () {
-      this.support = supportFullScreen()
+    teleport: {
+      type: Boolean,
+      default: false
     }
+  },
+
+  data () {
+    return {
+      isFullscreen: false,
+      isEnabled: sf.isEnabled
+    }
+  },
+
+  computed: {
+    isPageOnly () {
+      // 如果不支持浏览器全屏，改用网页全屏
+      return this.pageOnly || !sf.isEnabled
+    },
+    wrapperStyle () {
+      return (this.pageOnly || this.teleport) && this.isFullscreen
+        ? {
+          position: 'fixed',
+          left: '0',
+          top: '0',
+          width: '100%',
+          height: '100%'
+        }
+        : undefined
+    }
+  },
+
+  methods: {
+    toggle (value) {
+      if (value === undefined) {
+        // 如果已经是全屏状态，则退出
+        if (this.getState()) {
+          this.exit()
+        } else {
+          this.request()
+        }
+      } else {
+        value ? this.request() : this.exit()
+      }
+    },
+    request () {
+      if (this.isPageOnly) {
+        this.isFullscreen = true
+        this.onChangeFullScreen()
+        document.removeEventListener('keyup', this.keypressCallback)
+        document.addEventListener('keyup', this.keypressCallback)
+      } else {
+        sf.off('change', this.fullScreenCallback)
+        sf.on('change', this.fullScreenCallback)
+        sf.request(this.teleport ? document.body : this.$el)
+      }
+    },
+    exit () {
+      if (!this.isFullscreen) {
+        return
+      }
+      if (this.isPageOnly) {
+        this.isFullscreen = false
+        this.onChangeFullScreen()
+        document.removeEventListener('keyup', this.keypressCallback)
+      } else {
+        sf.exit()
+      }
+    },
+    shadeClick (e) {
+      if (e.target === this.$el) {
+        if (this.exitOnClickWrapper) {
+          this.exit()
+        }
+      }
+    },
+    // 全屏api事件回调
+    fullScreenCallback () {
+      if (!sf.isFullscreen) {
+        sf.off('change', this.fullScreenCallback)
+      }
+      this.isFullscreen = sf.isFullscreen
+      this.onChangeFullScreen()
+    },
+    // 按键回调
+    keypressCallback (e) {
+      if (e.key === 'Escape') {
+        this.exit()
+      }
+    },
+    // isFullscreen变化时，上报事件
+    onChangeFullScreen () {
+      this.$emit('change', this.isFullscreen)
+      this.$emit('update:fullscreen', this.isFullscreen)
+    }
+  },
+
+  watch: {
+    fullscreen (value) {
+      if (value !== this.isFullscreen) {
+        value ? this.request() : this.exit()
+      }
+    }
+  },
+
+  created () {
+    this.isEnabled = sf.isEnabled
   }
+}
 </script>
