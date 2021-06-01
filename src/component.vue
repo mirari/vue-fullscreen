@@ -56,7 +56,7 @@ export default defineComponent({
     })
 
     const wrapperStyle = computed(() => {
-      return props.pageOnly && state.isFullscreen
+      return (props.pageOnly || props.teleport) && state.isFullscreen
         ? {
           position: 'fixed',
           left: '0',
