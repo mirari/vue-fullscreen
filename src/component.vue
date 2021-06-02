@@ -49,7 +49,7 @@ export default {
       return this.pageOnly || !sf.isEnabled
     },
     wrapperStyle () {
-      return (this.pageOnly || this.teleport) && this.isFullscreen
+      return (this.isPageOnly || this.teleport) && this.isFullscreen
         ? {
           position: 'fixed',
           left: '0',
