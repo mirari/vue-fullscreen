@@ -62,7 +62,7 @@ The component and api will be installed together in the global.
 
 ```html
 <template>
-  <div id="app">
+  <div>
     <fullscreen :fullscreen.sync="fullscreen">
       content
     </fullscreen>
@@ -112,7 +112,7 @@ Or you can just import the api method and call it.
 
 ```html
 <template>
-  <div id="app">
+  <div>
     <div class="fullscreen-wrapper">
       Content
     </div>
@@ -243,7 +243,7 @@ You can simply import the component and register it locally.
 
 ```html
 <template>
-  <div id="app">
+  <div>
     <fullscreen :fullscreen.sync="fullscreen" :teleport="teleport" :page-only="pageOnly" >
       Content
     </fullscreen>
@@ -326,7 +326,7 @@ If you need to avoid name conflict, you can import it like this:
 
 ```html
 <template>
-  <div id="app">
+  <div>
     <fs :fullscreen.sync="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
       content
     </fs>
