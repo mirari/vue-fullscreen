@@ -74,9 +74,9 @@ The component and api will be installed together in the global.
   </div>
 </template>
 <script>
-  import fullscreen from 'vue-fullscreen'
+  import VueFullscreen from 'vue-fullscreen'
   import Vue from 'vue'
-  Vue.use(fullscreen)
+  Vue.use(VueFullscreen)
   export default {
     methods: {
       toggle () {
@@ -338,9 +338,9 @@ If you need to avoid name conflict, you can import it like this:
   </div>
 </template>
 <script>
-import Fullscreen from 'vue-fullscreen'
+import VueFullscreen from 'vue-fullscreen'
 import Vue from 'vue'
-Vue.use(Fullscreen, {name: 'fs'})
+Vue.use(VueFullscreen, {name: 'fs'})
 export default {
   methods: {
     toggle () {

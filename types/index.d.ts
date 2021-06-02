@@ -1,67 +1,67 @@
 import Vue from 'vue'
-import type { Screenfull as ScreenfullType } from 'screenfull'
-import type { Component } from 'vue'
-
-type VueFullScreenOptions = {
-  callback?: (fullscreen: boolean) => void;
-  fullscreenClass?: string;
-  teleport?: boolean;
-  pageOnly?: boolean;
-};
-declare class VueFullscreenApi {
-  /**
-   * Attempts to toggle fullscreen using the target element
-   *
-   * @param target - Target element to enter fullscreen, defaults to `document.body`
-   * @param options - The fullscreen options
-   * @param force - `true` to force enter, `false` to exit fullscreen
-   */
-  toggle(
-    target?: Element,
-    options?: VueFullScreenOptions,
-    force?: boolean | undefined
-  ): void;
-  /**
-   * Attempts to enter fullscreen using the target element
-   *
-   * @param target - Target element to enter fullscreen, defaults to `document.body`
-   * @param options - The fullscreen options
-   */
-  request(target?: Element, options?: VueFullScreenOptions): void;
-  /**
-   * Exits fullscreen
-   */
-  exit(): void;
-  /**
-   * Gets the fullscreen state
-   */
-  isFullscreen: boolean;
-  /**
-   * Check browser support for the fullscreen API
-   */
-  isEnabled: boolean;
-}
+import Screenfull from 'screenfull'
+import type { DirectiveOptions, Component } from 'vue'
 
 declare namespace VueFullscreen {
   export interface InstallationOptions {
-    name: string;
+    name?: string
   }
 
-  export function install(vue: typeof Vue, options?: InstallationOptions): void;
+  export interface ApiOptions {
+    callback?: (fullscreen: boolean) => void
+    fullscreenClass?: string
+    teleport?: boolean
+    pageOnly?: boolean
+  }
+
+  export interface VueFullscreenApi {
+    /**
+     * Attempts to toggle fullscreen using the target element
+     *
+     * @param target - Target element to enter fullscreen, defaults to `document.body`
+     * @param options - The fullscreen options
+     * @param force - `true` to force enter, `false` to exit fullscreen
+     */
+    toggle(
+      target?: Element | null,
+      options?: VueFullscreen.ApiOptions,
+      force?: boolean | undefined
+    ): Promise<void>
+
+    /**
+     * Attempts to enter fullscreen using the target element
+     *
+     * @param target - Target element to enter fullscreen, defaults to `document.body`
+     * @param options - The fullscreen options
+     */
+    request(target?: Element, options?: VueFullscreen.ApiOptions): Promise<void>
+    /**
+     * Exits fullscreen
+     */
+    exit(): Promise<void>
+    /**
+     * Gets the fullscreen state
+     */
+    isFullscreen: boolean
+    /**
+     * Check browser support for the fullscreen API
+     */
+    isEnabled: boolean
+  }
+
+  export function install(app: typeof Vue, options?: InstallationOptions): void
 }
+
+export declare const screenfull: typeof Screenfull
+
+export declare const api: VueFullscreen.VueFullscreenApi
+
+export declare const component: Component
+
+export default VueFullscreen
 
 declare module "vue/types/vue" {
   interface Vue {
-    $fullscreen: VueFullscreenApi;
+    $fullscreen: typeof api;
   }
 }
-
-export type screenfull = ScreenfullType
-
-export type api = VueFullScreenOptions
-
-export type component = Component
-
-export default VueFullscreen;
-
-

@@ -17,6 +17,11 @@
     "type": "git",
     "url": "git+https://github.com/mirari/vue-fullscreen.git"
   },
+  "files": [
+    "dist",
+    "types",
+    "README.md"
+  ],
   "keywords": [
     "vue",
     "fullscreen"
