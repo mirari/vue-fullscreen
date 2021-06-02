@@ -1,6 +1,6 @@
 import { App } from 'vue'
+import Screenfull from 'screenfull'
 import type { DefineComponent } from 'vue'
-import type screenfull from 'screenfull'
 
 declare namespace VueFullscreen {
   export interface InstallationOptions {
@@ -51,9 +51,12 @@ declare namespace VueFullscreen {
 
   export function install(app: App, options?: InstallationOptions): void
 }
-export type Screenfull = screenfull.Screenfull
-export type api = VueFullscreen.VueFullscreenApi
-export type component = DefineComponent<{}, {}, any>
+
+export declare const screenfull: typeof Screenfull
+
+export declare const api: VueFullscreen.VueFullscreenApi
+
+export declare const component: DefineComponent<{}, {}, any>
 
 export default VueFullscreen
 
