@@ -52,17 +52,21 @@ app.mount('#app')
 
 ```
 
-```html
+```vue
 <template>
-  <div id="app" ref="root">
-    <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
-      content
-    </fullscreen>
-    <button type="button" @click="toggle" >Fullscreen</button>
+<div id="app" ref="root">
+  <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
     <div class="fullscreen-wrapper">
-      content
-    </div>
-    <button type="button" @click="toggleApi" >FullscreenApi</button>
+      <div>
+        <button type="button" class="button" @click="toggle">
+          {{ fullscreen ? 'exit fullscreen' : 'request fullscreen' }}
+  </button>
+        <button type="button" @click="toggleApi" >FullscreenApi</button>
+  </div>
+      <img v-show="!fullscreen" :src="'//picsum.photos/640/360?random=1'">
+      <img v-show="fullscreen" :src="'//picsum.photos/1280/720?random=1'">
+  </div>
+  </fullscreen>
   </div>
 </template>
 <script lang="ts">
@@ -70,35 +74,36 @@ app.mount('#app')
     ref,
     defineComponent,
     toRefs,
-    reactive,
+    reactive
   } from 'vue'
   export default defineComponent({
-    setup() {
+    methods: {
+      toggleApi () {
+        this.$fullscreen.toggle(this.$el.querySelector('.fullscreen-wrapper'), {
+          teleport: this.teleport,
+          callback: (isFullscreen) => {
+            this.fullscreen = isFullscreen
+          }
+        })
+      }
+    },
+    setup () {
       const root = ref()
       const state = reactive({
         fullscreen: false,
         teleport: true,
-        pageOnly: false,
+        pageOnly: false
       })
-      function toggle() {
+      function toggle () {
         state.fullscreen = !state.fullscreen
-      }
-      function toggleApi() {
-        this.$fullscreen.toggle(root.value.querySelector('.fullscreen-wrapper'), {
-          teleport: state.teleport,
-          callback: (isFullscreen) => {
-            state.fullscreen = isFullscreen
-          },
-        })
       }
 
       return {
         root,
         ...toRefs(state),
-        toggle,
-        toggleApi,
+        toggle
       }
-    },
+    }
   })
 </script>
 ```
@@ -111,47 +116,47 @@ In your vue component, You can use `this.$fullscreen` to get the instance.
 
 Or you can just import the api method and call it.
 
-```html
+```vue
 <template>
-  <div ref="root" id="app">
-    <div class="fullscreen-wrapper">
-      Content
-    </div>
-    <button type="button" @click="toggle" >Fullscreen</button>
+<div ref="root" id="app">
+  <div class="fullscreen-wrapper">
+    Content
+  </div>
+  <button type="button" @click="toggle" >Fullscreen</button>
   </div>
 </template>
 <script lang="ts">
-import {
-  ref,
-  defineComponent,
-  toRefs,
-  reactive,
-} from 'vue'
-import { api as fullscreen } from 'vue-fullscreen'
-export default defineComponent({
-  setup() {
-    const root = ref()
-    const state = reactive({
-      fullscreen: false,
-      teleport: true,
-    })
-
-    async function toggle () {
-      fullscreen.toggle(root.value.querySelector('.fullscreen-wrapper'), {
-        teleport: state.teleport,
-        callback: (isFullscreen) => {
-          state.fullscreen = isFullscreen
-        },
+  import {
+    ref,
+    defineComponent,
+    toRefs,
+    reactive,
+  } from 'vue'
+  import { api as fullscreen } from 'vue-fullscreen'
+  export default defineComponent({
+    setup() {
+      const root = ref()
+      const state = reactive({
+        fullscreen: false,
+        teleport: true,
       })
-    }
 
-    return {
-      root,
-      ...toRefs(state),
-      toggle,
-    }
-  },
-})
+      async function toggle () {
+        fullscreen.toggle(root.value.querySelector('.fullscreen-wrapper'), {
+          teleport: state.teleport,
+          callback: (isFullscreen) => {
+            state.fullscreen = isFullscreen
+          },
+        })
+      }
+
+      return {
+        root,
+        ...toRefs(state),
+        toggle,
+      }
+    },
+  })
 </script>
 ```
 
@@ -254,13 +259,13 @@ This can avoid some pop-ups not being displayed.
 
 You can simply import the component and register it locally too.
 
-```html
+```vue
 <template>
-  <div id="app">
-    <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
-      Content
-    </fullscreen>
-    <button type="button" @click="toggle" >Fullscreen</button>
+<div id="app">
+  <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
+    Content
+  </fullscreen>
+  <button type="button" @click="toggle" >Fullscreen</button>
   </div>
 </template>
 
@@ -361,17 +366,21 @@ app.mount('#app')
 
 ```
 
-```html
+```vue
 <template>
-  <div id="app" ref="root">
-    <fs v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
-      content
-    </fs>
-    <button type="button" @click="toggle" >Fullscreen</button>
+<div id="app" ref="root">
+  <fs v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
     <div class="fullscreen-wrapper">
-      content
-    </div>
-    <button type="button" @click="toggleApi" >FullscreenApi</button>
+      <div>
+        <button type="button" class="button" @click="toggle">
+          {{ fullscreen ? 'exit fullscreen' : 'request fullscreen' }}
+  </button>
+        <button type="button" @click="toggleApi" >FullscreenApi</button>
+  </div>
+      <img v-show="!fullscreen" :src="'//picsum.photos/640/360?random=1'">
+      <img v-show="fullscreen" :src="'//picsum.photos/1280/720?random=1'">
+  </div>
+  </fs>
   </div>
 </template>
 <script lang="ts">
@@ -379,35 +388,36 @@ app.mount('#app')
     ref,
     defineComponent,
     toRefs,
-    reactive,
+    reactive
   } from 'vue'
   export default defineComponent({
-    setup() {
+    methods: {
+      toggleApi () {
+        this.$fs.toggle(this.$el.querySelector('.fullscreen-wrapper'), {
+          teleport: this.teleport,
+          callback: (isFullscreen) => {
+            this.fullscreen = isFullscreen
+          }
+        })
+      }
+    },
+    setup () {
       const root = ref()
       const state = reactive({
         fullscreen: false,
         teleport: true,
-        pageOnly: false,
+        pageOnly: false
       })
-      function toggle() {
+      function toggle () {
         state.fullscreen = !state.fullscreen
-      }
-      function toggleApi() {
-        this.$fs.toggle(root.value.querySelector('.fullscreen-wrapper'), {
-          teleport: state.teleport,
-          callback: (isFullscreen) => {
-            state.fullscreen = isFullscreen
-          },
-        })
       }
 
       return {
         root,
         ...toRefs(state),
-        toggle,
-        toggleApi,
+        toggle
       }
-    },
+    }
   })
 </script>
 ```
