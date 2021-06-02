@@ -1,6 +1,6 @@
 {
   "name": "vue-fullscreen",
-  "version": "2.5.0-beta",
+  "version": "2.5.0-beta.0",
   "description": "A simple Vue.js component for fullscreen",
   "main": "dist/vue-fullscreen.min.js",
   "types": "types/index.d.ts",
@@ -9,6 +9,7 @@
     "build": "webpack --progress --hide-modules --config  ./build/webpack.release.js && cross-env NODE_ENV=production webpack --progress --hide-modules --config  ./build/webpack.release.min.js",
     "example": "cross-env NODE_ENV=production node build/build.js",
     "release": "standard-version",
+    "release:beta": "standard-version -p beta",
     "publish": "npm run build && npm publish",
     "publish:beta": "npm run build && npm publish --tag beta"
   },
@@ -76,6 +77,7 @@
     "sass-loader": "^7.3.1",
     "serve-favicon": "^2.4.1",
     "shelljs": "^0.8.3",
+    "standard-version": "^9.3.0",
     "style-loader": "^0.13.1",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
