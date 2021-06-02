@@ -54,7 +54,7 @@ app.mount('#app')
 
 ```vue
 <template>
-<div id="app" ref="root">
+<div ref="root">
   <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
     <div class="fullscreen-wrapper">
       <div>
@@ -118,7 +118,7 @@ Or you can just import the api method and call it.
 
 ```vue
 <template>
-<div ref="root" id="app">
+<div ref="root">
   <div class="fullscreen-wrapper">
     Content
   </div>
@@ -261,7 +261,7 @@ You can simply import the component and register it locally too.
 
 ```vue
 <template>
-<div id="app">
+<div>
   <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
     Content
   </fullscreen>
@@ -368,7 +368,7 @@ app.mount('#app')
 
 ```vue
 <template>
-<div id="app" ref="root">
+<div ref="root">
   <fs v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
     <div class="fullscreen-wrapper">
       <div>
