@@ -68,7 +68,7 @@ export default {
     toggle (value) {
       if (value === undefined) {
         // 如果已经是全屏状态，则退出
-        if (this.getState()) {
+        if (this.isFullscreen) {
           this.exit()
         } else {
           this.request()
@@ -148,7 +148,7 @@ export default {
       this.request()
     },
     getState () {
-      return this.isEnabled
+      return this.isFullscreen
     }
   },
 
