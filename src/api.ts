@@ -24,7 +24,7 @@ class VueFullscreenApiOptions {
 
 interface VueFullscreenApi {
   options: VueFullscreenApiOptions
-  element: Element | null
+  element?: Element | null
   toggle(
     target?: Element,
     options?: ApiOptions,

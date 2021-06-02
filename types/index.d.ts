@@ -23,7 +23,7 @@ declare namespace VueFullscreen {
      * @param force - `true` to force enter, `false` to exit fullscreen
      */
     toggle(
-      target?: Element,
+      target?: Element | null,
       options?: VueFullscreen.ApiOptions,
       force?: boolean | undefined
     ): Promise<void>
