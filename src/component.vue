@@ -55,8 +55,13 @@ export default defineComponent({
       isEnabled: sf.isEnabled,
     })
 
+    const isPageOnly = computed(() => {
+      // 如果不支持浏览器全屏，改用网页全屏
+      return props.pageOnly || !sf.isEnabled
+    })
+
     const wrapperStyle = computed(() => {
-      return (props.pageOnly || props.teleport) && state.isFullscreen
+      return (isPageOnly.value || props.teleport) && state.isFullscreen
         ? {
           position: 'fixed',
           left: '0',
@@ -65,11 +70,6 @@ export default defineComponent({
           height: '100%',
         } as CSSProperties
         : undefined
-    })
-
-    const isPageOnly = computed(() => {
-      // 如果不支持浏览器全屏，改用网页全屏
-      return props.pageOnly || !sf.isEnabled
     })
 
     // isFullscreen变化时，上报事件
