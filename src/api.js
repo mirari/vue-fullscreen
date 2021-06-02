@@ -152,4 +152,9 @@ const api = {
   }
 }
 
+// 向下兼容
+api.support = api.isEnabled
+api.getState = () => api.isFullscreen
+api.enter = api.request
+
 export default api

@@ -44,6 +44,9 @@ export default {
   },
 
   computed: {
+    support () {
+      return this.isEnabled
+    },
     isPageOnly () {
       // 如果不支持浏览器全屏，改用网页全屏
       return this.pageOnly || !sf.isEnabled
@@ -140,6 +143,12 @@ export default {
       }
       this.$emit('change', this.isFullscreen)
       this.$emit('update:fullscreen', this.isFullscreen)
+    },
+    enter () {
+      this.request()
+    },
+    getState () {
+      return this.isEnabled
     }
   },
 

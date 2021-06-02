@@ -47,6 +47,21 @@ declare namespace VueFullscreen {
      * Check browser support for the fullscreen API
      */
     isEnabled: boolean
+    /**
+     * @deprecated
+     * Alias of request
+     */
+    enter(target?: Element, options?: VueFullscreen.ApiOptions): Promise<void>
+    /**
+     * @deprecated
+     * Alias of isEnabled
+     */
+    support: boolean
+    /**
+     * @deprecated
+     * Gets the fullscreen state
+     */
+    getState(): boolean
   }
 
   export function install(app: typeof Vue, options?: InstallationOptions): void
