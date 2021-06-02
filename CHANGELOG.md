@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/mirari/vue-fullscreen/compare/v2.5.0-beta.0...v2.5.0) (2021-06-02)
+
+
+### Bug Fixes
+
+* **common:** fix dts file; update readme; ([814dfa7](https://github.com/mirari/vue-fullscreen/commit/814dfa702152abad9c920ab634aaca493ec9fa4d))
+
 ## 2.5.0-beta.0 (2021-06-02)
 
 
