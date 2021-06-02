@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.1](https://github.com/mirari/vue-fullscreen/compare/v2.5.0...v2.5.1) (2021-06-02)
+
+
+### Bug Fixes
+
+* **component:** downward compatible error ([6a81a91](https://github.com/mirari/vue-fullscreen/commit/6a81a9157b8851a78f6488122fee7909e76f1245))
+
 ## [2.5.0](https://github.com/mirari/vue-fullscreen/compare/v2.5.0-beta.0...v2.5.0) (2021-06-02)
 
 
