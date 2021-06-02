@@ -55,7 +55,7 @@ app.mount('#app')
 ```vue
 <template>
 <div id="app" ref="root">
-  <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
+  <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
     <div class="fullscreen-wrapper">
       <div>
         <button type="button" class="button" @click="toggle">
@@ -369,7 +369,7 @@ app.mount('#app')
 ```vue
 <template>
 <div id="app" ref="root">
-  <fs v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
+  <fs v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
     <div class="fullscreen-wrapper">
       <div>
         <button type="button" class="button" @click="toggle">

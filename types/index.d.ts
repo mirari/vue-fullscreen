@@ -56,3 +56,9 @@ export type api = VueFullscreen.VueFullscreenApi
 export type component = DefineComponent<{}, {}, any>
 
 export default VueFullscreen
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $fullscreen: VueFullscreen.VueFullscreenApi
+  }
+}
