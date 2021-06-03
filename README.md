@@ -17,15 +17,24 @@ A simple Vue.js component for fullscreen, based on [screenfull.js](https://githu
 
 ## Quick Example
 
-- [component](https://codepen.io/mirari/pen/MWprxEZ)
-- [api](https://codepen.io/mirari/pen/eYvyXGX)
-- [vue-fullscreen in iPhone & options](https://codepen.io/mirari/pen/zYZpbEV)
+- [Component](https://codepen.io/mirari/pen/MWprxEZ)
+- [Api](https://codepen.io/mirari/pen/eYvyXGX)
+- [Compatible handling in iPhone & Popups in fullscreen](https://codepen.io/mirari/pen/zYZpbEV)
+- [Navigate to a new page without exiting fullscreen](https://codepen.io/mirari/pen/VwjyKPL)
 
 ## [中文文档](http://mirari.cc/2017/08/14/%E5%85%A8%E5%B1%8F%E5%88%87%E6%8D%A2%E7%BB%84%E4%BB%B6vue-fullscreen/)
 
-## Browser support
+## Support
 
-[Full Screen API](http://caniuse.com/fullscreen)
+[Supported browsers](http://caniuse.com/fullscreen)
+
+**Note**: In order to use this package in Internet Explorer, you need a Promise polyfill.
+
+**Note**: Safari is supported on desktop and iPad, but not on iPhone.
+
+**Note:** Navigating to another page, changing tabs, or switching to another application using any application switcher (or Alt-Tab) will likewise exit full-screen mode.
+
+[Learn more](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API)
 
 ## Migration from <= 2.3.5
 
