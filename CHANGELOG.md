@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.11](https://github.com/mirari/vue-fullscreen/compare/v3.0.10...v3.0.11) (2021-07-15)
+
+
+### Bug Fixes
+
+* **component:** fix that pressing the keyboard will exit the full screen ([b631604](https://github.com/mirari/vue-fullscreen/commit/b63160442f8941b30ff2354a1544b3f90f484cc7))
+
 ### [3.0.10](https://github.com/mirari/vue-fullscreen/compare/v3.0.9...v3.0.10) (2021-06-02)
 
 
