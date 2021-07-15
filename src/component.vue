@@ -6,7 +6,6 @@
       :style="wrapperStyle"
       :class="{[fullscreenClass]: isFullscreen}"
       @click="shadeClick($event)"
-      @keyup="exit"
     >
       <slot />
     </div>
