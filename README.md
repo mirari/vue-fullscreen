@@ -67,19 +67,20 @@ npm install vue-fullscreen
 
 To use `vue-fullscreen`, simply import it, and call `Vue.use()` to install.
 
-The component and api will be installed together in the global.
+The component, directive and api will be installed together in the global.
 
 ```html
 <template>
   <div>
+    <!-- Component  -->
     <fullscreen v-model="fullscreen">
       content
     </fullscreen>
     <button type="button" @click="toggle" >Fullscreen</button>
-    <div class="fullscreen-wrapper">
-      content
-    </div>
+    <!-- Api  -->
     <button type="button" @click="toggleApi" >FullscreenApi</button>
+    <!-- Directive  -->
+    <button type="button" v-fullscreen >FullscreenDirective</button>
   </div>
 </template>
 <script>
@@ -92,19 +93,12 @@ The component and api will be installed together in the global.
         this.fullscreen = !this.fullscreen
       },
       toggleApi () {
-        this.$fullscreen.toggle(this.$el.querySelector('.fullscreen-wrapper'), {
-          teleport: this.teleport,
-          callback: (isFullscreen) => {
-            this.fullscreen = isFullscreen
-          },
-        })
+        this.$fullscreen.toggle()
       },
     },
     data() {
       return {
         fullscreen: false,
-        teleport: true,
-        pageOnly: false,
       }
     }
   }
@@ -113,9 +107,15 @@ The component and api will be installed together in the global.
 
 **Caution:** Because of the browser security function, you can only call these methods by a user gesture(`click` or `keypress`).
 
+
+
 ### Usage of api
 
 In your vue component, You can use `this.$fullscreen` to get the instance.
+
+```javascript
+this.$fullscreen.toggle()
+```
 
 Or you can just import the api method and call it.
 
@@ -132,13 +132,14 @@ Or you can just import the api method and call it.
 import { api as fullscreen } from 'vue-fullscreen'
 export default {
   methods: {
-    toggle () {
-      fullscreen.toggle(this.$el.querySelector('.fullscreen-wrapper'), {
+    async toggle () {
+      await fullscreen.toggle(this.$el.querySelector('.fullscreen-wrapper'), {
         teleport: this.teleport,
         callback: (isFullscreen) => {
-          this.fullscreen = isFullscreen
+          //this.fullscreen = isFullscreen
         },
       })
+      this.fullscreen = fullscreen.isFullscreen
     },
   },
   data() {
@@ -169,8 +170,6 @@ Toggle the fullscreen mode.
   - Default: `undefined`
   - pass `true` to  force enter , `false` to exit fullscreen mode.
 
-
-
 #### request([target, options])
 
 enter the fullscreen mode.
@@ -183,11 +182,18 @@ enter the fullscreen mode.
   - Type: `Object`
   - The fullscreen options.
 
-
-
 #### exit()
 
 exit the fullscreen mode.
+
+**Note:** Each of these methods returns a promise object, and you can get the state after the promise has been resolved, or you can pass a callback function in options to get.
+
+```javascript
+async toggle () {
+  await this.$fullscreen.toggle()
+  this.fullscreen = this.$fullscreen.isFullscreen
+}
+```
 
 
 #### isFullscreen
@@ -213,14 +219,14 @@ get the fullscreen element.
 
 ### Options
 
-### callback
+#### callback
 
 - Type: `Function`
 - Default: `null`
 
 It will be called when the fullscreen mode changed.
 
-### fullscreenClass
+#### fullscreenClass
 
 - Type: `String`
 - Default: `fullscreen`
@@ -236,7 +242,7 @@ If `true`, only fill the page with current element.
 
 **Note:** If the browser does not support full-screen Api, this option will be automatically enabled.
 
-### teleport
+#### teleport
 
 - Type: `Boolean`
 - Default: `true`
@@ -244,6 +250,83 @@ If `true`, only fill the page with current element.
 If `true`, the target element will be appended to `document.body` when it is fullscreen.
 
 This can avoid some pop-ups not being displayed.
+
+
+
+
+## Use as directive
+
+You can use `v-fullscreen` to make any element have the effect of switching to full screen with a click.
+
+```html
+<button v-fullscreen>FullScreen</button>
+```
+Or you can just import the directive and install it.
+
+```html
+<template>
+  <div>
+    <div class="fullscreen-wrapper">
+      Content
+    </div>
+    <button type="button" v-fullscreen.teleport="options" >Fullscreen</button>
+  </div>
+</template>
+<script>
+import { directive as fullscreen } from 'vue-fullscreen'
+export default {
+  directives: {
+    fullscreen
+  },
+  data() {
+    return {
+      options: {
+        target: ".fullscreen-wrapper",
+        callback (isFullscreen) {
+          console.log(isFullscreen)
+        },
+      },
+    }
+  }
+}
+</script>
+```
+
+### Modifiers
+
+#### pageOnly
+
+only fill the page with current element.
+
+#### teleport
+
+the component will be appended to `document.body` when it is fullscreen.
+
+This can avoid some pop-ups not being displayed.
+
+### Options
+
+#### target
+
+- Type: `String | Element`
+- Default: `document.body`
+
+The element can be specified using a style selector string, equivalent to `document.querySelector(target)`. Note that when passing an element object directly, you need to make sure that the element already exists. The internal elements of the current component may not be initialized when the directive is initialized.
+
+#### callback
+
+- Type: `Function`
+- Default: `null`
+
+It will be called when the fullscreen mode changed.
+
+#### fullscreenClass
+
+- Type: `String`
+- Default: `fullscreen`
+
+The class will be added to target element when fullscreen mode is on.
+
 
 
 ## Use as component
@@ -324,6 +407,8 @@ This can avoid some pop-ups not being displayed.
 This event fires when the fullscreen mode changed.
 
 
+
+
 ## Plugin options
 
 ### name
@@ -336,14 +421,15 @@ If you need to avoid name conflict, you can import it like this:
 ```html
 <template>
   <div>
+    <!-- Component  -->
     <fs v-model="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
       content
     </fs>
     <button type="button" @click="toggle" >Fullscreen</button>
-    <div class="fullscreen-wrapper">
-      content
-    </div>
+    <!-- Api  -->
     <button type="button" @click="toggleApi" >FullscreenApi</button>
+    <!-- Directive  -->
+    <button type="button" v-fs.teleport >FullscreenDirective</button>
   </div>
 </template>
 <script>
@@ -356,19 +442,12 @@ export default {
       this.fullscreen = !this.fullscreen
     },
     toggleApi() {
-      this.$fs.toggle(this.$el.querySelector('.fullscreen-wrapper'), {
-        teleport: this.teleport,
-        callback: (isFullscreen) => {
-          this.fullscreen = isFullscreen
-        },
-      })
+      this.$fs.toggle()
     },
   },
   data() {
     return {
       fullscreen: false,
-      teleport: true,
-      pageOnly: false,
     }
   }
 }
