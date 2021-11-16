@@ -24,6 +24,13 @@ const sf = screenfull as Screenfull
 
 export default defineComponent({
   props: {
+    modelValue: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * @deprecated
+     */
     fullscreen: {
       type: Boolean,
       default: false,
@@ -45,7 +52,7 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: ['change', 'update:fullscreen'],
+  emits: ['change', 'update:modelValue', 'update:fullscreen'],
   setup(props, { emit }) {
     const wrapper = ref()
 
@@ -74,6 +81,7 @@ export default defineComponent({
     // isFullscreen变化时，上报事件
     function onChangeFullScreen() {
       emit('change', state.isFullscreen)
+      emit('update:modelValue', state.isFullscreen)
       emit('update:fullscreen', state.isFullscreen)
     }
     // 全屏api事件回调
@@ -144,6 +152,11 @@ export default defineComponent({
 
     // watch effect
     watch(() => props.fullscreen, (value) => {
+      if (value !== state.isFullscreen) {
+        value ? request() : exit()
+      }
+    })
+    watch(() => props.modelValue, (value) => {
       if (value !== state.isFullscreen) {
         value ? request() : exit()
       }

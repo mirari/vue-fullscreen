@@ -64,7 +64,7 @@ app.mount('#app')
 ```vue
 <template>
 <div ref="root">
-  <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
+  <fullscreen v-model="fullscreen" :teleport="teleport" :page-only="pageOnly" >
     <div class="fullscreen-wrapper">
       <div>
         <button type="button" class="button" @click="toggle">
@@ -271,7 +271,7 @@ You can simply import the component and register it locally too.
 ```vue
 <template>
 <div>
-  <fullscreen v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
+  <fullscreen v-model="fullscreen" :teleport="teleport" :page-only="pageOnly" >
     Content
   </fullscreen>
   <button type="button" @click="toggle" >Fullscreen</button>
@@ -378,7 +378,7 @@ app.mount('#app')
 ```vue
 <template>
 <div ref="root">
-  <fs v-model:fullscreen="fullscreen" :teleport="teleport" :page-only="pageOnly" >
+  <fs v-model="fullscreen" :teleport="teleport" :page-only="pageOnly" >
     <div class="fullscreen-wrapper">
       <div>
         <button type="button" class="button" @click="toggle">
