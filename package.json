@@ -1,7 +1,7 @@
 {
   "name": "vue-fullscreen",
   "scope": "VueFullscreen",
-  "version": "3.0.11",
+  "version": "3.0.12",
   "description": "A simple Vue.js component for fullscreen",
   "main": "./dist/index.umd.js",
   "unpkg": "./dist/index.umd.js",
@@ -21,6 +21,9 @@
     "preview:serve": "npm -C example run serve",
     "commit": "npx git-cz",
     "release": "standard-version",
+    "release:beta": "standard-version -p beta",
+    "publish": "npm run build && npm publish",
+    "publish:beta": "npm run build && npm publish --tag beta",
     "publish:next": "npm run build && npm publish --tag next"
   },
   "files": [
