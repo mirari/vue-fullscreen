@@ -31,7 +31,7 @@ import {
   toRefs,
   reactive, computed,
 } from 'vue'
-import { component, directive as fullscreen } from '../../../src'
+import { directive as fullscreen } from '../../../src'
 
 export default defineComponent({
   name: 'DirectiveExample',
@@ -46,7 +46,6 @@ export default defineComponent({
       pageOnly: true,
     })
     const options = computed(() => {
-      // 如果不支持浏览器全屏，改用网页全屏
       return {
         callback: (isFullscreen) => {
           state.fullscreen = isFullscreen
