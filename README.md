@@ -19,6 +19,7 @@ A simple Vue.js component for fullscreen, based on [screenfull.js](https://githu
 
 - [Component](https://codepen.io/mirari/pen/MWprxEZ)
 - [Api](https://codepen.io/mirari/pen/eYvyXGX)
+- [Directive](https://codepen.io/mirari/pen/YzxRJYq)
 - [Compatible handling in iPhone & Popups in fullscreen](https://codepen.io/mirari/pen/zYZpbEV)
 - [Navigate to a new page without exiting fullscreen](https://codepen.io/mirari/pen/VwjyKPL)
 
