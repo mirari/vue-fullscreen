@@ -390,7 +390,7 @@ If `true`, only fill the page with current element.
 
 **Note:** If the browser does not support full-screen Api, this option will be automatically enabled.
 
-### teleport
+#### teleport
 
 - Type: `Boolean`
 - Default: `true`
