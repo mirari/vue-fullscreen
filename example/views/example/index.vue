@@ -34,7 +34,7 @@
       </h2>
       <p class="subtitle">
         <a
-          href="https://github.com/mirari/vue-fullscreen/blob/master/example/views/example/ApiExample.vue"
+          href="https://github.com/mirari/vue-fullscreen/blob/master/example/views/example/DirectiveExample.vue"
           target="_blank"
         >Source</a>
       </p>
