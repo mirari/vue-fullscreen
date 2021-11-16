@@ -14,7 +14,7 @@
         name="button"
       > teleport
     </label>
-    <fullscreen :fullscreen.sync="fullscreen" :teleport="teleport" :page-only="pageOnly">
+    <fullscreen v-model="fullscreen" :teleport="teleport" :page-only="pageOnly">
       <div class="fullscreen-wrapper">
         <button type="button" class="button" @click="toggle">
           {{ fullscreen ? 'exit fullscreen' : 'request fullscreen' }}

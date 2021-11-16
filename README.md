@@ -72,7 +72,7 @@ The component and api will be installed together in the global.
 ```html
 <template>
   <div>
-    <fullscreen :fullscreen.sync="fullscreen">
+    <fullscreen v-model="fullscreen">
       content
     </fullscreen>
     <button type="button" @click="toggle" >Fullscreen</button>
@@ -253,7 +253,7 @@ You can simply import the component and register it locally.
 ```html
 <template>
   <div>
-    <fullscreen :fullscreen.sync="fullscreen" :teleport="teleport" :page-only="pageOnly" >
+    <fullscreen v-model="fullscreen" :teleport="teleport" :page-only="pageOnly" >
       Content
     </fullscreen>
     <button type="button" @click="toggle" >Fullscreen</button>
@@ -336,7 +336,7 @@ If you need to avoid name conflict, you can import it like this:
 ```html
 <template>
   <div>
-    <fs :fullscreen.sync="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
+    <fs v-model="fullscreen" :teleport="teleport" :page-only="pageOnly" @change="fullscreenChange" >
       content
     </fs>
     <button type="button" @click="toggle" >Fullscreen</button>

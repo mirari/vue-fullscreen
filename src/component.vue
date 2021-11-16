@@ -13,6 +13,13 @@
 import sf from 'screenfull'
 export default {
   props: {
+    value: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * @deprecated
+     */
     fullscreen: {
       type: Boolean,
       default: false
@@ -142,6 +149,7 @@ export default {
       }
       this.$emit('change', this.isFullscreen)
       this.$emit('update:fullscreen', this.isFullscreen)
+      this.$emit('input', this.isFullscreen)
     },
     enter () {
       this.request()
@@ -152,6 +160,11 @@ export default {
   },
 
   watch: {
+    value (value) {
+      if (value !== this.isFullscreen) {
+        value ? this.request() : this.exit()
+      }
+    },
     fullscreen (value) {
       if (value !== this.isFullscreen) {
         value ? this.request() : this.exit()
