@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/mirari/vue-fullscreen/compare/v3.0.12...v3.1.0) (2021-11-16)
+
+
+### Features
+
+* **directive:** new feature: directive ([15b4bd9](https://github.com/mirari/vue-fullscreen/commit/15b4bd9a311cd2f56c5a6d486806fef5068f52e7))
+
 ### [3.0.12](https://github.com/mirari/vue-fullscreen/compare/v3.0.11...v3.0.12) (2021-11-16)
 
 ### [3.0.11](https://github.com/mirari/vue-fullscreen/compare/v3.0.10...v3.0.11) (2021-07-15)
