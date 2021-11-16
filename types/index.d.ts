@@ -73,6 +73,8 @@ export declare const api: VueFullscreen.VueFullscreenApi
 
 export declare const component: Component
 
+export declare const directive: DirectiveOptions
+
 export default VueFullscreen
 
 declare module "vue/types/vue" {
