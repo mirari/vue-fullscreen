@@ -1,6 +1,6 @@
 import { App } from 'vue'
 import Screenfull from 'screenfull'
-import type { DefineComponent } from 'vue'
+import type { Directive, DefineComponent } from 'vue'
 
 declare namespace VueFullscreen {
   export interface InstallationOptions {
@@ -57,6 +57,8 @@ export declare const screenfull: typeof Screenfull
 export declare const api: VueFullscreen.VueFullscreenApi
 
 export declare const component: DefineComponent<{}, {}, any>
+
+export declare const directive: Directive
 
 export default VueFullscreen
 

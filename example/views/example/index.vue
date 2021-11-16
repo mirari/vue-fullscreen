@@ -28,6 +28,18 @@
       </p>
       <api-example />
     </div>
+    <div>
+      <h2 class="title is-4">
+        Directive
+      </h2>
+      <p class="subtitle">
+        <a
+          href="https://github.com/mirari/vue-fullscreen/blob/v3/example/views/example/DirectiveExample.vue"
+          target="_blank"
+        >Source</a>
+      </p>
+      <directive-example />
+    </div>
   </div>
 </template>
 
@@ -35,9 +47,11 @@
 import { defineComponent } from 'vue'
 import ComponentExample from './ComponentExample.vue'
 import ApiExample from './ApiExample.vue'
+import DirectiveExample from './DirectiveExample.vue'
 
 export default defineComponent({
   components: {
+    DirectiveExample,
     ComponentExample,
     ApiExample,
   },
