@@ -62,7 +62,7 @@ The method names are changed as follows:
 Install from NPM
 
 ```bash
-npm install vue-fullscreen
+npm install vue-fullscreen@legacy
 ```
 ## Usage
 
