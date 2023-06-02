@@ -52,10 +52,10 @@ export default {
   components: {
     DirectiveExample,
     ComponentExample,
-    ApiExample
+    ApiExample,
   },
 
-  data () {
+  data() {
     return {
     }
   },
@@ -64,9 +64,9 @@ export default {
 
   },
 
-  mounted () {
+  mounted() {
 
-  }
+  },
 }
 </script>
 

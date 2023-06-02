@@ -1,70 +1,77 @@
 <template>
   <div id="app">
-    <a class="github-fork-ribbon" href="https://github.com/mirari/vue-fullscreen" title="Fork me on GitHub">Fork me on GitHub</a>
-    <div class="jumbotron">
-      <div class="container">
-        <h1>vue-fullscreen</h1>
-        <p>A simple Vue.js component for fullscreen</p>
+    <a
+      class="github-fork-ribbon"
+      href="https://github.com/mirari/vue-fullscreen"
+      title="Fork me on GitHub"
+    >Fork me on GitHub</a>
+    <section
+      class="hero is-primary"
+      style="margin-bottom: 2em"
+    >
+      <div class="hero-body">
+        <div class="container">
+          <div class="columns is-vcentered">
+            <div class="column">
+              <p class="title is-1">
+                vue-fullscreen
+              </p>
+              <p class="subtitle is-4">
+                A simple Vue.js component for fullscreen, based on <a
+                  href="https://sindresorhus.com/screenfull.js/"
+                  target="_blank"
+                >screenfull</a>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="container">
-      <example></example>
-      <div class="row">
-        <doc class="col-md-12 markdown-body"></doc>
-      </div>
+    </section>
+    <div
+      class="container"
+      style="margin-bottom: 30px"
+    >
+      <example />
     </div>
     <footer class="footer">
       <div class="container">
-        <h4>
-          <a href="https://mirari.cc" target="_blank" title="mirari.cc">
-            mirari.cc
-          </a>
-          ·  GitHub
-          <a href="https://github.com/mirari" target="_blank" title="GitHub">
-            @mirari
-          </a>
-        </h4>
+        <div class="content has-text-centered">
+          <p>
+            <a
+              href="https://mirari.cc"
+              target="_blank"
+              title="mirari.cc"
+            >
+              <strong>mirari.cc</strong>
+            </a>
+            ·  GitHub
+            <a
+              href="https://github.com/mirari"
+              target="_blank"
+              title="GitHub"
+            >
+              @mirari
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   </div>
 </template>
 
 <script>
-import Doc from '../README.md'
-import Example from './views/example'
-import 'github-markdown-css'
-import 'highlight.js/styles/github.css'
+import Example from './views/example/index.vue'
 
 export default {
+  name: 'App',
   components: {
-    Doc,
-    Example
-  }
+    Example,
+  },
 }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  $mdi-font-path: '~mdi/fonts/';
-  @import "~mdi/scss/materialdesignicons.scss";
-
+<style lang="scss">
   .fullscreen {
     z-index: 10000;
     background: cyan;
-  }
-
-  .jumbotron {
-    color: white;
-    background: #41b883;
-  }
-
-  .footer {
-    margin-top: 30px;
-    padding: 20px;
-    color: white;
-    background: #41b883;
-    text-align: center;
-
-    a {
-      color: white;
-    }
   }
 </style>

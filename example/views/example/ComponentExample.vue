@@ -32,20 +32,20 @@ import { component } from '../../../src'
 export default {
   name: 'ComponentExample',
   components: {
-    fullscreen: component
+    fullscreen: component,
   },
-  data () {
+  data() {
     return {
       fullscreen: false,
       teleport: true,
-      pageOnly: false
+      pageOnly: false,
     }
   },
   methods: {
-    toggle () {
+    toggle() {
       this.fullscreen = !this.fullscreen
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -15,7 +15,7 @@
       > teleport
     </label>
     <div class="directive-fullscreen-wrapper">
-      <button type="button" class="button" v-fullscreen="options">
+      <button v-fullscreen="options" type="button" class="button">
         toggle
       </button>
       <img v-show="!fullscreen" :src="'//picsum.photos/640/360?random=3'">
@@ -30,29 +30,29 @@ import { directive } from '../../../src'
 export default {
   name: 'DirectiveExample',
   directives: {
-    fullscreen: directive
+    fullscreen: directive,
   },
-  data () {
+  data() {
     return {
       fullscreen: false,
       teleport: true,
-      pageOnly: false
+      pageOnly: false,
     }
   },
   computed: {
-    options () {
+    options() {
       return {
         callback: (isFullscreen) => {
           this.fullscreen = isFullscreen
         },
         target: '.directive-fullscreen-wrapper',
         pageOnly: this.pageOnly,
-        teleport: this.teleport
+        teleport: this.teleport,
       }
-    }
+    },
   },
   methods: {
-  }
+  },
 }
 </script>
 

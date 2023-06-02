@@ -29,15 +29,15 @@ import { api as fullscreen } from '../../../src'
 
 export default {
   name: 'ApiExample',
-  data () {
+  data() {
     return {
       fullscreen: false,
       teleport: true,
-      pageOnly: false
+      pageOnly: false,
     }
   },
   methods: {
-    async toggle () {
+    async toggle() {
       await fullscreen.toggle(this.$el.querySelector('.fullscreen-wrapper'), {
         teleport: this.teleport,
         pageOnly: this.pageOnly,
@@ -45,11 +45,11 @@ export default {
           this.fullscreen = isFullscreen
           console.log(fullscreen.element)
           console.log(fullscreen.isFullscreen)
-        }
+        },
       })
       this.fullscreen = fullscreen.isFullscreen
-    }
-  }
+    },
+  },
 }
 </script>
 
