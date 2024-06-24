@@ -6,9 +6,10 @@
   "main": "./dist/index.umd.js",
   "unpkg": "./dist/index.umd.js",
   "module": "./dist/index.es.js",
-  "types": "./types/index.d.ts",
+  "typings": "./types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./types/index.d.js",
       "import": "./dist/index.es.js",
       "require": "./dist/index.umd.js"
     }
