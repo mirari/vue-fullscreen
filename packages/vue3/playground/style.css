@@ -1,0 +1,23 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 2rem;
+}
+button {
+  padding: 0.75rem;
+  margin: 0.5rem;
+  cursor: pointer;
+}
+#target,
+#api-target {
+  padding: 2rem;
+  box-sizing: border-box;
+  background: #eff6ff;
+}
+.fullscreen {
+  background: white !important;
+  overflow: auto;
+}
+output {
+  display: block;
+  margin: 1rem;
+}

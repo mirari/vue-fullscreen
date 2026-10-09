@@ -1,0 +1,14 @@
+{
+  "name": "@vue-fullscreen/vue2",
+  "version": "2.7.0-beta.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "vite playground --host 0.0.0.0",
+    "build:example": "vite build playground --base ./"
+  },
+  "devDependencies": {
+    "vue": "2.7.16"
+  }
+}

@@ -1,511 +1,123 @@
 # vue-fullscreen
 
-A simple Vue.js component for fullscreen, based on [screenfull.js](https://github.com/sindresorhus/screenfull.js)
+Vue components, directives and a promise-based API for native fullscreen and page-only fullscreen, powered by [screenfull](https://github.com/sindresorhus/screenfull).
 
-[![npm version](https://img.shields.io/npm/v/vue-fullscreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
-[![language](https://img.shields.io/badge/language-Vue2-brightgreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
+One repository maintains both Vue versions. The shared browser logic is bundled into each release; Vue itself is always a peer dependency.
 
-[![npm version](https://img.shields.io/npm/v/vue-fullscreen/next.svg)](https://www.npmjs.com/package/vue-fullscreen)
-[![language](https://img.shields.io/badge/language-Vue3-brightgreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
+## Install
 
-[![npm download](https://img.shields.io/npm/dw/vue-fullscreen.svg)](https://www.npmjs.com/package/vue-fullscreen)
-[![license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://mit-license.org/)
-
-## [vue-fullscreen for vue2](https://github.com/mirari/vue-fullscreen)
-
-## [Live demo](http://mirari.github.io/vue3-fullscreen/)
-
-## Quick Example
-
-- [Component](https://codepen.io/mirari/pen/LYWeNZM)
-- [Api](https://codepen.io/mirari/pen/abJENpa)
-- [Directive](https://codepen.io/mirari/pen/yLoQZLp)
-- [Compatible handling in iPhone & Popups in fullscreen](https://codepen.io/mirari/pen/abJEVNe)
-- [Navigate to a new page without exiting fullscreen](https://codepen.io/mirari/pen/oNZEOEw)
-
-## [中文文档](https://mirari.cc/posts/vue3-fullscreen)
-
-## Support
-
-[Supported browsers](http://caniuse.com/fullscreen)
-
-**Note**: In order to use this package in Internet Explorer, you need a Promise polyfill.
-
-**Note**: Safari is supported on desktop and iPad, but not on iPhone. 
-
-**Note:** Navigating to another page, changing tabs, or switching to another application using any application switcher (or Alt-Tab) will likewise exit full-screen mode.
-
-[Learn more](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API)
-
-## Installation
-
-Install from NPM
-
-```bash
+```sh
+# Vue 3
 npm install vue-fullscreen@next
+# Vue 2
+npm install vue-fullscreen@legacy
 ```
 
-## Usage
+This branch prepares **3.2.0-beta.0** and **2.7.0-beta.0**; neither is published yet. Stable releases keep the existing `next` (Vue 3) and `legacy` (Vue 2) channels. Prereleases use `vue3-beta` and `vue2-beta`. Changing npm's `latest` channel is a separate maintainer decision.
 
-To use `vue-fullscreen`, simply import it, and call `app.use()` to install.
+Supported peers: Vue 3.0+ and Vue 2.6.14/2.7. Development uses Vue 3.5 and Vue 2.7. Browser bundles target ES2018; Internet Explorer is no longer a supported build target. Importing the package during SSR is supported; fullscreen operations require the DOM.
 
-The component, directive and api will be installed together in the global.
+## Component
 
 ```ts
+// Vue 3
 import { createApp } from 'vue'
 import VueFullscreen from 'vue-fullscreen'
 import App from './App.vue'
 
-export const app = createApp(App)
-app.use(VueFullscreen)
-app.mount('#app')
-
+createApp(App).use(VueFullscreen).mount('#app')
 ```
 
-```vue
-<template>
-<div ref="root">
-  <!-- Component  -->
-  <fullscreen v-model="fullscreen">
-    content
-  </fullscreen>
-  <!-- Api  -->
-  <button type="button" @click="toggleApi" >FullscreenApi</button>
-  <!-- Directive  -->
-  <button type="button" v-fullscreen >FullscreenDirective</button>
-  </div>
-</template>
-<script lang="ts">
-  import {
-    ref,
-    defineComponent,
-    toRefs,
-    reactive
-  } from 'vue'
-  export default defineComponent({
-    methods: {
-      toggleApi () {
-        this.$fullscreen.toggle()
-      }
-    },
-    setup () {
-      const root = ref()
-      const state = reactive({
-        fullscreen: false,
-      })
-      function toggle () {
-        state.fullscreen = !state.fullscreen
-      }
-      return {
-        root,
-        ...toRefs(state),
-        toggle
-      }
-    }
-  })
-</script>
+```ts
+// Vue 2
+import Vue from 'vue'
+import VueFullscreen from 'vue-fullscreen'
+
+Vue.use(VueFullscreen)
 ```
-
-**Caution:** Because of the browser security function, you can only call these methods by a user gesture(`click` or `keypress`).
-
-
-
-### Usage of api
-
-In your vue component, You can use `this.$fullscreen` to get the instance.
-
-```javascript
-this.$fullscreen.toggle()
-```
-
-Or you can just import the api method and call it.
-
-```vue
-<template>
-<div ref="root">
-  <div class="fullscreen-wrapper">
-    Content
-  </div>
-  <button type="button" @click="toggle" >Fullscreen</button>
-  </div>
-</template>
-<script lang="ts">
-  import {
-    ref,
-    defineComponent,
-    toRefs,
-    reactive,
-  } from 'vue'
-  import { api as fullscreen } from 'vue-fullscreen'
-  export default defineComponent({
-    setup() {
-      const root = ref()
-      const state = reactive({
-        fullscreen: false,
-        teleport: true,
-      })
-
-      async function toggle () {
-        await fullscreen.toggle(root.value.querySelector('.fullscreen-wrapper'), {
-          teleport: state.teleport,
-          callback: (isFullscreen) => {
-            // state.fullscreen = isFullscreen
-          },
-        })
-        state.fullscreen = fullscreen.isFullscreen
-      }
-
-      return {
-        root,
-        ...toRefs(state),
-        toggle,
-      }
-    },
-  })
-</script>
-```
-
-### Methods & Attributes
-
-#### toggle([target, options, force])
-
-Toggle the fullscreen mode.
-
-- **target**:
-  - Type: `Element`
-  - Default: `document.body`
-  - The element target for fullscreen.
-- **options** (optional):
-  - Type: `Object`
-  - The fullscreen options.
-- **force** (optional):
-  - Type: `Boolean`
-  - Default: `undefined`
-  - pass `true` to  force enter , `false` to exit fullscreen mode.
-
-#### request([target, options])
-
-enter the fullscreen mode.
-
-- **target**:
-  - Type: `Element`
-  - Default: `document.body`
-  - The element target for fullscreen.
-- **options** (optional):
-  - Type: `Object`
-  - The fullscreen options.
-
-#### exit()
-
-exit the fullscreen mode.
-
-**Note:** Each of these methods returns a promise object, and you can get the state after the promise has been resolved, or you can pass a callback function in options to get.
-
-```javascript
-async toggle () {
-  await this.$fullscreen.toggle()
-  this.fullscreen = this.$fullscreen.isFullscreen
-}
-```
-
-#### isFullscreen
-
-get the fullscreen state.
-
-- Type: `Boolean`
-
-**Caution:** The action is asynchronous, you can not get the expected state immediately following the calling method.
-
-#### isEnabled
-
-check browser support for the fullscreen API.
-
-- Type: `Boolean`
-
-#### element
-
-get the fullscreen element.
-
-- Type: `Element | null`
-
-
-### Options
-
-### callback
-
-- Type: `Function`
-- Default: `null`
-
-It will be called when the fullscreen mode changed.
-
-### fullscreenClass
-
-- Type: `String`
-- Default: `fullscreen`
-
-The class will be added to target element when fullscreen mode is on.
-
-#### pageOnly
-
-- Type: `Boolean`
-- Default: `false`
-
-If `true`, only fill the page with current element.
-
-**Note:** If the browser does not support full-screen Api, this option will be automatically enabled.
-
-#### teleport
-
-- Type: `Boolean`
-- Default: `true`
-
-If `true`, the target element will be appended to `document.body` when it is fullscreen.
-
-This can avoid some pop-ups not being displayed.
-
-
-
-
-## Use as directive
-
-You can use `v-fullscreen` to make any element have the effect of switching to full screen with a click.
-
-```html
-<button v-fullscreen>FullScreen</button>
-```
-Or you can just import the directive and install it.
 
 ```vue
 <template>
   <div>
-    <div class="fullscreen-wrapper">
-      Content
-    </div>
-    <button type="button" v-fullscreen.teleport="options" >Fullscreen</button>
+    <button @click="active = true">Enter fullscreen</button>
+    <fullscreen v-model="active" :teleport="true" @error="handleError">
+      <p>Fullscreen content</p>
+      <button @click="active = false">Exit</button>
+    </fullscreen>
   </div>
 </template>
-<script lang="ts">
-  import {
-    ref,
-    defineComponent,
-    toRefs,
-    reactive
-  } from 'vue'
-  import { directive as fullscreen } from 'vue-fullscreen'
-  export default defineComponent({
-    directives: {
-      fullscreen
-    },
-    setup () {
-      const root = ref()
-      const state = reactive({
-        options: {
-          target: ".fullscreen-wrapper",
-          callback (isFullscreen) {
-            console.log(isFullscreen)
-          },
-        },
-      })
-      return {
-        root,
-        ...toRefs(state),
-        toggle
-      }
-    }
-  })
-</script>
 ```
 
-### Modifiers
+Declare `active` in your component state and handle `error` as appropriate. Both Vue versions use the same template; Vue 2 uses `value`/`input`, Vue 3 uses `modelValue`/`update:modelValue` internally. For local registration, import `{ component }`.
 
-#### pageOnly
+| Prop                 | Default        | Behavior                                                                                                                                    |
+| -------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pageOnly`           | `false`        | Fill the page without invoking native fullscreen. Automatic fallback where native fullscreen is unavailable.                                |
+| `teleport`           | `false`        | Move the wrapper to `document.body` while active and restore it on exit. Native fullscreen targets the body so overlays can remain visible. |
+| `fullscreenClass`    | `'fullscreen'` | Class applied while active.                                                                                                                 |
+| `exitOnClickWrapper` | `true`         | Clicking the wrapper background exits fullscreen.                                                                                           |
+| `fullscreen`         | `false`        | Deprecated model prop; `update:fullscreen` remains supported.                                                                               |
 
-only fill the page with current element.
+`change` emits the new boolean state. Component-triggered rejected requests emit `error`. Component refs expose `request()`, `exit()`, `toggle(force?)`, `isFullscreen`, and `isEnabled`; Vue 2 also retains `enter()`, `getState()`, and `support`. Methods return promises. Escape exits page mode; browsers control Escape in native mode. Listeners and teleported elements are cleaned up on unmount.
 
-#### teleport
-
-the component will be appended to `document.body` when it is fullscreen.
-
-This can avoid some pop-ups not being displayed.
-
-### Options
-
-#### target
-
-- Type: `String | Element`
-- Default: `document.body`
-
-The element can be specified using a style selector string, equivalent to `document.querySelector(target)`. Note that when passing an element object directly, you need to make sure that the element already exists. The internal elements of the current component may not be initialized when the directive is initialized.
-
-#### callback
-
-- Type: `Function`
-- Default: `null`
-
-It will be called when the fullscreen mode changed.
-
-#### fullscreenClass
-
-- Type: `String`
-- Default: `fullscreen`
-
-The class will be added to target element when fullscreen mode is on.
-
-
-
-## Usage of component
-
-You can simply import the component and register it locally too.
-
-```vue
-<template>
-<div>
-  <fullscreen v-model="fullscreen" :teleport="teleport" :page-only="pageOnly" >
-    Content
-  </fullscreen>
-  <button type="button" @click="toggle" >Fullscreen</button>
-  </div>
-</template>
-
-<script lang="ts">
-  import {
-    defineComponent,
-    toRefs,
-    reactive,
-  } from 'vue'
-  import { component } from 'vue-fullscreen'
-
-  export default defineComponent({
-    name: 'ComponentExample',
-    components: {
-      fullscreen: component,
-    },
-    setup() {
-      const state = reactive({
-        fullscreen: false,
-        teleport: true,
-        pageOnly: false,
-      })
-      function toggle() {
-        state.fullscreen = !state.fullscreen
-      }
-
-      return {
-        ...toRefs(state),
-        toggle,
-      }
-    },
-  })
-</script>
-```
-
-### Props
-
-#### fullscreen-class
-
-- Type: `String`
-- Default: `fullscreen`
-
-The class will be added to the component when fullscreen mode is on.
-
-#### exit-on-click-wrapper
-
-- Type: `Boolean`
-- Default: `true`
-
-If `true`, clicking wrapper will exit fullscreen.
-
-#### page-only
-
-- Type: `Boolean`
-- Default: `false`
-
-If `true`, only fill the page with current element.
-
-**Note:** If the browser does not support full-screen Api, this option will be automatically enabled.
-
-#### teleport
-
-- Type: `Boolean`
-- Default: `true`
-
-If `true`, the component will be appended to `document.body` when it is fullscreen.
-
-This can avoid some pop-ups not being displayed.
-
-### Events
-
-#### change
-
-- **isFullscreen**:  The current fullscreen state.
-
-This event fires when the fullscreen mode changed.
-
-
-
-
-## Plugin options
-
-### name
-
-- Type: `String`
-- Default: `fullscreen`
-
-If you need to avoid name conflict, you can import it like this:
+## API
 
 ```ts
-import { createApp } from 'vue'
-import VueFullscreen from 'vue-fullscreen'
-import App from './App.vue'
+import { api } from 'vue-fullscreen'
 
-export const app = createApp(App)
-app.use(VueFullscreen, {
-  name: 'fs',
+// Call from a user gesture to satisfy native fullscreen activation requirements.
+await api.request(document.querySelector('#content'), {
+  teleport: true,
+  pageOnly: false,
+  fullscreenClass: 'fullscreen',
+  callback: (active) => console.log(active),
 })
-app.mount('#app')
-
+await api.exit()
+await api.toggle(document.querySelector('#content'), { pageOnly: true })
 ```
+
+`request(target?, options?)` defaults to `document.body`. `toggle(target?, options?, force?)` accepts an optional forced state. `exit()` is idempotent. Read `api.isFullscreen`, `api.isEnabled`, `api.element`, and `api.options` for state. Handle rejected promises when the browser denies a native request. Only HTML elements are accepted as targets. The singleton API and each component have separate controllers; avoid requesting competing fullscreen targets simultaneously.
+
+## Directive
 
 ```vue
-<template>
-<div ref="root">
-  <!-- Component  -->
-  <fs v-model="fullscreen">
-    content
-  </fs>
-  <!-- Api  -->
-  <button type="button" @click="toggleApi" >FullscreenApi</button>
-  <!-- Directive  -->
-  <button type="button" v-fs >FullscreenDirective</button>
-  </div>
-</template>
-<script lang="ts">
-  import {
-    ref,
-    defineComponent,
-    toRefs,
-    reactive
-  } from 'vue'
-  export default defineComponent({
-    methods: {
-      toggleApi () {
-        this.$fs.toggle()
-      }
-    },
-    setup () {
-      const root = ref()
-      const state = reactive({
-        fullscreen: false,
-      })
-      function toggle () {
-        state.fullscreen = !state.fullscreen
-      }
-      return {
-        root,
-        ...toRefs(state),
-        toggle
-      }
-    }
-  })
-</script>
+<button v-fullscreen.pageOnly.teleport="{ target: '#content' }">
+  Toggle fullscreen
+</button>
 ```
+
+The binding accepts a selector string or an options object with `target` (selector or element) and the same API options. With no target it uses the body. A missing selector reports an error rather than fullscreening the body. Listen for the bubbling native `fullscreen-error` event to handle directive failures. Import `{ directive }` for local registration.
+
+## Plugin and module formats
+
+`app.use(VueFullscreen, { name: 'fs' })` (or `Vue.use` in Vue 2) registers the `fs` component, `v-fs` directive and `$fs` API. The default name is `fullscreen`, with `$fullscreen` typed on component instances. Custom global property names need your own TypeScript augmentation.
+
+The default export is the plugin; named exports are `component`, `directive`, `api`, and `screenfull`. ESM, CJS and browser-global UMD bundles are included with declarations for both module systems. The UMD bundle is `index.umd.js` and exposes `window.VueFullscreen`; load the matching Vue global first. Bundled screenfull 6 retains the public `screenfull` export; native fullscreen support follows the browser's capabilities.
+
+## Development
+
+Node.js 24.15+ LTS is recommended; CI also checks Node.js 22.22.2+.
+
+```sh
+npm ci
+npm run dev          # Vue 3 playground
+npm run dev:vue2     # Vue 2 playground
+npm run check        # format, types, tests, builds, installed-package checks
+npx playwright install chromium
+npm run test:browser
+```
+
+Append `?pageOnly` to a playground URL to exercise page fullscreen. For a system Chromium installation, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/path/to/chromium` when running browser tests.
+
+```text
+packages/core/       shared fullscreen controller and directive behavior
+packages/vue2/       Vue 2 adapter, tests and playground
+packages/vue3/       Vue 3 adapter, tests and playground
+scripts/             build, installed-package validation and releases
+```
+
+Adapters use typed render functions, so both Vue versions share modern Vite without relying on an obsolete Vue 2 SFC plugin.
+
+Builds produce publishable directories in `dist/vue2` and `dist/vue3`. Workspace packages have unique private names; only generated release manifests use `vue-fullscreen`. Do not publish the workspace root or adapters directly.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for releases, CI/CD setup and migration details. Existing release history remains in [CHANGELOG.md](./CHANGELOG.md).
