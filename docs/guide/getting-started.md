@@ -1,6 +1,6 @@
 # 快速上手
 
-安装 Vue 3 对应的软件包，再注册组件。Vue 2 请使用独立的 [Vue 2 文档](/vue2/)。
+安装软件包，在应用中注册插件，然后通过页面状态控制全屏。
 
 ## 1. 安装
 
@@ -8,7 +8,7 @@
 npm install vue-fullscreen@next
 ```
 
-Vue 3 使用 `next` 渠道。接口版本和安装渠道见[兼容性说明](/guide/compatibility)。
+接口版本和安装渠道见[兼容性说明](/guide/compatibility)。
 
 ## 2. 注册插件
 

@@ -1,6 +1,6 @@
 # Getting started
 
-Install the package for Vue 3, then register the plugin in your application. For Vue 2, use the separate [Vue 2 documentation](/en/vue2/).
+Install the package, register the plugin in your application, and bind fullscreen to a state value.
 
 ## 1. Install
 
@@ -8,7 +8,7 @@ Install the package for Vue 3, then register the plugin in your application. For
 npm install vue-fullscreen@next
 ```
 
-The `next` channel provides the Vue 3 package. See [compatibility](/en/guide/compatibility) for API versions and package channels.
+See [compatibility](/en/guide/compatibility) for API versions and package channels.
 
 ## 2. Register the plugin
 

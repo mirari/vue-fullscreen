@@ -3,7 +3,7 @@ layout: home
 hero:
   name: vue-fullscreen
   text: Fullscreen for Vue
-  tagline: Control native or page-only fullscreen in Vue 3 using a component, directive or API.
+  tagline: Control native or page-only fullscreen using a component, directive or API.
   actions:
     - theme: brand
       text: Getting started

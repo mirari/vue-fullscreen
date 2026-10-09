@@ -26,7 +26,7 @@ function navigation(english: boolean, vue2 = false) {
     ],
     sidebar: [
       {
-        text: `${vue2 ? 'Vue 2' : 'Vue 3'} · ${english ? 'Getting started' : '开始使用'}`,
+        text: `${vue2 ? 'Vue 2 · ' : ''}${english ? 'Getting started' : '开始使用'}`,
         items: [
           {
             text: english ? 'Installation' : '快速上手',
@@ -85,7 +85,7 @@ export default defineConfig({
     root: {
       label: '简体中文',
       lang: 'zh-CN',
-      description: 'Vue 3 的全屏组件、指令与 API。',
+      description: 'Vue 的全屏组件、指令与 API。',
       themeConfig: {
         ...navigation(false),
         sidebar: {
@@ -117,7 +117,7 @@ export default defineConfig({
     en: {
       label: 'English',
       lang: 'en-US',
-      description: 'Fullscreen components, directives and API for Vue 3.',
+      description: 'Fullscreen components, directives and API for Vue.',
       themeConfig: {
         ...navigation(true),
         sidebar: {

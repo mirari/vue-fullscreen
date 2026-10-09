@@ -3,7 +3,7 @@ layout: home
 hero:
   name: vue-fullscreen
   text: Vue 全屏组件
-  tagline: 用于 Vue 3，通过组件、指令或 API 控制原生全屏和网页全屏。
+  tagline: 通过组件、指令或 API 控制原生全屏和网页全屏。
   actions:
     - theme: brand
       text: 快速上手
