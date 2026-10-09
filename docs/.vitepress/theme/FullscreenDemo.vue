@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
-import { useData, withBase } from 'vitepress'
+import { useData } from 'vitepress'
 import {
   api,
   component as Fullscreen,
@@ -16,14 +16,16 @@ const pageOnly = ref(false)
 const teleport = ref(true)
 const error = ref('')
 const target = ref<HTMLElement>()
-const photos = [
-  { file: 'tibet-1.jpg', zh: '错那湖', en: 'Cuo Na Lake' },
-  { file: 'tibet-2.jpg', zh: '青藏高原', en: 'Tibetan Plateau' },
-  { file: 'tibet-7.jpg', zh: '拉萨河', en: 'Lhasa River' },
-]
+// Same image source and sizes as the v-viewer demo; stable IDs avoid hydration drift.
+const photos = Array.from({ length: 5 }, (_, index) => ({
+  id: 10 + index,
+  zh: `图片 ${index + 1}`,
+  en: `Image ${index + 1}`,
+}))
 const selected = ref(0)
 const photo = computed(() => photos[selected.value])
-const photoUrl = (file: string) => withBase(`/images/gallery/${file}`)
+const photoUrl = (id: number, fullSize = false) =>
+  `https://picsum.photos/id/${id}/${fullSize ? '1440/900' : '346/216'}`
 function movePhoto(offset: number) {
   selected.value = (selected.value + offset + photos.length) % photos.length
 }
@@ -43,7 +45,7 @@ const text = computed(() =>
         previous: 'Previous image',
         next: 'Next image',
         gallery: 'Image browser',
-        credit: 'Photos: Viewer.js examples',
+        credit: 'Photos: Lorem Picsum',
         pageCaption:
           'Page-only mode keeps the browser toolbar visible. Press Esc or use the exit button to leave.',
         nativeCaption:
@@ -62,7 +64,7 @@ const text = computed(() =>
         previous: '上一张',
         next: '下一张',
         gallery: '图片浏览',
-        credit: '图片：Viewer.js 示例',
+        credit: '图片：Lorem Picsum',
         pageCaption: '网页全屏保留浏览器工具栏，按 Esc 或点击退出按钮退出。',
         nativeCaption: '原生全屏由浏览器提供，是否可用取决于浏览器支持与权限。',
         error: '无法进入全屏：',
@@ -148,10 +150,10 @@ onBeforeUnmount(() => {
       <div class="gallery-stage">
         <img
           class="gallery-image"
-          :src="photoUrl(photo.file)"
+          :src="photoUrl(photo.id, true)"
           :alt="english ? photo.en : photo.zh"
-          width="1280"
-          height="720"
+          width="1440"
+          height="900"
         />
         <button
           class="gallery-arrow gallery-previous"
@@ -171,13 +173,13 @@ onBeforeUnmount(() => {
       <div class="gallery-thumbnails" :aria-label="text.gallery">
         <button
           v-for="(item, index) in photos"
-          :key="item.file"
+          :key="item.id"
           :aria-label="english ? item.en : item.zh"
           :aria-pressed="selected === index"
           @click="selected = index"
         >
           <img
-            :src="photoUrl(item.file)"
+            :src="photoUrl(item.id)"
             alt=""
             width="64"
             height="40"
@@ -188,12 +190,9 @@ onBeforeUnmount(() => {
     </component>
     <p class="demo-caption">
       {{ pageOnly ? text.pageCaption : text.nativeCaption }}
-      <a
-        href="https://github.com/fengyuanchen/viewerjs"
-        target="_blank"
-        rel="noopener"
-        >{{ text.credit }}</a
-      >
+      <a href="https://picsum.photos" target="_blank" rel="noopener">{{
+        text.credit
+      }}</a>
     </p>
     <p v-if="error" role="alert" class="demo-error">
       {{ text.error }} {{ error }}

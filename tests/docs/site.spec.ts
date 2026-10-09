@@ -1,5 +1,15 @@
 import { expect, test } from '@playwright/test'
 
+// Exercise the v-viewer demo image URLs without depending on a third-party image service in CI.
+test.beforeEach(async ({ page }) => {
+  await page.route('https://picsum.photos/**', (route) =>
+    route.fulfill({
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720"><rect width="1280" height="720" fill="#406b8a"/></svg>',
+    }),
+  )
+})
+
 for (const english of [false, true]) {
   const prefix = english ? './en/' : './'
   const text = english
@@ -284,6 +294,10 @@ for (const english of [false, true]) {
       await page.goto(`${english ? './en/' : './'}${route}`)
       const demo = page.locator('[data-demo="component"]')
       const image = page.locator('#demo-component .gallery-image')
+      await expect(demo.locator('.gallery-thumbnails button')).toHaveCount(5)
+      await expect(
+        demo.locator('.gallery-thumbnails img').first(),
+      ).toHaveAttribute('src', /picsum\.photos\/id\/10\/346\/216$/)
       await expect
         .poll(() =>
           image.evaluate(
@@ -297,7 +311,10 @@ for (const english of [false, true]) {
           exact: true,
         })
         .click()
-      await expect(image).toHaveAttribute('src', /tibet-2.jpg$/)
+      await expect(image).toHaveAttribute(
+        'src',
+        /picsum\.photos\/id\/11\/1440\/900$/,
+      )
       await demo
         .getByRole('button', {
           name: english ? 'Enter fullscreen' : '进入全屏',
@@ -306,14 +323,20 @@ for (const english of [false, true]) {
         .click()
       const target = page.locator('#demo-component')
       await expect(target).toHaveClass(/demo-fullscreen/)
-      await expect(image).toHaveAttribute('src', /tibet-2.jpg$/)
+      await expect(image).toHaveAttribute(
+        'src',
+        /picsum\.photos\/id\/11\/1440\/900$/,
+      )
       await target
         .getByRole('button', {
-          name: english ? 'Lhasa River' : '拉萨河',
+          name: english ? 'Image 3' : '图片 3',
           exact: true,
         })
         .click()
-      await expect(image).toHaveAttribute('src', /tibet-7.jpg$/)
+      await expect(image).toHaveAttribute(
+        'src',
+        /picsum\.photos\/id\/12\/1440\/900$/,
+      )
       await expect
         .poll(() =>
           image.evaluate(
@@ -323,14 +346,21 @@ for (const english of [false, true]) {
         .toBe(true)
       await target.focus()
       await page.keyboard.press('ArrowLeft')
-      await expect(image).toHaveAttribute('src', /tibet-2.jpg$/)
+      await expect(image).toHaveAttribute(
+        'src',
+        /picsum\.photos\/id\/11\/1440\/900$/,
+      )
       await target
         .getByRole('button', {
           name: english ? 'Exit fullscreen' : '退出全屏',
           exact: true,
         })
         .click()
-      await expect(demo.locator('.gallery-count')).toHaveText('2 / 3')
+      await expect(demo.locator('.gallery-count')).toHaveText('2 / 5')
+      await expect(image).toHaveAttribute(
+        'src',
+        /picsum\.photos\/id\/11\/1440\/900$/,
+      )
     })
   }
 }
