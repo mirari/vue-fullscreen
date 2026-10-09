@@ -8,8 +8,8 @@ import {
 } from 'vue-fullscreen'
 
 const props = withDefaults(
-  defineProps<{ kind?: 'component' | 'directive' | 'api' }>(),
-  { kind: 'component' },
+  defineProps<{ kind?: 'component' | 'directive' | 'api'; simple?: boolean }>(),
+  { kind: 'component', simple: false },
 )
 const active = ref(false)
 const pageOnly = ref(false)
@@ -51,7 +51,6 @@ const text = computed(() =>
         previous: 'Previous image',
         next: 'Next image',
         gallery: 'Image browser',
-        credit: 'Photos: personal collection',
         pageCaption:
           'Page-only mode keeps the browser toolbar visible. Press Esc or use the exit button to leave.',
         nativeCaption:
@@ -70,7 +69,6 @@ const text = computed(() =>
         previous: '上一张',
         next: '下一张',
         gallery: '图片浏览',
-        credit: '图片：个人摄影',
         pageCaption: '网页全屏保留浏览器工具栏，按 Esc 或点击退出按钮退出。',
         nativeCaption: '原生全屏由浏览器提供，是否可用取决于浏览器支持与权限。',
         error: '无法进入全屏：',
@@ -106,7 +104,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="fullscreen-demo" :data-demo="kind" :aria-label="text[kind]">
-    <div class="demo-controls">
+    <div v-if="!simple" class="demo-controls">
       <label
         ><input v-model="pageOnly" type="checkbox" :disabled="active" />
         {{ text.pageOnly }}</label
@@ -149,6 +147,9 @@ onBeforeUnmount(() => {
         <span class="gallery-count" aria-live="polite"
           >{{ selected + 1 }} / {{ photos.length }}</span
         >
+        <button v-if="simple && !active" class="gallery-exit" @click="enter">
+          {{ text.enter }}
+        </button>
         <button v-if="active" class="gallery-exit" @click="exit">
           {{ text.exit }}
         </button>
@@ -199,9 +200,8 @@ onBeforeUnmount(() => {
         </button>
       </div>
     </component>
-    <p class="demo-caption">
+    <p v-if="!simple" class="demo-caption">
       {{ pageOnly ? text.pageCaption : text.nativeCaption }}
-      <span>{{ text.credit }}</span>
     </p>
     <p v-if="error" role="alert" class="demo-error">
       {{ text.error }} {{ error }}

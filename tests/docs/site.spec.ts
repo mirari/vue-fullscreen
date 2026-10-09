@@ -297,6 +297,22 @@ for (const english of [false, true]) {
       await page.goto(`${english ? './en/' : './'}${route}`)
       const demo = page.locator('[data-demo="component"]')
       const image = page.locator('#demo-component .gallery-image')
+      if (!route) {
+        await expect(demo.getByRole('checkbox')).toHaveCount(0)
+        await expect(demo.locator('.demo-caption')).toHaveCount(0)
+        await expect(
+          page.getByRole('heading', {
+            name: english ? 'Component example' : '组件示例',
+            exact: true,
+          }),
+        ).toHaveCount(0)
+      } else {
+        await expect(demo.getByRole('checkbox')).toHaveCount(2)
+      }
+      await expect(demo).not.toContainText(
+        english ? 'Photos:' : '图片：个人摄影',
+      )
+
       await expect(demo.locator('.gallery-thumbnails')).toBeHidden()
       await expect(demo.locator('.gallery-thumbnails button')).toHaveCount(6)
       // Check every shipped variant, including photos beyond the switching sample.

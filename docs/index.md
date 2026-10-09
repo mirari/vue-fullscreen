@@ -25,10 +25,6 @@ features:
 
 <div class="vp-doc" style="max-width: 960px; margin: 32px auto; padding: 0 24px;">
 
-## 组件示例
-
-勾选「仅网页全屏」时，内容填满当前网页；取消勾选后使用浏览器原生全屏。
-
-<ClientOnly><FullscreenDemo /></ClientOnly>
+<ClientOnly><FullscreenDemo simple /></ClientOnly>
 
 </div>

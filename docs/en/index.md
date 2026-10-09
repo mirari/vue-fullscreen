@@ -25,10 +25,6 @@ features:
 
 <div class="vp-doc" style="max-width: 960px; margin: 32px auto; padding: 0 24px;">
 
-## Component example
-
-With “Page-only fullscreen” selected, the content fills the page. Clear the checkbox to use the browser's native fullscreen mode.
-
-<ClientOnly><FullscreenDemo /></ClientOnly>
+<ClientOnly><FullscreenDemo simple /></ClientOnly>
 
 </div>
