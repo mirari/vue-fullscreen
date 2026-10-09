@@ -275,3 +275,62 @@ for (const vue2 of [false, true]) {
     })
   }
 }
+
+for (const english of [false, true]) {
+  for (const route of ['', 'guide/getting-started']) {
+    test(`${english ? 'en' : 'zh'} gallery on ${route || 'home'}`, async ({
+      page,
+    }) => {
+      await page.goto(`${english ? './en/' : './'}${route}`)
+      const demo = page.locator('[data-demo="component"]')
+      const image = page.locator('#demo-component .gallery-image')
+      await expect
+        .poll(() =>
+          image.evaluate(
+            (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
+          ),
+        )
+        .toBe(true)
+      await demo
+        .getByRole('button', {
+          name: english ? 'Next image' : '下一张',
+          exact: true,
+        })
+        .click()
+      await expect(image).toHaveAttribute('src', /tibet-2.jpg$/)
+      await demo
+        .getByRole('button', {
+          name: english ? 'Enter fullscreen' : '进入全屏',
+          exact: true,
+        })
+        .click()
+      const target = page.locator('#demo-component')
+      await expect(target).toHaveClass(/demo-fullscreen/)
+      await expect(image).toHaveAttribute('src', /tibet-2.jpg$/)
+      await target
+        .getByRole('button', {
+          name: english ? 'Lhasa River' : '拉萨河',
+          exact: true,
+        })
+        .click()
+      await expect(image).toHaveAttribute('src', /tibet-7.jpg$/)
+      await expect
+        .poll(() =>
+          image.evaluate(
+            (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
+          ),
+        )
+        .toBe(true)
+      await target.focus()
+      await page.keyboard.press('ArrowLeft')
+      await expect(image).toHaveAttribute('src', /tibet-2.jpg$/)
+      await target
+        .getByRole('button', {
+          name: english ? 'Exit fullscreen' : '退出全屏',
+          exact: true,
+        })
+        .click()
+      await expect(demo.locator('.gallery-count')).toHaveText('2 / 3')
+    })
+  }
+}

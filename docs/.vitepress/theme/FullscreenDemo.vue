@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
-import { useData } from 'vitepress'
+import { useData, withBase } from 'vitepress'
 import {
   api,
   component as Fullscreen,
@@ -16,6 +16,17 @@ const pageOnly = ref(false)
 const teleport = ref(true)
 const error = ref('')
 const target = ref<HTMLElement>()
+const photos = [
+  { file: 'tibet-1.jpg', zh: '错那湖', en: 'Cuo Na Lake' },
+  { file: 'tibet-2.jpg', zh: '青藏高原', en: 'Tibetan Plateau' },
+  { file: 'tibet-7.jpg', zh: '拉萨河', en: 'Lhasa River' },
+]
+const selected = ref(0)
+const photo = computed(() => photos[selected.value])
+const photoUrl = (file: string) => withBase(`/images/gallery/${file}`)
+function movePhoto(offset: number) {
+  selected.value = (selected.value + offset + photos.length) % photos.length
+}
 const { lang } = useData()
 const english = computed(() => lang.value.startsWith('en'))
 const text = computed(() =>
@@ -29,10 +40,10 @@ const text = computed(() =>
         directiveButton: 'Toggle with directive',
         enter: 'Enter fullscreen',
         exit: 'Exit fullscreen',
-        title: 'Example content',
-        description:
-          'This area can contain a chart, an image or other page content.',
-        hint: 'Use the button above to enter fullscreen.',
+        previous: 'Previous image',
+        next: 'Next image',
+        gallery: 'Image browser',
+        credit: 'Photos: Viewer.js examples',
         pageCaption:
           'Page-only mode keeps the browser toolbar visible. Press Esc or use the exit button to leave.',
         nativeCaption:
@@ -48,9 +59,10 @@ const text = computed(() =>
         directiveButton: '点击指令按钮',
         enter: '进入全屏',
         exit: '退出全屏',
-        title: '示例内容',
-        description: '这个区域可以放置图表、图片或其他页面内容。',
-        hint: '点击上方按钮进入全屏。',
+        previous: '上一张',
+        next: '下一张',
+        gallery: '图片浏览',
+        credit: '图片：Viewer.js 示例',
         pageCaption: '网页全屏保留浏览器工具栏，按 Esc 或点击退出按钮退出。',
         nativeCaption: '原生全屏由浏览器提供，是否可用取决于浏览器支持与权限。',
         error: '无法进入全屏：',
@@ -86,9 +98,6 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="fullscreen-demo" :data-demo="kind" :aria-label="text[kind]">
-    <div class="demo-toolbar">
-      <span class="demo-eyebrow">{{ text[kind] }}</span>
-    </div>
     <div class="demo-controls">
       <label
         ><input v-model="pageOnly" type="checkbox" :disabled="active" />
@@ -117,26 +126,74 @@ onBeforeUnmount(() => {
       ref="target"
       v-model="active"
       class="demo-surface"
+      tabindex="0"
+      :aria-label="text.gallery"
+      @keydown.left.prevent="movePhoto(-1)"
+      @keydown.right.prevent="movePhoto(1)"
       :page-only="pageOnly"
       :teleport="teleport"
       :exit-on-click-wrapper="false"
       fullscreen-class="demo-fullscreen"
       @error="report"
     >
-      <div class="demo-card">
-        <h3>{{ text.title }}</h3>
-        <p>{{ text.description }}</p>
-        <div class="demo-bars" aria-hidden="true">
-          <i /><i /><i /><i /><i /><i /><i />
-        </div>
-        <button v-if="active" class="demo-button demo-exit" @click="exit">
+      <div class="gallery-topbar">
+        <span>{{ english ? photo.en : photo.zh }}</span>
+        <span class="gallery-count" aria-live="polite"
+          >{{ selected + 1 }} / {{ photos.length }}</span
+        >
+        <button v-if="active" class="gallery-exit" @click="exit">
           {{ text.exit }}
         </button>
-        <span v-else class="demo-hint">{{ text.hint }}</span>
+      </div>
+      <div class="gallery-stage">
+        <img
+          class="gallery-image"
+          :src="photoUrl(photo.file)"
+          :alt="english ? photo.en : photo.zh"
+          width="1280"
+          height="720"
+        />
+        <button
+          class="gallery-arrow gallery-previous"
+          :aria-label="text.previous"
+          @click="movePhoto(-1)"
+        >
+          <span aria-hidden="true">‹</span>
+        </button>
+        <button
+          class="gallery-arrow gallery-next"
+          :aria-label="text.next"
+          @click="movePhoto(1)"
+        >
+          <span aria-hidden="true">›</span>
+        </button>
+      </div>
+      <div class="gallery-thumbnails" :aria-label="text.gallery">
+        <button
+          v-for="(item, index) in photos"
+          :key="item.file"
+          :aria-label="english ? item.en : item.zh"
+          :aria-pressed="selected === index"
+          @click="selected = index"
+        >
+          <img
+            :src="photoUrl(item.file)"
+            alt=""
+            width="64"
+            height="40"
+            loading="lazy"
+          />
+        </button>
       </div>
     </component>
     <p class="demo-caption">
       {{ pageOnly ? text.pageCaption : text.nativeCaption }}
+      <a
+        href="https://github.com/fengyuanchen/viewerjs"
+        target="_blank"
+        rel="noopener"
+        >{{ text.credit }}</a
+      >
     </p>
     <p v-if="error" role="alert" class="demo-error">
       {{ text.error }} {{ error }}
