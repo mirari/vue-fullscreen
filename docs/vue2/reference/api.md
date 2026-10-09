@@ -1,4 +1,4 @@
-# 完整 API
+# Vue 2 API 参考
 
 ## 导出
 
@@ -20,7 +20,7 @@ import VueFullscreen, {
 ## 插件
 
 ```ts
-app.use(VueFullscreen, { name: 'fs' }) // Vue 3
+Vue.use(VueFullscreen, { name: 'fs' }) // Vue 2
 ```
 
 | 选项   | 类型     | 默认值         | 作用                               |
@@ -35,7 +35,7 @@ app.use(VueFullscreen, { name: 'fs' }) // Vue 3
 
 | 属性                 | 类型      | 默认值         | 说明                                  |
 | -------------------- | --------- | -------------- | ------------------------------------- |
-| `modelValue`         | `boolean` | `false`        | `v-model` 绑定值                      |
+| `value`              | `boolean` | `false`        | `v-model` 绑定值                      |
 | `pageOnly`           | `boolean` | `false`        | 仅填满网页；不支持原生 API 时自动启用 |
 | `teleport`           | `boolean` | `false`        | 全屏期间将元素移动到 body             |
 | `fullscreenClass`    | `string`  | `'fullscreen'` | 激活期间的 class                      |
@@ -49,19 +49,22 @@ app.use(VueFullscreen, { name: 'fs' }) // Vue 3
 | 事件                | 参数      | 时机                             |
 | ------------------- | --------- | -------------------------------- |
 | `change`            | `boolean` | 全屏状态改变                     |
-| `update:modelValue` | `boolean` | 同步 `v-model`                   |
+| `input`             | `boolean` | 同步 `v-model`                   |
 | `update:fullscreen` | `boolean` | 同步旧模型属性                   |
 | `error`             | 错误对象  | 模型变化或容器点击触发的操作失败 |
 
 ### 实例
 
-| 成员           | 类型 / 签名                        | 作用             |
-| -------------- | ---------------------------------- | ---------------- |
-| `request`      | `(): Promise<void>`                | 请求全屏         |
-| `exit`         | `(): Promise<void>`                | 退出全屏         |
-| `toggle`       | `(force?: boolean): Promise<void>` | 切换或指定状态   |
-| `isFullscreen` | `boolean`                          | 当前全屏状态     |
-| `isEnabled`    | `boolean`                          | 原生全屏是否可用 |
+| 成员           | 类型 / 签名                        | 作用                   |
+| -------------- | ---------------------------------- | ---------------------- |
+| `request`      | `(): Promise<void>`                | 请求全屏               |
+| `exit`         | `(): Promise<void>`                | 退出全屏               |
+| `toggle`       | `(force?: boolean): Promise<void>` | 切换或指定状态         |
+| `isFullscreen` | `boolean`                          | 当前全屏状态           |
+| `isEnabled`    | `boolean`                          | 原生全屏是否可用       |
+| `enter`        | `(): Promise<void>`                | `request` 的兼容入口   |
+| `getState`     | `(): boolean`                      | 读取全屏状态           |
+| `support`      | `boolean`                          | `isEnabled` 的兼容属性 |
 
 直接调用方法时捕获返回 Promise 的拒绝。组件卸载时清理监听器和被移动的 DOM。
 

@@ -1,91 +1,202 @@
 import { expect, test } from '@playwright/test'
 
-test('production site supports navigation, local search and mobile layout', async ({
-  page,
-}) => {
-  const errors: string[] = []
-  page.on('pageerror', (error) => errors.push(error.message))
-  await page.goto('./')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText(
-    'vue-fullscreen',
-  )
-  await page.getByRole('link', { name: '快速上手', exact: true }).click()
-  await expect(page).toHaveURL(/\/guide\/getting-started$/)
-  await expect(
-    page.getByRole('heading', { level: 1, name: /快速上手/ }),
-  ).toBeVisible()
-  await page.reload()
-  await expect(page.locator('.vp-doc')).toContainText(
-    'npm install vue-fullscreen@next',
-  )
-  await page.getByRole('button', { name: '搜索文档' }).click()
-  await page.locator('#localsearch-input').fill('teleport')
-  await expect(page.locator('.VPLocalSearchBox .result').first()).toBeVisible()
-  await page.keyboard.press('Escape')
-  await page.setViewportSize({ width: 390, height: 844 })
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true)
-  await page.getByRole('button', { name: 'mobile navigation' }).click()
-  await expect(
-    page.getByRole('link', { name: '交互示例', exact: true }).last(),
-  ).toBeVisible()
-  expect(errors).toEqual([])
-})
+for (const english of [false, true]) {
+  const prefix = english ? './en/' : './'
+  const text = english
+    ? {
+        start: 'Getting started',
+        search: 'Search',
+        examples: 'Examples',
+        pageOnly: 'Page-only fullscreen',
+        enter: 'Enter fullscreen',
+        directive: 'Toggle with directive',
+        exit: 'Exit fullscreen',
+        inactive: 'Not fullscreen',
+        guide: 'Guide',
+      }
+    : {
+        start: '快速上手',
+        search: '搜索文档',
+        examples: '交互示例',
+        pageOnly: '仅网页全屏',
+        enter: '进入全屏',
+        directive: '点击指令按钮',
+        exit: '退出全屏',
+        inactive: '未全屏',
+        guide: '指南',
+      }
 
-for (const kind of ['component', 'directive', 'api']) {
+  test(`${english ? 'English' : 'Chinese'} navigation, search and mobile layout`, async ({
+    page,
+  }) => {
+    const errors: string[] = []
+    page.on('pageerror', (error) => errors.push(error.message))
+    await page.goto(prefix)
+    await expect(page.locator('html')).toHaveAttribute(
+      'lang',
+      english ? 'en-US' : 'zh-CN',
+    )
+    await page.getByRole('link', { name: text.start, exact: true }).click()
+    await expect(page).toHaveURL(
+      english ? /\/en\/guide\/getting-started$/ : /\/guide\/getting-started$/,
+    )
+    await page.reload()
+    await expect(page.locator('.vp-doc')).toContainText(
+      'npm install vue-fullscreen@next',
+    )
+    await expect(page.locator('.vp-doc')).not.toContainText(
+      'npm install vue-fullscreen@legacy',
+    )
+    await page.getByRole('button', { name: text.search, exact: true }).click()
+    await page.locator('#localsearch-input').fill('teleport')
+    await expect(
+      page.locator('.VPLocalSearchBox .result').first(),
+    ).toBeVisible()
+    await page.keyboard.press('Escape')
+    await page.setViewportSize({ width: 390, height: 844 })
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true)
+    await page.getByRole('button', { name: 'mobile navigation' }).click()
+    await expect(
+      page.getByRole('link', { name: text.examples, exact: true }).last(),
+    ).toBeVisible()
+    expect(errors).toEqual([])
+  })
+
+  for (const kind of ['component', 'directive', 'api']) {
+    for (const native of [false, true]) {
+      test(`${english ? 'en' : 'zh'} ${kind}: ${native ? 'native' : 'page'} fullscreen`, async ({
+        page,
+      }) => {
+        const errors: string[] = []
+        page.on('pageerror', (error) => errors.push(error.message))
+        await page.goto(`${prefix}examples`)
+        const demo = page.locator(`[data-demo="${kind}"]`)
+        await expect(demo).toBeVisible()
+        if (native) {
+          expect(await page.evaluate(() => document.fullscreenEnabled)).toBe(
+            true,
+          )
+          await demo.getByLabel(text.pageOnly).uncheck()
+        }
+        await demo
+          .getByRole('button', {
+            name: kind === 'directive' ? text.directive : text.enter,
+          })
+          .click()
+        const target = page.locator(`#demo-${kind}`)
+        await expect(target).toHaveClass(/demo-fullscreen/)
+        expect(
+          await target.evaluate((el) => el.parentElement === document.body),
+        ).toBe(true)
+        if (native)
+          expect(
+            await page.evaluate(
+              () => document.fullscreenElement === document.body,
+            ),
+          ).toBe(true)
+        await target.getByRole('button', { name: text.exit }).click()
+        await expect(demo.getByRole('status')).toHaveText(text.inactive)
+        await expect(demo.locator(`#demo-${kind}`)).toBeVisible()
+        expect(await page.evaluate(() => document.fullscreenElement)).toBeNull()
+        expect(errors).toEqual([])
+      })
+    }
+  }
+
+  test(`${english ? 'en' : 'zh'} API cleanup before navigation`, async ({
+    page,
+  }) => {
+    await page.goto(`${prefix}examples`)
+    await page
+      .locator('[data-demo="api"]')
+      .getByRole('button', { name: text.enter })
+      .click()
+    await expect(page.locator('body > #demo-api')).toBeVisible()
+    await page
+      .locator('.VPNavBarMenu')
+      .getByRole('link', { name: text.guide, exact: true })
+      .evaluate((el: HTMLElement) => el.click())
+    await expect(page).toHaveURL(/getting-started$/)
+    await expect(page.locator('body > #demo-api')).toHaveCount(0)
+  })
+
+  test(`${english ? 'en' : 'zh'} Vue 2 has a separate entry and sidebar`, async ({
+    page,
+  }) => {
+    await page.goto(prefix)
+    await page
+      .locator('.VPNavBarMenu')
+      .getByRole('link', { name: 'Vue 2', exact: true })
+      .click()
+    await expect(page).toHaveURL(english ? /\/en\/vue2\/$/ : /\/vue2\/$/)
+    await expect(page.locator('.vp-doc')).toContainText('vue-fullscreen@legacy')
+    const sidebar = page.locator('.VPSidebar')
+    const links = await sidebar
+      .locator('a[href]')
+      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href')))
+    expect(
+      links.every((href) => href?.startsWith(english ? '/en/vue2/' : '/vue2/')),
+    ).toBe(true)
+    await sidebar
+      .getByRole('link', { name: english ? 'Component' : '组件', exact: true })
+      .click()
+    await expect(page.locator('.vp-doc')).toContainText('input')
+    await expect(page.locator('.vp-doc')).not.toContainText('modelValue')
+    await page.locator('.VPNavBarTranslations button').click()
+    await page
+      .locator('.VPNavBarTranslations')
+      .getByRole('link', {
+        name: english ? '简体中文' : 'English',
+        exact: true,
+      })
+      .click()
+    await expect(page).toHaveURL(
+      english ? /\/vue2\/guide\/component$/ : /\/en\/vue2\/guide\/component$/,
+    )
+    await expect(page.locator('html')).toHaveAttribute(
+      'lang',
+      english ? 'zh-CN' : 'en-US',
+    )
+  })
+
   for (const native of [false, true]) {
-    test(`${kind} demo: ${native ? 'native' : 'page'} fullscreen and restore`, async ({
+    test(`${english ? 'en' : 'zh'} embedded Vue 2 ${native ? 'native' : 'page'} example`, async ({
       page,
     }) => {
-      const errors: string[] = []
-      page.on('pageerror', (error) => errors.push(error.message))
-      await page.goto('./examples')
-      const demo = page.locator(`[data-demo="${kind}"]`)
-      await expect(demo).toBeVisible()
-      if (native) {
-        expect(await page.evaluate(() => document.fullscreenEnabled)).toBe(true)
-        await demo.getByLabel('仅网页全屏').uncheck()
-      }
-      await demo
-        .getByRole('button', {
-          name: kind === 'directive' ? '点击指令按钮' : '进入全屏',
-        })
-        .click()
-      const target = page.locator(`#demo-${kind}`)
-      await expect(target).toHaveClass(/demo-fullscreen/)
-      expect(
-        await target.evaluate((el) => el.parentElement === document.body),
-      ).toBe(true)
+      await page.goto(`${prefix}vue2/examples`)
+      if (native) await page.getByLabel(text.pageOnly).uncheck()
+      const frame = page.frameLocator('iframe')
+      await expect(frame.locator('html')).toHaveAttribute(
+        'lang',
+        english ? 'en' : 'zh-CN',
+      )
+      await frame.locator('#enter').click()
+      await expect(frame.locator('#state')).toHaveText('true')
       if (native)
         expect(
-          await page.evaluate(
-            () => document.fullscreenElement === document.body,
-          ),
+          await frame
+            .locator('body')
+            .evaluate(() => document.fullscreenElement === document.body),
         ).toBe(true)
-      await target.getByRole('button', { name: '退出全屏' }).click()
-      await expect(demo.getByRole('status')).toHaveText('未全屏')
-      await expect(demo.locator(`#demo-${kind}`)).toBeVisible()
-      expect(await page.evaluate(() => document.fullscreenElement)).toBeNull()
-      expect(errors).toEqual([])
+      await frame.locator('#exit').click()
+      await expect(frame.locator('#state')).toHaveText('false')
     })
   }
 }
 
-test('API demo is restored before client-side navigation', async ({ page }) => {
-  await page.goto('./examples')
+test('language switch keeps the Vue 3 page', async ({ page }) => {
+  await page.goto('./guide/component')
+  await page.locator('.VPNavBarTranslations button').click()
   await page
-    .locator('[data-demo="api"]')
-    .getByRole('button', { name: '进入全屏' })
+    .locator('.VPNavBarTranslations')
+    .getByRole('link', { name: 'English', exact: true })
     .click()
-  await expect(page.locator('body > #demo-api')).toBeVisible()
-  // Trigger the real navigation link while the demo overlays the document.
-  await page
-    .locator('.VPNavBarMenu')
-    .getByRole('link', { name: '指南' })
-    .evaluate((el: HTMLElement) => el.click())
-  await expect(page).toHaveURL(/getting-started$/)
-  await expect(page.locator('body > #demo-api')).toHaveCount(0)
+  await expect(page).toHaveURL(/\/en\/guide\/component$/)
+  await expect(page.locator('[data-demo="component"]')).toContainText(
+    'Enter fullscreen',
+  )
 })

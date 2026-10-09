@@ -8,3 +8,4 @@ test-results/
 .env*.local
 .DS_Store
 docs/.vitepress/cache/
+docs/public/vue2-demo/

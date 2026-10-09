@@ -1,35 +1,29 @@
-# 指令
+# Vue 2 指令
 
-无需维护模型状态，点击绑定的按钮即可切换指定区域。
-
-<ClientOnly><FullscreenDemo kind="directive" /></ClientOnly>
-
-## 局部使用
+在 `directives` 中局部注册指令，点击按钮即可切换目标元素的全屏状态。
 
 ```vue
-<script setup>
-import { directive as vFullscreen } from 'vue-fullscreen'
-import { ref } from 'vue'
-
-const error = ref('')
-</script>
-
 <template>
-  <button
-    v-fullscreen.pageOnly.teleport="{ target: '#report' }"
-    @fullscreen-error="error = $event.detail.message"
-  >
-    切换报表全屏
-  </button>
-  <section id="report">
-    <h2>报表</h2>
-    <p>按 Esc 退出，或在实际业务中加入退出按钮。</p>
-  </section>
-  <p v-if="error" role="alert">{{ error }}</p>
+  <div>
+    <button
+      v-fullscreen.pageOnly.teleport="{ target: '#report' }"
+      @fullscreen-error="error = $event.detail.message"
+    >
+      切换全屏
+    </button>
+    <section id="report">内容区域</section>
+    <p v-if="error" role="alert">{{ error }}</p>
+  </div>
 </template>
-```
 
-安装全局插件后，可直接使用 `v-fullscreen`，无需局部导入。
+<script>
+import { directive } from 'vue-fullscreen'
+export default {
+  directives: { fullscreen: directive },
+  data: () => ({ error: '' }),
+}
+</script>
+```
 
 ## 三种绑定形式
 

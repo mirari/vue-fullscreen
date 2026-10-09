@@ -2,9 +2,7 @@
 
 Fullscreen components, directives and a promise-based API for **Vue 2 and Vue 3**. Supports native fullscreen, page-only mode and moving content to `document.body`.
 
-**[Documentation & interactive examples](https://vue-fullscreen.mirari.cc/)** · [Documentation source](./docs/index.md) · [Contributing](./CONTRIBUTING.md)
-
-The VitePress site is published at the existing custom domain from the `gh-pages` branch.
+**[English documentation](https://vue-fullscreen.mirari.cc/en/)** · **[中文文档](https://vue-fullscreen.mirari.cc/)** · [Documentation source](./docs/index.md) · [Contributing](./CONTRIBUTING.md)
 
 ## Install
 
@@ -13,7 +11,7 @@ npm install vue-fullscreen@next    # Vue 3
 npm install vue-fullscreen@legacy  # Vue 2
 ```
 
-This branch prepares **3.2.0-beta.0** (Vue 3) and **2.7.0-beta.0** (Vue 2); they are not published yet. The commands above install the existing releases. npm's `latest` channel is unchanged.
+See the [compatibility page](https://vue-fullscreen.mirari.cc/en/guide/compatibility) for API versions and package channels.
 
 ## Quick start
 
@@ -57,7 +55,7 @@ npm run check         # types, tests, packages, examples and documentation
 npm run test:docs     # production documentation browser checks
 ```
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for browser setup, CI/CD, release channels and migration details. Historical releases remain in [CHANGELOG.md](./CHANGELOG.md).
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for browser setup, CI/CD, release channels and compatibility details. Historical releases remain in [CHANGELOG.md](./CHANGELOG.md).
 
 ## License
 

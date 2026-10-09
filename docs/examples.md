@@ -1,4 +1,4 @@
-# 交互实验室
+# 交互示例
 
 用同一块内容比较三种入口。默认启用网页全屏，你可以取消勾选「仅网页全屏」以尝试浏览器原生模式。
 
@@ -25,7 +25,3 @@
 <ClientOnly><FullscreenDemo kind="api" /></ClientOnly>
 
 [查看 API 代码与说明 →](/guide/api)
-
-::: info 示例版本
-页面内的交互示例使用当前仓库的 Vue 3 适配器。Vue 2 的实际运行通过独立 playground 和兼容测试验证；两者的模型事件差异见[版本说明](/guide/compatibility)。
-:::

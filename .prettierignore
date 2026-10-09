@@ -7,3 +7,4 @@ CHANGELOG.md
 playwright-report
 test-results
 docs/.vitepress/cache/
+docs/public/vue2-demo/
