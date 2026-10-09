@@ -177,7 +177,11 @@ onBeforeUnmount(() => {
           <span aria-hidden="true">›</span>
         </button>
       </div>
-      <div class="gallery-thumbnails" :aria-label="text.gallery">
+      <div
+        v-show="active"
+        class="gallery-thumbnails"
+        :aria-label="text.gallery"
+      >
         <button
           v-for="(item, index) in photos"
           :key="item.id"

@@ -297,6 +297,7 @@ for (const english of [false, true]) {
       await page.goto(`${english ? './en/' : './'}${route}`)
       const demo = page.locator('[data-demo="component"]')
       const image = page.locator('#demo-component .gallery-image')
+      await expect(demo.locator('.gallery-thumbnails')).toBeHidden()
       await expect(demo.locator('.gallery-thumbnails button')).toHaveCount(6)
       // Check every shipped variant, including photos beyond the switching sample.
       const sources = await demo
@@ -342,6 +343,7 @@ for (const english of [false, true]) {
         .click()
       const target = page.locator('#demo-component')
       await expect(target).toHaveClass(/demo-fullscreen/)
+      await expect(target.locator('.gallery-thumbnails')).toBeVisible()
       await expect(image).toHaveAttribute(
         'src',
         /\/images\/gallery\/DSCF3389-full\.webp$/,
@@ -375,6 +377,7 @@ for (const english of [false, true]) {
           exact: true,
         })
         .click()
+      await expect(demo.locator('.gallery-thumbnails')).toBeHidden()
       await expect(demo.locator('.gallery-count')).toHaveText('2 / 6')
       await expect(image).toHaveAttribute(
         'src',
