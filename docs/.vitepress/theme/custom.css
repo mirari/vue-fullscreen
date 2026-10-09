@@ -59,6 +59,9 @@
   color: #edf2f7;
   overflow: hidden;
 }
+.demo-surface:not(.demo-fullscreen) {
+  padding-bottom: 24px;
+}
 .demo-fullscreen {
   z-index: 10000;
 }
