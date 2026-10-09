@@ -20,8 +20,12 @@
     "build": "node scripts/build.mjs",
     "build:examples": "npm run build:example --workspaces",
     "check:packages": "node scripts/check-packages.mjs",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run check:packages && npm run build:examples",
-    "release:prepare": "node scripts/release.mjs"
+    "check": "npm run lint && npm run typecheck && npm test && npm run build && npm run check:packages && npm run build:examples && npm run docs:build",
+    "release:prepare": "node scripts/release.mjs",
+    "docs:dev": "vitepress dev docs --host 0.0.0.0",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs --host 0.0.0.0",
+    "test:docs": "playwright test --config playwright.docs.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.64.0",
@@ -31,6 +35,8 @@
     "screenfull": "6.0.2",
     "typescript": "7.0.2",
     "vite": "8.3.4",
-    "vitest": "5.0.3"
+    "vitepress": "1.6.4",
+    "vitest": "5.0.3",
+    "vue": "3.5.43"
   }
 }

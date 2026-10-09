@@ -23,7 +23,7 @@ CI runs checks on Node 22/24, browser tests on Node 24, and uploads both tarball
 1. Review and merge this branch, or make the reviewed branch the repository's default. Release tags must point to commits reachable from the default branch. CI supports both `main` and `master`.
 2. In npm's **vue-fullscreen → Settings → Trusted Publisher**, configure GitHub Actions for owner `mirari`, repository `vue-fullscreen`, workflow `release.yml`, environment `npm`.
 3. Create the GitHub `npm` environment; configure reviewers if desired. The publish job requests `id-token: write` and uses Node 24's npm (OIDC support requires npm 11.5.1+). No `NPM_TOKEN` secret is required.
-4. For example deployment, select GitHub Pages source **GitHub Actions** and run the `Playground Pages` workflow on the reviewed branch. It uses the Pages deployment API, not commits to `gh-pages`.
+4. For example deployment, select GitHub Pages source **GitHub Actions** and run the `Documentation Pages` workflow on the reviewed branch. It deploys the VitePress site, including interactive examples; pushes to the current default branch (`main` or `master`) also deploy it. It uses the Pages deployment API, not commits to `gh-pages`.
 
 These account settings cannot be supplied by repository code. Never test the release workflow by publishing an already-used version.
 
@@ -68,3 +68,16 @@ If npm publishing succeeds but GitHub Release creation fails, re-run only the fa
 - Native request rejection restores styles/DOM and removes listeners. Component errors use `error`; directive errors use the native `fullscreen-error` event.
 - Missing directive selectors now report an error instead of silently targeting the body.
 - Components now honor an initially true model on mount; native mode still requires browser user activation.
+
+## VitePress documentation
+
+User-facing documentation lives in `docs/`, with Chinese navigation, local search and interactive component/directive/API examples. `README.md` is the npm/repository entry point.
+
+- `npm run docs:dev`: develop at `/vue-fullscreen/`.
+- `npm run docs:build`: SSR/static build, including dead-link checks.
+- `npm run docs:preview`: serve the production build.
+- `npm run test:docs`: build and test the production site with Chromium, including GitHub Pages subpath navigation and fullscreen examples.
+
+VitePress is pinned to its stable 1.6.4 release and uses its own compatible Vite dependency; the library still builds with Vite 8. The root Vue 3 dependency supplies the docs runtime, while the Vue 2 workspace keeps its own runtime. Demo imports resolve to the local Vue 3 adapter. The site labels the unpublished refactor versions explicitly.
+
+The default base is `/vue-fullscreen/`. For a root-domain deployment use `DOCS_BASE=/ npm run docs:build`. Keep the base consistent when serving previews. Browser tests deliberately exercise the standard GitHub Pages base.
