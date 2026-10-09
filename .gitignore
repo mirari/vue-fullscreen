@@ -9,3 +9,6 @@ test-results/
 .DS_Store
 docs/.vitepress/cache/
 docs/public/vue2-demo/
+tests/consumers/fixture/nuxt/.nuxt/
+tests/consumers/fixture/nuxt/.output/
+tests/consumers/fixture/public/

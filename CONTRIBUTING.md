@@ -16,7 +16,19 @@ The internal workspace packages are private. Their versions independently determ
 - `npm run build:examples`: build both playgrounds.
 - `npm run test:browser`: Chromium tests for both adapters in page and native fullscreen modes. Native exit uses the browser API because synthetic Escape is not a reliable native browser fullscreen command.
 
-CI runs checks on Node 22/24, browser tests on Node 24, and uploads both tarballs. Browser engines other than Chromium are not part of the automated coverage yet.
+CI runs checks on Node 22/24, browser and consumer tests on Node 24, and uploads both tarballs. Browser engines other than Chromium are not part of the automated coverage yet.
+
+## Published-package consumer tests
+
+Run `npm run test:consumers` after installing Chromium. The command builds and packs both adapters, installs the current tarball into an isolated fixture with a committed dependency lockfile, then builds Vite and Nuxt in production mode. It uses no source aliases or workspace links to the library.
+
+| Consumer                  | Checks                                                                                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Plain HTML, Vue 2 and Vue | Classic `<script>` tags load the extracted UMD tarball and Vue global build; enter/exit page and native fullscreen                                     |
+| Vue with Vite             | Package-root imports, global plugin registration, component model, directive and API in a production build                                             |
+| Nuxt 4                    | Universal plugin import and server rendering, HTML with JavaScript disabled, hydration, component/directive/API interactions and route unmount/remount |
+
+All browser assertions run in Chromium. Local script URLs keep the tests independent of third-party CDN availability; they exercise the same files a CDN serves. Nuxt uses its Node server output; this does not claim coverage of every Nitro deployment adapter. Existing `check:packages` tests additionally cover ESM/CJS imports and TypeScript declarations across supported Vue versions.
 
 ## First-time GitHub/npm configuration
 

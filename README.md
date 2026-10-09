@@ -62,6 +62,7 @@ npm run dev           # Vue 3 playground
 npm run dev:vue2      # Vue 2 playground
 npm run check         # types, tests, packages, examples and documentation
 npm run test:docs     # production documentation browser checks
+npm run test:consumers # script tags, Vite and Nuxt 4 using packed releases
 ```
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for browser setup, CI/CD, release channels and compatibility details. Historical releases remain in [CHANGELOG.md](./CHANGELOG.md).

@@ -26,7 +26,8 @@
     "docs:build": "npm run docs:prepare && vitepress build docs",
     "docs:preview": "vitepress preview docs --host 0.0.0.0",
     "test:docs": "playwright test --config playwright.docs.config.ts",
-    "docs:prepare": "node scripts/prepare-docs.mjs"
+    "docs:prepare": "node scripts/prepare-docs.mjs",
+    "test:consumers": "npm run build && node scripts/prepare-consumers.mjs && playwright test --config playwright.consumers.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.64.0",
