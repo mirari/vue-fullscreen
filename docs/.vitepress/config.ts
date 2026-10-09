@@ -5,7 +5,7 @@ export default defineConfig({
   lang: 'zh-CN',
   title: 'vue-fullscreen',
   description: '为 Vue 2 和 Vue 3 添加全屏体验：组件、指令和 API，按需选择。',
-  base: process.env.DOCS_BASE || '/vue-fullscreen/',
+  base: process.env.DOCS_BASE || '/',
   cleanUrls: true,
   lastUpdated: true,
   head: [['meta', { name: 'theme-color', content: '#646cff' }]],

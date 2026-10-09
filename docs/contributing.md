@@ -21,7 +21,7 @@ npm run test:browser # 两套适配器的浏览器测试
 npm run test:docs    # 构建后的文档、导航和全屏示例测试
 ```
 
-`test:docs` 先构建文档，再启动静态预览，验证 GitHub Pages 子路径下的资源和页面。需要预先安装 Chromium：`npx playwright install chromium`。环境已有浏览器时，可设置 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`。
+`test:docs` 先构建文档，再启动静态预览，验证 自定义域名根路径下的资源和页面。需要预先安装 Chromium：`npx playwright install chromium`。环境已有浏览器时，可设置 `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`。
 
 ## 仓库结构
 
@@ -55,8 +55,10 @@ git push origin vue3-v3.2.0-beta.1
 
 在 npm 的 Trusted Publisher 配置 GitHub 仓库 `mirari/vue-fullscreen`、工作流 `release.yml`、环境 `npm`。发布使用 OIDC，不需要长期 `NPM_TOKEN`。
 
-GitHub Pages 的 Source 选择 **GitHub Actions**。`Documentation Pages` 工作流构建 VitePress 并部署静态产物；支持手动运行，在 `main` / `master` 推送后也会触发，仅仓库当前默认分支会自动部署。
+生产域名为 [vue-fullscreen.mirari.cc](https://vue-fullscreen.mirari.cc/)。现有仓库从 `gh-pages` 分支的根目录发布；该分支的 `CNAME` 指定这个域名。旧工作流会把 `master` 的示例构建提交到这里。
 
-部署根路径默认为 `/vue-fullscreen/`。独立域名可通过构建时的 `DOCS_BASE=/` 调整。这里的配置不会替你修改仓库默认分支，也不会自动配置 npm 账户。
+新的 `Documentation Pages` 工作流沿用 `gh-pages` 静态产物分支，内容替换为 VitePress 文档，保留 `CNAME` 并添加 `.nojekyll`。Cloudflare 的 DNS/代理无需因为文档替换而改变。工作流支持手动运行；默认分支为 `main` / `master` 时推送也会触发。
+
+默认构建路径是 `/`。如果需要另外部署到项目子路径，可用 `DOCS_BASE=/vue-fullscreen/` 覆盖。替换静态站不会切换源码默认分支，也不会发布 npm 包。
 
 发布失败后的恢复步骤和完整维护约定见[仓库 CONTRIBUTING.md](https://github.com/mirari/vue-fullscreen/blob/refactor/fullscreen-workspace/CONTRIBUTING.md)。

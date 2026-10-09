@@ -2,7 +2,7 @@
 
 Fullscreen components, directives and a promise-based API for **Vue 2 and Vue 3**. Supports native fullscreen, page-only mode and moving content to `document.body`.
 
-**[Documentation & interactive examples](https://mirari.github.io/vue-fullscreen/)** · [Documentation source](./docs/index.md) · [Contributing](./CONTRIBUTING.md)
+**[Documentation & interactive examples](https://vue-fullscreen.mirari.cc/)** · [Documentation source](./docs/index.md) · [Contributing](./CONTRIBUTING.md)
 
 The new VitePress site is prepared on this branch; the hosted URL will show it after the documentation workflow is deployed.
 
@@ -50,7 +50,7 @@ Use Node 24.15+ (recommended) or Node 22.22.2+.
 
 ```sh
 npm ci
-npm run docs:dev      # VitePress documentation, /vue-fullscreen/
+npm run docs:dev      # VitePress documentation, /
 npm run dev           # Vue 3 playground
 npm run dev:vue2      # Vue 2 playground
 npm run check         # types, tests, packages, examples and documentation

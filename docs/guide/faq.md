@@ -37,4 +37,4 @@ npm ci
 npm run docs:dev
 ```
 
-默认路径是 `/vue-fullscreen/`，与 GitHub Pages 项目路径一致。部署到独立域名根目录时使用 `DOCS_BASE=/ npm run docs:build`。
+默认路径是 `/`，对应 `vue-fullscreen.mirari.cc`。如果另行部署到 GitHub Pages 项目子路径，使用 `DOCS_BASE=/vue-fullscreen/ npm run docs:build`，并同步调整预览路径。

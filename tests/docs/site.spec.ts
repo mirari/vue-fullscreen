@@ -10,7 +10,7 @@ test('production site supports navigation, local search and mobile layout', asyn
     'vue-fullscreen',
   )
   await page.getByRole('link', { name: '快速上手', exact: true }).click()
-  await expect(page).toHaveURL(/\/vue-fullscreen\/guide\/getting-started$/)
+  await expect(page).toHaveURL(/\/guide\/getting-started$/)
   await expect(
     page.getByRole('heading', { level: 1, name: /快速上手/ }),
   ).toBeVisible()
