@@ -4,12 +4,12 @@ const [line, version, ...notes] = process.argv.slice(2)
 if (
   !['vue2', 'vue3'].includes(line) ||
   !new RegExp(
-    `^${line === 'vue2' ? 2 : 3}\\.\\d+\\.\\d+(?:-(?:beta|rc)\\.\\d+)?$`,
+    `^${line === 'vue2' ? 2 : 4}\\.\\d+\\.\\d+(?:-(?:beta|rc)\\.\\d+)?$`,
   ).test(version ?? '') ||
   !notes.length
 ) {
   throw new Error(
-    'Usage: npm run release:prepare -- vue2|vue3 3.2.0-beta.1 "Release notes" (major must match Vue line)',
+    'Usage: npm run release:prepare -- vue2|vue3 4.0.1-beta.1 "Release notes" (Vue 2 uses 2.x; Vue 3 uses 4.x)',
   )
 }
 if (execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim())

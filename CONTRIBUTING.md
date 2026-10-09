@@ -2,7 +2,7 @@
 
 ## Branch and version model
 
-The refactor starts from published Vue 3 tag `v3.1.3` (`050eb7e`), also recorded as npm's `gitHead`. Vue 2 compatibility was checked against `vue-fullscreen`'s `2.6.3` source (`6a115db`). Keep both adapters on the same development branch. No default branch or existing npm tag is changed by this refactor.
+The refactor starts from published Vue 3 tag `v3.1.3` (`050eb7e`), also recorded as npm's `gitHead`. Vue 2 compatibility was checked against `vue-fullscreen`'s `2.6.3` source (`6a115db`). Keep both adapters on the `v4` development branch. The current package starts at `4.0.0`; the Vue 2 maintenance package keeps its independent `2.x` version. No default branch or existing npm tag is changed by this refactor.
 
 The internal workspace packages are private. Their versions independently determine the generated `vue-fullscreen` packages. A core change must pass both adapters' checks, but releasing both lines is optional.
 
@@ -32,28 +32,28 @@ These account settings cannot be supplied by repository code. Never test the rel
 Start with a clean working tree. For example:
 
 ```sh
-npm run release:prepare -- vue3 3.2.0-beta.1 "Modernize builds and fix fullscreen cleanup."
+npm run release:prepare -- vue3 4.0.1-beta.1 "Modernize builds and fix fullscreen cleanup."
 npm run check
 npm run test:browser
 ```
 
-The helper updates the selected adapter's version, npm lockfile and `releases/vue3-v3.2.0-beta.1.md`. It does not commit, tag or publish. Review/commit those files and merge them into the default branch. Then tag the merged commit:
+The helper updates the selected adapter's version, npm lockfile and `releases/vue3-v4.0.1-beta.1.md`. It does not commit, tag or publish. Review/commit those files and merge them into the default branch. Then tag the merged commit:
 
 ```sh
-git tag vue3-v3.2.0-beta.1
-git push origin vue3-v3.2.0-beta.1
+git tag vue3-v4.0.1-beta.1
+git push origin vue3-v4.0.1-beta.1
 ```
 
-Use `vue2-v2.x.y` for Vue 2 and `vue3-v3.x.y` for Vue 3. A release must include matching version metadata and a release notes file. Versions only increase. The initial beta versions in this branch are placeholders for review, not existing releases.
+Use `vue2-v2.x.y` for Vue 2 and `vue3-v4.x.y` for Vue 3. A release must include matching version metadata and a release notes file. Versions only increase. The initial current release is prepared as `4.0.0` with notes in `releases/vue3-v4.0.0.md`; after review and merge, use tag `vue3-v4.0.0`. It has not been published. The Vue 2 version remains `2.7.0-beta.0`.
 
 | Version       | npm dist-tag |
 | ------------- | ------------ |
 | Stable Vue 2  | `legacy`     |
-| Stable Vue 3  | `next`       |
+| Stable Vue 3  | `latest`     |
 | Vue 2 beta/rc | `vue2-beta`  |
 | Vue 3 beta/rc | `vue3-beta`  |
 
-The workflow re-runs all checks, publishes the exact verified tarball using npm OIDC/provenance, then creates a GitHub Release with that tarball. It never writes `latest`. Promotion of Vue 3 to `latest` is a separate decision after compatibility review. Do not run different releases for the same version line concurrently, because npm tags follow the last successful publish.
+The workflow re-runs all checks, publishes the exact verified tarball using npm OIDC/provenance, then creates a GitHub Release with that tarball. A stable 4.x release publishes to `latest`; Vue 2 releases use `legacy`. The historical `next` tag is left unchanged. Do not run different releases for the same version line concurrently, because npm tags follow the last successful publish.
 
 If npm publishing succeeds but GitHub Release creation fails, re-run only the failed Release job or create that release using the existing tag and tarball; do not retry publishing an immutable version. If publication fails before npm accepts it, re-run the failed publish job. If the outcome is uncertain, inspect npm first.
 

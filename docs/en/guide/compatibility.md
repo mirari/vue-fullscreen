@@ -8,7 +8,7 @@ Install the Vue 3 package with:
 npm install vue-fullscreen@next
 ```
 
-This API reference describes `3.2.0-beta.0`, which is not yet published. The `next` channel currently provides `3.1.3`; some error events and package entry paths differ. Check [npm](https://www.npmjs.com/package/vue-fullscreen) for published versions.
+This API reference describes `4.0.0`, which is not yet published. The `next` channel currently provides `3.1.3`; some error events and package entry paths differ. Check [npm](https://www.npmjs.com/package/vue-fullscreen) for published versions.
 
 ## Supported environments
 

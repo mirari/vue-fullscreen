@@ -28,17 +28,19 @@ function run(line: string, version: string, tag: string, notes = true) {
 }
 it.each([
   ['vue2', '2.7.0', 'legacy'],
-  ['vue3', '3.2.0', 'next'],
+  ['vue3', '4.0.0', 'latest'],
   ['vue2', '2.7.0-beta.1', 'vue2-beta'],
-  ['vue3', '3.2.0-rc.1', 'vue3-beta'],
-])('routes %s %s to %s without touching latest', (line, version, channel) => {
+  ['vue3', '4.0.0-rc.1', 'vue3-beta'],
+])('routes %s %s to %s', (line, version, channel) => {
   expect(run(line, version, `${line}-v${version}`)).toContain(
     `channel=${channel}\n`,
   )
 })
 it('rejects mismatched versions, majors, missing notes and malformed tags', () => {
-  expect(() => run('vue3', '3.2.0', 'vue3-v3.1.3')).toThrow()
+  expect(() => run('vue3', '4.0.0', 'vue3-v3.1.3')).toThrow()
+  expect(() => run('vue3', '3.0.0', 'vue3-v3.0.0')).toThrow()
+  expect(() => run('vue2', '4.0.0', 'vue2-v4.0.0')).toThrow()
   expect(() => run('vue3', '30.0.0', 'vue3-v30.0.0')).toThrow()
-  expect(() => run('vue3', '3.2.0', 'vue3-v3.2.0', false)).toThrow()
-  expect(() => run('vue3', '3.2.0', 'v3.2.0')).toThrow()
+  expect(() => run('vue3', '4.0.0', 'vue3-v4.0.0', false)).toThrow()
+  expect(() => run('vue3', '4.0.0', 'v4.0.0')).toThrow()
 })

@@ -1,8 +1,17 @@
 # vue-fullscreen
 
+[![npm version](https://img.shields.io/npm/v/vue-fullscreen?label=npm)](https://www.npmjs.com/package/vue-fullscreen)
+[![npm downloads](https://img.shields.io/npm/dm/vue-fullscreen)](https://www.npmjs.com/package/vue-fullscreen)
+[![CI](https://github.com/mirari/vue-fullscreen/actions/workflows/ci.yml/badge.svg?branch=v4)](https://github.com/mirari/vue-fullscreen/actions/workflows/ci.yml?query=branch%3Av4)
+[![Vue](https://img.shields.io/badge/Vue-3%20%7C%202-42b883?logo=vuedotjs)](https://vue-fullscreen.mirari.cc/en/guide/compatibility)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/mirari/vue-fullscreen)](https://github.com/mirari/vue-fullscreen/stargazers)
+
 Fullscreen components, directives and a promise-based API for **Vue 2 and Vue 3**. Supports native fullscreen, page-only mode and moving content to `document.body`.
 
 **[English documentation](https://vue-fullscreen.mirari.cc/en/)** · **[中文文档](https://vue-fullscreen.mirari.cc/)** · [Documentation source](./docs/index.md) · [Contributing](./CONTRIBUTING.md)
+
+This branch prepares **4.0.0**, which has not been published yet. The npm badge and installation commands below refer to published packages.
 
 ## Install
 
@@ -56,6 +65,10 @@ npm run test:docs     # production documentation browser checks
 ```
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for browser setup, CI/CD, release channels and compatibility details. Historical releases remain in [CHANGELOG.md](./CHANGELOG.md).
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=mirari/vue-fullscreen&type=Date)](https://star-history.com/#mirari/vue-fullscreen&Date)
 
 ## License
 

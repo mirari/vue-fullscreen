@@ -2,7 +2,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, master, 'refactor/**']
+    branches: [main, master, v4]
   workflow_dispatch:
 permissions:
   contents: read

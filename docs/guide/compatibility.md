@@ -8,7 +8,7 @@ Vue 3 使用 `next` 渠道：
 npm install vue-fullscreen@next
 ```
 
-本文档的接口参考版本为 `3.2.0-beta.0`，尚未发布。`next` 渠道目前提供 `3.1.3`，部分错误事件和包入口存在差异。可在 [npm](https://www.npmjs.com/package/vue-fullscreen) 查看已发布版本。
+本文档的接口参考版本为 `4.0.0`，尚未发布。`next` 渠道目前提供 `3.1.3`，部分错误事件和包入口存在差异。可在 [npm](https://www.npmjs.com/package/vue-fullscreen) 查看已发布版本。
 
 ## 支持范围
 
