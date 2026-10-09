@@ -76,11 +76,12 @@ for (const english of [false, true]) {
         await page.goto(`${prefix}examples`)
         const demo = page.locator(`[data-demo="${kind}"]`)
         await expect(demo).toBeVisible()
+        await expect(demo.getByLabel(text.pageOnly)).not.toBeChecked()
+        if (!native) await demo.getByLabel(text.pageOnly).check()
         if (native) {
           expect(await page.evaluate(() => document.fullscreenEnabled)).toBe(
             true,
           )
-          await demo.getByLabel(text.pageOnly).uncheck()
         }
         await demo
           .getByRole('button', {
@@ -170,7 +171,8 @@ for (const english of [false, true]) {
       page,
     }) => {
       await page.goto(`${prefix}vue2/examples`)
-      if (native) await page.getByLabel(text.pageOnly).uncheck()
+      await expect(page.getByLabel(text.pageOnly)).not.toBeChecked()
+      if (!native) await page.getByLabel(text.pageOnly).check()
       const frame = page.frameLocator('iframe')
       await expect(frame.locator('html')).toHaveAttribute(
         'lang',
@@ -213,8 +215,11 @@ for (const vue2 of [false, true]) {
       const controls = vue2
         ? scope.locator('main')
         : page.locator('[data-demo="teleport"]')
-      if (native)
-        await (vue2 ? page : controls).getByLabel('仅网页全屏').uncheck()
+      await expect(
+        (vue2 ? page : controls).getByLabel('仅网页全屏'),
+      ).not.toBeChecked()
+      if (!native)
+        await (vue2 ? page : controls).getByLabel('仅网页全屏').check()
       const target = scope.locator(vue2 ? '#target' : '#teleport-target')
       const popup = scope.locator(vue2 ? '#body-popup' : '.teleport-popup')
       for (const teleport of [false, true]) {

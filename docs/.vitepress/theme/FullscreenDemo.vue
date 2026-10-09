@@ -12,7 +12,7 @@ const props = withDefaults(
   { kind: 'component' },
 )
 const active = ref(false)
-const pageOnly = ref(true)
+const pageOnly = ref(false)
 const teleport = ref(true)
 const error = ref('')
 const target = ref<HTMLElement>()

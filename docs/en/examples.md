@@ -1,6 +1,6 @@
 # Examples
 
-Compare the component, directive and API using the same content. Page-only mode is selected by default. Clear that checkbox to request native fullscreen.
+Compare the component, directive and API using the same content. Native fullscreen is selected by default. Select “Page-only fullscreen” to fill the page instead.
 
 ## Component
 
@@ -30,7 +30,7 @@ The API receives a DOM element and returns a Promise for the operation.
 
 The popup is a regular element mounted under `body`, as used by many dropdown and dialog libraries.
 
-1. Keep page-only mode selected and turn off `teleport`. Enter fullscreen: the transformed parent limits the panel's fixed positioning.
+1. Select page-only mode and turn off `teleport`. Enter fullscreen: the transformed parent limits the panel's fixed positioning.
 2. Exit, enable `teleport`, and enter again. The panel now moves outside that parent and fills the viewport.
 3. Exit, disable page-only mode and `teleport`, then enter native fullscreen. Toggle the body popup: it exists outside the fullscreen element, so the browser does not display it. A larger `z-index` cannot fix this.
 4. Exit, enable `teleport`, and repeat. The library requests fullscreen on `body`; both the panel and the popup are inside it. The popup is now visible.

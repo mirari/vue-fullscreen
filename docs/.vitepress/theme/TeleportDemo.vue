@@ -5,7 +5,7 @@ import { component as Fullscreen } from 'vue-fullscreen'
 const { lang } = useData()
 const en = computed(() => lang.value.startsWith('en'))
 const active = ref(false)
-const pageOnly = ref(true)
+const pageOnly = ref(false)
 const teleport = ref(false)
 const popup = ref(false)
 const error = ref('')
