@@ -1,15 +1,5 @@
 import { expect, test } from '@playwright/test'
 
-// Exercise the v-viewer demo image URLs without depending on a third-party image service in CI.
-test.beforeEach(async ({ page }) => {
-  await page.route('https://picsum.photos/**', (route) =>
-    route.fulfill({
-      contentType: 'image/svg+xml',
-      body: '<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720"><rect width="1280" height="720" fill="#406b8a"/></svg>',
-    }),
-  )
-})
-
 for (const english of [false, true]) {
   const prefix = english ? './en/' : './'
   const text = english
@@ -294,10 +284,26 @@ for (const english of [false, true]) {
       await page.goto(`${english ? './en/' : './'}${route}`)
       const demo = page.locator('[data-demo="component"]')
       const image = page.locator('#demo-component .gallery-image')
-      await expect(demo.locator('.gallery-thumbnails button')).toHaveCount(5)
+      await expect(demo.locator('.gallery-thumbnails button')).toHaveCount(6)
+      // Check every shipped variant, including photos beyond the switching sample.
+      const sources = await demo
+        .locator('.gallery-thumbnails img')
+        .evaluateAll((images) =>
+          images.map((image) => (image as HTMLImageElement).src),
+        )
+      for (const source of sources) {
+        for (const size of ['thumb', 'preview', 'full']) {
+          const response = await page.request.get(
+            source.replace('-thumb.', `-${size}.`),
+          )
+          expect(response.ok()).toBe(true)
+          expect(response.headers()['content-type']).toContain('image/webp')
+        }
+      }
+
       await expect(
         demo.locator('.gallery-thumbnails img').first(),
-      ).toHaveAttribute('src', /picsum\.photos\/id\/10\/346\/216$/)
+      ).toHaveAttribute('src', /\/images\/gallery\/DSCF2734-thumb\.webp$/)
       await expect
         .poll(() =>
           image.evaluate(
@@ -313,7 +319,7 @@ for (const english of [false, true]) {
         .click()
       await expect(image).toHaveAttribute(
         'src',
-        /picsum\.photos\/id\/11\/1440\/900$/,
+        /\/images\/gallery\/DSCF3389-preview\.webp$/,
       )
       await demo
         .getByRole('button', {
@@ -325,7 +331,7 @@ for (const english of [false, true]) {
       await expect(target).toHaveClass(/demo-fullscreen/)
       await expect(image).toHaveAttribute(
         'src',
-        /picsum\.photos\/id\/11\/1440\/900$/,
+        /\/images\/gallery\/DSCF3389-full\.webp$/,
       )
       await target
         .getByRole('button', {
@@ -335,7 +341,7 @@ for (const english of [false, true]) {
         .click()
       await expect(image).toHaveAttribute(
         'src',
-        /picsum\.photos\/id\/12\/1440\/900$/,
+        /\/images\/gallery\/IMG_20241001_140036-full\.webp$/,
       )
       await expect
         .poll(() =>
@@ -348,7 +354,7 @@ for (const english of [false, true]) {
       await page.keyboard.press('ArrowLeft')
       await expect(image).toHaveAttribute(
         'src',
-        /picsum\.photos\/id\/11\/1440\/900$/,
+        /\/images\/gallery\/DSCF3389-full\.webp$/,
       )
       await target
         .getByRole('button', {
@@ -356,10 +362,10 @@ for (const english of [false, true]) {
           exact: true,
         })
         .click()
-      await expect(demo.locator('.gallery-count')).toHaveText('2 / 5')
+      await expect(demo.locator('.gallery-count')).toHaveText('2 / 6')
       await expect(image).toHaveAttribute(
         'src',
-        /picsum\.photos\/id\/11\/1440\/900$/,
+        /\/images\/gallery\/DSCF3389-preview\.webp$/,
       )
     })
   }

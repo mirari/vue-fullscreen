@@ -130,6 +130,7 @@
 }
 .gallery-thumbnails {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
   padding: 14px;

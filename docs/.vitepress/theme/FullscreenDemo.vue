@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
-import { useData } from 'vitepress'
+import { useData, withBase } from 'vitepress'
 import {
   api,
   component as Fullscreen,
@@ -16,16 +16,22 @@ const pageOnly = ref(false)
 const teleport = ref(true)
 const error = ref('')
 const target = ref<HTMLElement>()
-// Same image source and sizes as the v-viewer demo; stable IDs avoid hydration drift.
-const photos = Array.from({ length: 5 }, (_, index) => ({
-  id: 10 + index,
+const photos = [
+  { id: 'DSCF2734', width: 4896, height: 3264 },
+  { id: 'DSCF3389', width: 3840, height: 2560 },
+  { id: 'IMG_20241001_140036', width: 4080, height: 3060 },
+  { id: 'IMG_20250726_130738', width: 4096, height: 3072 },
+  { id: 'IMG_20260427_170326', width: 4096, height: 3072 },
+  { id: 'P1020132', width: 3776, height: 2520 },
+].map((photo, index) => ({
+  ...photo,
   zh: `图片 ${index + 1}`,
   en: `Image ${index + 1}`,
 }))
 const selected = ref(0)
 const photo = computed(() => photos[selected.value])
-const photoUrl = (id: number, fullSize = false) =>
-  `https://picsum.photos/id/${id}/${fullSize ? '1440/900' : '346/216'}`
+const photoUrl = (id: string, size: 'thumb' | 'preview' | 'full' = 'thumb') =>
+  withBase(`/images/gallery/${id}-${size}.webp`)
 function movePhoto(offset: number) {
   selected.value = (selected.value + offset + photos.length) % photos.length
 }
@@ -45,7 +51,7 @@ const text = computed(() =>
         previous: 'Previous image',
         next: 'Next image',
         gallery: 'Image browser',
-        credit: 'Photos: Lorem Picsum',
+        credit: 'Photos: personal collection',
         pageCaption:
           'Page-only mode keeps the browser toolbar visible. Press Esc or use the exit button to leave.',
         nativeCaption:
@@ -64,7 +70,7 @@ const text = computed(() =>
         previous: '上一张',
         next: '下一张',
         gallery: '图片浏览',
-        credit: '图片：Lorem Picsum',
+        credit: '图片：个人摄影',
         pageCaption: '网页全屏保留浏览器工具栏，按 Esc 或点击退出按钮退出。',
         nativeCaption: '原生全屏由浏览器提供，是否可用取决于浏览器支持与权限。',
         error: '无法进入全屏：',
@@ -150,10 +156,11 @@ onBeforeUnmount(() => {
       <div class="gallery-stage">
         <img
           class="gallery-image"
-          :src="photoUrl(photo.id, true)"
+          :src="photoUrl(photo.id, active ? 'full' : 'preview')"
           :alt="english ? photo.en : photo.zh"
-          width="1440"
-          height="900"
+          :width="photo.width"
+          :height="photo.height"
+          decoding="async"
         />
         <button
           class="gallery-arrow gallery-previous"
@@ -190,9 +197,7 @@ onBeforeUnmount(() => {
     </component>
     <p class="demo-caption">
       {{ pageOnly ? text.pageCaption : text.nativeCaption }}
-      <a href="https://picsum.photos" target="_blank" rel="noopener">{{
-        text.credit
-      }}</a>
+      <span>{{ text.credit }}</span>
     </p>
     <p v-if="error" role="alert" class="demo-error">
       {{ text.error }} {{ error }}
