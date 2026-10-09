@@ -74,6 +74,10 @@ for (const english of [false, true]) {
         await page.goto(`${prefix}examples`)
         const demo = page.locator(`[data-demo="${kind}"]`)
         await expect(demo).toBeVisible()
+        const image = demo.locator('.gallery-image')
+        await expect(image).toHaveCSS('object-fit', 'contain')
+        const preview = await image.boundingBox()
+        expect(preview!.height).toBeLessThanOrEqual(280)
         await expect(demo.getByLabel(text.pageOnly)).not.toBeChecked()
         if (!native) await demo.getByLabel(text.pageOnly).check()
         if (native) {
@@ -88,6 +92,15 @@ for (const english of [false, true]) {
           .click()
         const target = page.locator(`#demo-${kind}`)
         await expect(target).toHaveClass(/demo-fullscreen/)
+        const fullImage = target.locator('.gallery-image')
+        await expect(fullImage).toHaveCSS('object-fit', 'contain')
+        await expect
+          .poll(async () => {
+            const box = await fullImage.boundingBox()
+            // First photo is 3:2; compare the visible image, not its letterbox.
+            return Math.min(box!.height, box!.width / 1.5)
+          })
+          .toBeGreaterThan(preview!.height * 1.5)
         expect(
           await target.evaluate((el) => el.parentElement === document.body),
         ).toBe(true)
