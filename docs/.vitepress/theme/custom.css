@@ -30,10 +30,6 @@
   font-weight: 700;
   letter-spacing: 0.12em;
 }
-.demo-state {
-  font-size: 12px;
-  color: var(--vp-c-text-2);
-}
 .demo-controls label {
   display: flex;
   align-items: center;

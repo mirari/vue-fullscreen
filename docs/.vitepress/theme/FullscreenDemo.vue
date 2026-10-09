@@ -24,8 +24,6 @@ const text = computed(() =>
         component: 'Component example',
         directive: 'Directive example',
         api: 'API example',
-        active: 'Fullscreen',
-        inactive: 'Not fullscreen',
         pageOnly: 'Page-only fullscreen',
         teleport: 'Move to body',
         directiveButton: 'Toggle with directive',
@@ -45,8 +43,6 @@ const text = computed(() =>
         component: '组件示例',
         directive: '指令示例',
         api: 'API 示例',
-        active: '全屏中',
-        inactive: '未全屏',
         pageOnly: '仅网页全屏',
         teleport: '移到 body',
         directiveButton: '点击指令按钮',
@@ -92,9 +88,6 @@ onBeforeUnmount(() => {
   <section class="fullscreen-demo" :data-demo="kind" :aria-label="text[kind]">
     <div class="demo-toolbar">
       <span class="demo-eyebrow">{{ text[kind] }}</span>
-      <span class="demo-state" role="status">{{
-        active ? text.active : text.inactive
-      }}</span>
     </div>
     <div class="demo-controls">
       <label

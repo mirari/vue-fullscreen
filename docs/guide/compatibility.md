@@ -53,7 +53,7 @@ iPad 原生全屏会显示浏览器提供的退出控件，下滑等系统手势
 
 ### Internet Explorer
 
-当前版本不支持 IE，Vue 2 适配包也不例外。仅添加 `Promise` polyfill 不能解决 ES2018 语法、框架和浏览器 API 的兼容性问题。
+当前版本基于 Vue 3，不支持 IE；`Promise` polyfill 不能补齐 Vue 3 所需的 Proxy 能力。需要 IE 11 时，请使用独立的 [Vue 2 版本及兼容性说明](/vue2/guide/compatibility)。
 
 ## 能力检测与网页全屏降级
 

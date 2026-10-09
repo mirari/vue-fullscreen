@@ -6,7 +6,7 @@ Use `vue-fullscreen@legacy` for Vue 2. This API reference describes `2.7.0-beta.
 
 ## Supported environments
 
-Vue `2.6.14` and `2.7.x` are supported. Browser builds target ES2018; Internet Explorer is not supported. Importing works during SSR, but fullscreen operations require the browser.
+Vue `2.6.14` and `2.7.x` are supported. Published builds target IE 11 and bundle the JavaScript polyfills they require. Importing works during SSR, but fullscreen operations require the browser.
 
 ## Model events
 
@@ -31,9 +31,9 @@ Native fullscreen is provided by the browser. See [Can I use: Fullscreen API](ht
 | iPad Safari              | Standard API in iPadOS 16.4+, with device restrictions; earlier versions have partial prefixed support |
 | iPhone Safari            | No Fullscreen API for arbitrary elements; use page-only mode                                           |
 | Android Chrome / Firefox | Supported in current versions; see the support table for individual releases                           |
-| Internet Explorer        | IE 11 has partial native API support; this package does not support IE                                 |
+| Internet Explorer        | IE 11 uses the ms-prefixed API; page-only mode is used when unavailable                                |
 
-These versions describe the browser API, not this package's minimum browser versions or a promise of testing on each device. Package builds target ES2018. The underlying `screenfull` library handles some vendor prefixes, but cannot supply missing browser capabilities.
+These versions describe the browser API, not this package's minimum browser versions or a promise of testing on each device. UMD/CJS builds use ES5 syntax; ESM builds retain module declarations for your application bundler. The underlying `screenfull` library handles some vendor prefixes, but cannot supply missing browser capabilities.
 
 ### Safari and mobile devices
 
@@ -41,7 +41,11 @@ iPad fullscreen displays browser-provided exit controls, and system gestures suc
 
 ### Internet Explorer
 
-The current package does not support IE, including the Vue 2 adapter. Adding a `Promise` polyfill alone cannot address ES2018 syntax, framework requirements and browser API compatibility.
+Vue 2 release files are transpiled for IE 11 and bundle `core-js` polyfills for Promise (including `finally`), WeakMap, Symbol, array iterators and Object.assign. Missing capabilities are installed in the global environment when the package loads; no separate Promise polyfill is needed for this package. The Vue dependency remains external.
+
+For a plain HTML page, load Vue 2's browser build followed by this package's `index.umd.js` as classic scripts. IE cannot load ESM directly. When using a bundler, the application, Vue and other dependencies must also be compatible with IE 11. These polyfills cannot make Vue 3 work in IE.
+
+Automated checks parse the emitted code as ES5 and exercise missing capabilities, the ms-prefixed native API, page-only fallback, DOM restoration and directive errors in a simulated environment. This is not an actual IE browser run; verify your application on IE 11 before deployment. IE 10 and earlier are not supported. The VitePress documentation site and Vite demo pages require a modern browser.
 
 ## Capability detection and page-only fallback
 

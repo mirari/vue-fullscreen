@@ -49,7 +49,7 @@ const active = ref(false)
 
 For Vue 2, register with `Vue.use(VueFullscreen)` and define `active` in `data`. See the documentation for complete examples, native fullscreen, directives, API control and error handling.
 
-Package-root imports support ESM and CJS, with TypeScript declarations. Browser-global builds expose `VueFullscreen` from `index.umd.js`. Vue is a peer dependency. Supported versions are Vue 2.6.14/2.7 and Vue 3.0+; browser builds target ES2018.
+Package-root imports support ESM and CJS, with TypeScript declarations. Browser-global builds expose `VueFullscreen` from `index.umd.js`. Vue is a peer dependency. Supported versions are Vue 2.6.14/2.7 and Vue 3.0+; Vue 2 builds target IE 11 with ES5 syntax and bundled polyfills; Vue 3 builds target ES2018.
 
 ## Development
 

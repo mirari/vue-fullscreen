@@ -11,7 +11,6 @@ for (const english of [false, true]) {
         enter: 'Enter fullscreen',
         directive: 'Toggle with directive',
         exit: 'Exit fullscreen',
-        inactive: 'Not fullscreen',
         guide: 'Guide',
       }
     : {
@@ -22,7 +21,6 @@ for (const english of [false, true]) {
         enter: '进入全屏',
         directive: '点击指令按钮',
         exit: '退出全屏',
-        inactive: '未全屏',
         guide: '指南',
       }
 
@@ -100,7 +98,7 @@ for (const english of [false, true]) {
             ),
           ).toBe(true)
         await target.getByRole('button', { name: text.exit }).click()
-        await expect(demo.getByRole('status')).toHaveText(text.inactive)
+        await expect(target).not.toHaveClass(/demo-fullscreen/)
         await expect(demo.locator(`#demo-${kind}`)).toBeVisible()
         expect(await page.evaluate(() => document.fullscreenElement)).toBeNull()
         expect(errors).toEqual([])

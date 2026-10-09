@@ -1,4 +1,6 @@
 import { build } from 'vite'
+import { transformAsync } from '@babel/core'
+import presetEnv from '@babel/preset-env'
 import { execFileSync } from 'node:child_process'
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
@@ -12,7 +14,11 @@ for (const line of ['vue2', 'vue3']) {
       target: 'es2018',
       outDir: destination,
       lib: {
-        entry: resolve(`packages/${line}/src/index.ts`),
+        entry: resolve(
+          line === 'vue2'
+            ? 'scripts/entries/vue2.ts'
+            : `packages/${line}/src/index.ts`,
+        ),
         name: 'VueFullscreen',
         formats: ['es', 'cjs', 'umd'],
         fileName: (format) =>
@@ -20,10 +26,43 @@ for (const line of ['vue2', 'vue3']) {
       },
       rolldownOptions: {
         external: ['vue'],
-        output: { globals: { vue: 'Vue' }, exports: 'named' },
+        output: {
+          globals: { vue: 'Vue' },
+          exports: 'named',
+          ...(line === 'vue2'
+            ? { generatedCode: { preset: 'es5', symbols: false } }
+            : {}),
+        },
       },
     },
   })
+  if (line === 'vue2') {
+    // Transform after bundling so screenfull, polyfills and the UMD wrapper also use ES5.
+    for (const filename of ['index.js', 'index.cjs', 'index.umd.js']) {
+      const path = `${destination}/${filename}`
+      const result = await transformAsync(await readFile(path, 'utf8'), {
+        filename,
+        babelrc: false,
+        configFile: false,
+        sourceType: filename === 'index.js' ? 'module' : 'script',
+        presets: [
+          [
+            presetEnv,
+            {
+              targets: { ie: '11' },
+              modules: false,
+              useBuiltIns: false,
+              // Keep native typeof semantics while core-js initializes Symbol.
+              exclude: ['transform-typeof-symbol'],
+            },
+          ],
+        ],
+        comments: false,
+        compact: true,
+      })
+      await writeFile(path, result.code + '\n')
+    }
+  }
   await rm(`.types/${line}`, { recursive: true, force: true })
   execFileSync(
     'node',
@@ -85,7 +124,7 @@ for (const line of ['vue2', 'vue3']) {
       './package.json': './package.json',
     },
     files: ['*.js', '*.cjs', 'types', 'README.md', 'LICENSE'],
-    sideEffects: false,
+    sideEffects: line === 'vue2',
     peerDependencies: { vue: line === 'vue2' ? '^2.6.14 || ^2.7.0' : '^3.0.0' },
     license: 'MIT',
     author: 'mirari',
@@ -110,6 +149,10 @@ for (const line of ['vue2', 'vue3']) {
     `${destination}/SCREENFULL-LICENSE`,
   )
   metadata.files.push('SCREENFULL-LICENSE')
+  if (line === 'vue2') {
+    await cp('node_modules/core-js/LICENSE', `${destination}/CORE-JS-LICENSE`)
+    metadata.files.push('CORE-JS-LICENSE')
+  }
   await writeFile(
     `${destination}/package.json`,
     JSON.stringify(metadata, null, 2) + '\n',

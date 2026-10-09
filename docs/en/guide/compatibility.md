@@ -53,7 +53,7 @@ iPad fullscreen displays browser-provided exit controls, and system gestures suc
 
 ### Internet Explorer
 
-The current package does not support IE, including the Vue 2 adapter. Adding a `Promise` polyfill alone cannot address ES2018 syntax, framework requirements and browser API compatibility.
+This package requires Vue 3 and does not support IE. Adding a `Promise` polyfill cannot supply the Proxy support required by Vue 3. For IE 11, use the separate [Vue 2 package and compatibility guide](/en/vue2/guide/compatibility).
 
 ## Capability detection and page-only fallback
 

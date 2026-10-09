@@ -13,6 +13,7 @@ The internal workspace packages are private. Their versions independently determ
 - `npm test`: controller, rejection rollback, teleport restoration, listener cleanup, directive rebinding and Vue component lifecycle tests.
 - `npm run build`: Vite ESM/CJS/UMD builds with Vue external, followed by TypeScript declaration generation. screenfull and its license/types are bundled.
 - `npm run check:packages`: pack actual release directories, install tarballs into isolated consumers with Vue 2.6.14, 2.7.16, 3.0.0 and the current Vue 3 development version; verify SSR ESM/CJS imports, browser-global UMD exports, mounted component lifecycles and TypeScript NodeNext consumers. Vue 3.0's own declarations require `skipLibCheck` with modern TypeScript; current Vue and both Vue 2 consumers are checked without it.
+- `npm run check:ie11`: ES5 parsing of Vue 2 outputs and simulated missing runtime/DOM capabilities, MS native fullscreen, page fallback and Vue lifecycle. This is not a real IE engine test.
 - `npm run build:examples`: build both playgrounds.
 - `npm run test:browser`: Chromium tests for both adapters in page and native fullscreen modes. Native exit uses the browser API because synthetic Escape is not a reliable native browser fullscreen command.
 
@@ -75,7 +76,7 @@ If npm publishing succeeds but GitHub Release creation fails, re-run only the fa
 - Vue 2 minimum is explicitly 2.6.14; releases before 2.6.14 are outside the validated support range.
 - Output paths change to root-level `index.js`, `index.cjs`, and `index.umd.js`; update direct CDN/deep-file URLs. Package-root imports use `exports` and need no path change.
 - Declaration entries are generated rather than maintained separately; public component types avoid exposing build-time Vue internal generics.
-- screenfull is updated from 5 to 6 and bundled in every format. IE and ES5-only environments are outside the ES2018 build target.
+- screenfull is updated from 5 to 6 and bundled in every format. Vue 3 targets ES2018. Vue 2 bundles selected core-js polyfills, then Babel transforms all output (including dependencies and wrappers) for IE 11. Vue 2 output is marked as having side effects so bundlers retain polyfill initialization.
 - `teleport` defaults to `false`, matching existing code (old README examples incorrectly documented `true`).
 - Native request rejection restores styles/DOM and removes listeners. Component errors use `error`; directive errors use the native `fullscreen-error` event.
 - Missing directive selectors now report an error instead of silently targeting the body.

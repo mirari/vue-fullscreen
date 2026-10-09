@@ -6,7 +6,7 @@ Vue 2 使用 `vue-fullscreen@legacy`。本文接口参考版本为 `2.7.0-beta.0
 
 ## 支持范围
 
-支持 Vue `2.6.14` 和 `2.7.x`。浏览器构建面向 ES2018，不支持 IE。导入包支持 SSR，全屏操作只能在浏览器中调用。
+支持 Vue `2.6.14` 和 `2.7.x`。发布构建以 IE 11 为兼容目标，内置所需的 JavaScript polyfill。导入包支持 SSR，全屏操作只能在浏览器中调用。
 
 ## 模型事件
 
@@ -31,9 +31,9 @@ Vue 2 使用 `vue-fullscreen@legacy`。本文接口参考版本为 `2.7.0-beta.0
 | iPad Safari              | iPadOS 16.4+ 支持标准 API，但有设备限制；较早版本有带前缀的部分支持 |
 | iPhone Safari            | 不支持任意元素的 Fullscreen API；使用网页全屏                       |
 | Android Chrome / Firefox | 当前版本支持，具体版本见支持表                                      |
-| Internet Explorer        | IE 11 仅部分支持原生 API；本组件包不支持 IE                         |
+| Internet Explorer        | IE 11 通过带 ms 前缀的 API 支持；不可用时使用网页全屏               |
 
-表中的版本号描述浏览器 API，不是本组件包的最低浏览器版本或实机测试承诺。本包构建面向 ES2018。底层 `screenfull` 处理部分浏览器前缀差异，但不能补齐浏览器缺失的全屏能力。
+表中的版本号描述浏览器 API，不是本组件包的最低浏览器版本或实机测试承诺。本包的 UMD/CJS 构建使用 ES5 语法，ESM 构建保留模块声明，供应用打包器处理。底层 `screenfull` 处理部分浏览器前缀差异，但不能补齐浏览器缺失的全屏能力。
 
 ### Safari 与移动设备
 
@@ -41,7 +41,11 @@ iPad 原生全屏会显示浏览器提供的退出控件，下滑等系统手势
 
 ### Internet Explorer
 
-当前版本不支持 IE，Vue 2 适配包也不例外。仅添加 `Promise` polyfill 不能解决 ES2018 语法、框架和浏览器 API 的兼容性问题。
+Vue 2 发布文件会转译为兼容 IE 11 的语法，并内置 `core-js` 提供的 Promise（含 `finally`）、WeakMap、Symbol、数组迭代器和 Object.assign 等 polyfill。加载时会在全局环境中补齐缺失能力，使用本包无需额外添加 Promise polyfill。Vue 本身仍由应用提供。
+
+直接在网页中使用时，先加载 Vue 2 浏览器构建，再用普通 script 标签加载本包的 `index.umd.js`；IE 无法直接加载 ESM。使用打包器时，应用代码、Vue 和其他依赖也需要兼容 IE 11。这些 polyfill 不能让 Vue 3 支持 IE。
+
+自动检查覆盖产物 ES5 语法，以及模拟缺失能力、ms 前缀全屏 API、网页降级、DOM 恢复和指令错误事件。这不是 IE 浏览器实机测试，部署前仍需在 IE 11 中验证实际应用。不支持 IE 10 及更早版本。VitePress 文档站和 Vite 示例页面本身需要现代浏览器。
 
 ## 能力检测与网页全屏降级
 

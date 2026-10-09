@@ -26,6 +26,8 @@ for (const [line, versions] of [
   if (
     manifest.name !== 'vue-fullscreen' ||
     !paths.includes('SCREENFULL-LICENSE') ||
+    (line === 'vue2' &&
+      (!paths.includes('CORE-JS-LICENSE') || manifest.sideEffects !== true)) ||
     paths.some((path) => path.includes('node_modules'))
   )
     throw new Error('Invalid package contents')

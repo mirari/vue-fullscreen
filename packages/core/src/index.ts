@@ -64,7 +64,8 @@ export function createFullscreen(): FullscreenController {
     }
   }
   const onKey = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') void controller.exit().catch(() => {})
+    if (event.key === 'Escape' || event.key === 'Esc')
+      void controller.exit().catch(() => {})
   }
   const controller: FullscreenController = {
     get options() {
@@ -117,7 +118,7 @@ export function createFullscreen(): FullscreenController {
       )
       let marker: Comment | undefined
       restore = () => {
-        node.classList.remove(...added)
+        added.forEach((name) => node.classList.remove(name))
         if (options.pageOnly || options.teleport) {
           for (const [key, value, priority] of styles) {
             if (value) node.style.setProperty(key, value, priority)
@@ -125,12 +126,12 @@ export function createFullscreen(): FullscreenController {
           }
         }
         if (marker?.parentNode) {
-          if (node.parentNode) marker.replaceWith(node)
-          else marker.remove()
+          if (node.parentNode) marker.parentNode.replaceChild(node, marker)
+          else marker.parentNode.removeChild(marker)
         }
       }
       element = node
-      node.classList.add(...added)
+      added.forEach((name) => node.classList.add(name))
       if (options.pageOnly || options.teleport) {
         Object.assign(node.style, {
           position: 'fixed',
@@ -142,8 +143,8 @@ export function createFullscreen(): FullscreenController {
       }
       if (options.teleport && node.parentNode) {
         marker = document.createComment('fullscreen')
-        node.before(marker)
-        document.body.append(node)
+        node.parentNode.insertBefore(marker, node)
+        document.body.appendChild(node)
       }
       if (options.pageOnly) {
         document.addEventListener('keyup', onKey)
@@ -255,10 +256,12 @@ export function bindDirective(el: HTMLElement, binding: FullscreenBinding) {
       report(error)
     }
   }
-  const report = (error: unknown) =>
-    el.dispatchEvent(
-      new CustomEvent('fullscreen-error', { detail: error, bubbles: true }),
-    )
+  const report = (error: unknown) => {
+    // IE 11 exposes CustomEvent but does not support calling its constructor.
+    const event = document.createEvent('CustomEvent')
+    event.initCustomEvent('fullscreen-error', true, false, error)
+    el.dispatchEvent(event)
+  }
   clicks.set(el, listener)
   el.addEventListener('click', listener)
 }

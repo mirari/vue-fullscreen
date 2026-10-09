@@ -7,3 +7,5 @@
 - Replace legacy workflows with tested tarball publishing via npm OIDC and GitHub Releases.
 
 This is a prerelease. Review CONTRIBUTING.md for changed direct bundle URLs, browser targets and supported peer versions.
+
+- Target IE 11 with ES5 output and bundled runtime polyfills; support MS fullscreen success/error events and legacy DOM operations.
