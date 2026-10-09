@@ -1,3 +1,6 @@
+import { build } from 'vite'
+import { runInNewContext } from 'node:vm'
+import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
 import {
   mkdtempSync,
@@ -27,7 +30,10 @@ for (const [line, versions] of [
     manifest.name !== 'vue-fullscreen' ||
     !paths.includes('SCREENFULL-LICENSE') ||
     (line === 'vue2' &&
-      (!paths.includes('CORE-JS-LICENSE') || manifest.sideEffects !== true)) ||
+      (!paths.includes('CORE-JS-LICENSE') ||
+        !manifest.sideEffects?.includes('./polyfills.js') ||
+        !paths.includes('polyfills.js') ||
+        !paths.includes('polyfills.cjs'))) ||
     paths.some((path) => path.includes('node_modules'))
   )
     throw new Error('Invalid package contents')
@@ -51,7 +57,38 @@ for (const [line, versions] of [
         ],
         { cwd: directory, stdio: 'pipe' },
       )
-      const esm = `import plugin, { api, component, directive, screenfull } from 'vue-fullscreen'; if (!plugin.install || !component || !directive || !screenfull || api.isFullscreen) throw Error('Invalid exports'); console.log('SSR ESM OK')`
+      const polyfillImport =
+        line === 'vue2' ? "import 'vue-fullscreen/polyfills'; " : ''
+      if (line === 'vue2') {
+        const entry = join(directory, 'polyfill-consumer.js')
+        writeFileSync(
+          entry,
+          "import 'vue-fullscreen/polyfills'; globalThis.polyfillConsumerLoaded = true",
+        )
+        const result = await build({
+          configFile: false,
+          root: directory,
+          logLevel: 'silent',
+          build: {
+            write: false,
+            lib: { entry, name: 'Consumer', formats: ['iife'] },
+            rolldownOptions: { output: { generatedCode: { symbols: false } } },
+          },
+        })
+        const code = (Array.isArray(result) ? result[0] : result).output[0].code
+        const sandbox = { setTimeout, clearTimeout }
+        runInNewContext(
+          'Promise = undefined; WeakMap = undefined; Symbol = undefined; Object.assign = undefined;',
+          sandbox,
+        )
+        runInNewContext(code, sandbox)
+        assert.equal(sandbox.polyfillConsumerLoaded, true)
+        assert.equal(typeof sandbox.Promise, 'function')
+        assert.equal(typeof sandbox.Promise.prototype.finally, 'function')
+        assert.equal(typeof sandbox.WeakMap, 'function')
+        console.log('Optional polyfill import survives production tree shaking')
+      }
+      const esm = `${polyfillImport}import plugin, { api, component, directive, screenfull } from 'vue-fullscreen'; if (!plugin.install || !component || !directive || !screenfull || api.isFullscreen) throw Error('Invalid exports'); console.log('SSR ESM OK')`
       execFileSync('node', ['--input-type=module', '-e', esm], {
         cwd: directory,
         stdio: 'inherit',
@@ -61,7 +98,7 @@ for (const [line, versions] of [
         [
           '--input-type=commonjs',
           '-e',
-          `const p = require('vue-fullscreen'); if (!p.default.install || !p.api || !p.component || !p.directive) throw Error('Invalid CJS exports'); console.log('SSR CJS OK')`,
+          `${line === 'vue2' ? "require('vue-fullscreen/polyfills');" : ''} const p = require('vue-fullscreen'); if (!p.default.install || !p.api || !p.component || !p.directive) throw Error('Invalid CJS exports'); console.log('SSR CJS OK')`,
         ],
         { cwd: directory, stdio: 'inherit' },
       )
@@ -116,7 +153,7 @@ for (const [line, versions] of [
         ],
         { cwd: directory, stdio: 'inherit' },
       )
-      const source = `import plugin, { api, component, directive, type ApiOptions } from 'vue-fullscreen'; const options: ApiOptions = { pageOnly: true }; const result: Promise<void> = api.request(undefined, options); void [plugin, component, directive, result];\n`
+      const source = `${polyfillImport}import plugin, { api, component, directive, type ApiOptions } from 'vue-fullscreen'; const options: ApiOptions = { pageOnly: true }; const result: Promise<void> = api.request(undefined, options); void [plugin, component, directive, result];\n`
       writeFileSync(join(directory, 'consumer.mts'), source)
       writeFileSync(join(directory, 'consumer.cts'), source)
       execFileSync(

@@ -8,4 +8,4 @@
 
 This is a prerelease. Review CONTRIBUTING.md for changed direct bundle URLs, browser targets and supported peer versions.
 
-- Target IE 11 with ES5 output and bundled runtime polyfills; support MS fullscreen success/error events and legacy DOM operations.
+- Target IE 11 with ES5 output and optional runtime polyfills via `vue-fullscreen/polyfills`; support MS fullscreen success/error events and legacy DOM operations.

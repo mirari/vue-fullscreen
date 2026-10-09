@@ -6,7 +6,7 @@ Use `vue-fullscreen@legacy` for Vue 2. This API reference describes `2.7.0-beta.
 
 ## Supported environments
 
-Vue `2.6.14` and `2.7.x` are supported. Published builds target IE 11 and bundle the JavaScript polyfills they require. Importing works during SSR, but fullscreen operations require the browser.
+Vue `2.6.14` and `2.7.x` are supported. Published builds target IE 11, with runtime polyfills available as an optional entry. Importing works during SSR, but fullscreen operations require the browser.
 
 ## Model events
 
@@ -41,9 +41,45 @@ iPad fullscreen displays browser-provided exit controls, and system gestures suc
 
 ### Internet Explorer
 
-Vue 2 release files are transpiled for IE 11 and bundle `core-js` polyfills for Promise (including `finally`), WeakMap, Symbol, array iterators and Object.assign. Missing capabilities are installed in the global environment when the package loads; no separate Promise polyfill is needed for this package. The Vue dependency remains external.
+Vue 2 release files use ES5 syntax. The main entry does **not** load global polyfills. For IE 11, choose one of the following approaches.
 
-For a plain HTML page, load Vue 2's browser build followed by this package's `index.umd.js` as classic scripts. IE cannot load ESM directly. When using a bundler, the application, Vue and other dependencies must also be compatible with IE 11. These polyfills cannot make Vue 3 work in IE.
+### Use the optional polyfill entry
+
+Load it before the component package in your application entry:
+
+```js
+import 'vue-fullscreen/polyfills'
+import Vue from 'vue'
+import VueFullscreen from 'vue-fullscreen'
+
+Vue.use(VueFullscreen)
+```
+
+CommonJS consumers can use `require('vue-fullscreen/polyfills')` before `require('vue-fullscreen')`.
+
+For classic scripts, load the files in this order. The paths below refer to files copied from the installed packages:
+
+```html
+<script src="/vendor/vue-fullscreen/polyfills.js"></script>
+<script src="/vendor/vue/dist/vue.js"></script>
+<script src="/vendor/vue-fullscreen/index.umd.js"></script>
+```
+
+Keep script execution in order; do not use `async`. IE cannot load ESM directly. The optional entry fills missing global capabilities; it is marked as having side effects so bundlers retain an explicit import.
+
+### Use your application's polyfills
+
+If your application already supplies these capabilities, omit the optional entry:
+
+- Promise, including `Promise.prototype.finally`;
+- WeakMap;
+- Symbol and `Symbol.iterator`;
+- array iteration, including `Array.prototype.entries`;
+- Object.assign.
+
+A global `core-js/stable` import in the application entry is one option. Load it before the component. A library-local ponyfill or only a Promise polyfill does not supply all of these globals. For code-split setups, finish loading polyfills before dynamically importing the component.
+
+Modern browsers with these capabilities do not need the optional entry. Your application, Vue 2 and other dependencies must still be compatible with IE 11. These polyfills cannot make Vue 3 work in IE.
 
 Automated checks parse the emitted code as ES5 and exercise missing capabilities, the ms-prefixed native API, page-only fallback, DOM restoration and directive errors in a simulated environment. This is not an actual IE browser run; verify your application on IE 11 before deployment. IE 10 and earlier are not supported. The VitePress documentation site and Vite demo pages require a modern browser.
 

@@ -6,7 +6,7 @@ Vue 2 使用 `vue-fullscreen@legacy`。本文接口参考版本为 `2.7.0-beta.0
 
 ## 支持范围
 
-支持 Vue `2.6.14` 和 `2.7.x`。发布构建以 IE 11 为兼容目标，内置所需的 JavaScript polyfill。导入包支持 SSR，全屏操作只能在浏览器中调用。
+支持 Vue `2.6.14` 和 `2.7.x`。发布构建以 IE 11 为兼容目标，所需的 JavaScript polyfill 可按需引入。导入包支持 SSR，全屏操作只能在浏览器中调用。
 
 ## 模型事件
 
@@ -41,9 +41,45 @@ iPad 原生全屏会显示浏览器提供的退出控件，下滑等系统手势
 
 ### Internet Explorer
 
-Vue 2 发布文件会转译为兼容 IE 11 的语法，并内置 `core-js` 提供的 Promise（含 `finally`）、WeakMap、Symbol、数组迭代器和 Object.assign 等 polyfill。加载时会在全局环境中补齐缺失能力，使用本包无需额外添加 Promise polyfill。Vue 本身仍由应用提供。
+Vue 2 发布文件使用 ES5 语法，主入口**不会自动加载全局 polyfill**。需要 IE 11 时，可以选择以下任意一种方式。
 
-直接在网页中使用时，先加载 Vue 2 浏览器构建，再用普通 script 标签加载本包的 `index.umd.js`；IE 无法直接加载 ESM。使用打包器时，应用代码、Vue 和其他依赖也需要兼容 IE 11。这些 polyfill 不能让 Vue 3 支持 IE。
+### 引入本包提供的 polyfill
+
+在应用入口中，先引入 polyfill，再引入组件包：
+
+```js
+import 'vue-fullscreen/polyfills'
+import Vue from 'vue'
+import VueFullscreen from 'vue-fullscreen'
+
+Vue.use(VueFullscreen)
+```
+
+CommonJS 项目可先执行 `require('vue-fullscreen/polyfills')`，再执行 `require('vue-fullscreen')`。
+
+普通网页按下面顺序加载，路径表示从安装的软件包中复制出的文件：
+
+```html
+<script src="/vendor/vue-fullscreen/polyfills.js"></script>
+<script src="/vendor/vue/dist/vue.js"></script>
+<script src="/vendor/vue-fullscreen/index.umd.js"></script>
+```
+
+保持脚本执行顺序，不要添加 `async`。IE 无法直接加载 ESM。可选入口会在全局环境中补齐缺失能力，已标记为具有副作用，打包器会保留显式引入。
+
+### 使用应用已有的 polyfill
+
+如果应用已经提供以下能力，就无需重复引入本包的 polyfill：
+
+- Promise，包括 `Promise.prototype.finally`；
+- WeakMap；
+- Symbol 和 `Symbol.iterator`；
+- 数组迭代能力，包括 `Array.prototype.entries`；
+- Object.assign。
+
+例如，可以在应用入口先全局引入 `core-js/stable`，再加载组件包。仅在模块内生效的 ponyfill 或只补 Promise 的方案不能覆盖全部要求。如果使用动态加载，应先等 polyfill 加载完成，再动态导入组件。
+
+具备这些能力的现代浏览器无需引入可选入口。应用代码、Vue 2 和其他依赖仍需兼容 IE 11；这些 polyfill 不能让 Vue 3 支持 IE。
 
 自动检查覆盖产物 ES5 语法，以及模拟缺失能力、ms 前缀全屏 API、网页降级、DOM 恢复和指令错误事件。这不是 IE 浏览器实机测试，部署前仍需在 IE 11 中验证实际应用。不支持 IE 10 及更早版本。VitePress 文档站和 Vite 示例页面本身需要现代浏览器。
 

@@ -37,8 +37,30 @@ for (const line of ['vue2', 'vue3']) {
     },
   })
   if (line === 'vue2') {
+    await build({
+      configFile: false,
+      build: {
+        target: 'es2018',
+        outDir: destination,
+        emptyOutDir: false,
+        lib: {
+          entry: resolve('scripts/entries/polyfills.js'),
+          formats: ['iife'],
+          name: 'VueFullscreenPolyfills',
+          fileName: () => 'polyfills.js',
+        },
+        rolldownOptions: {
+          output: { generatedCode: { preset: 'es5', symbols: false } },
+        },
+      },
+    })
     // Transform after bundling so screenfull, polyfills and the UMD wrapper also use ES5.
-    for (const filename of ['index.js', 'index.cjs', 'index.umd.js']) {
+    for (const filename of [
+      'index.js',
+      'index.cjs',
+      'index.umd.js',
+      'polyfills.js',
+    ]) {
       const path = `${destination}/${filename}`
       const result = await transformAsync(await readFile(path, 'utf8'), {
         filename,
@@ -62,6 +84,11 @@ for (const line of ['vue2', 'vue3']) {
       })
       await writeFile(path, result.code + '\n')
     }
+  }
+  if (line === 'vue2') {
+    await cp(`${destination}/polyfills.js`, `${destination}/polyfills.cjs`)
+    await writeFile(`${destination}/polyfills.d.ts`, 'export {}\n')
+    await writeFile(`${destination}/polyfills.d.cts`, 'export {}\n')
   }
   await rm(`.types/${line}`, { recursive: true, force: true })
   execFileSync(
@@ -121,10 +148,30 @@ for (const line of ['vue2', 'vue3']) {
           default: './index.cjs',
         },
       },
+      ...(line === 'vue2'
+        ? {
+            './polyfills': {
+              import: { types: './polyfills.d.ts', default: './polyfills.js' },
+              require: {
+                types: './polyfills.d.cts',
+                default: './polyfills.cjs',
+              },
+            },
+          }
+        : {}),
       './package.json': './package.json',
     },
-    files: ['*.js', '*.cjs', 'types', 'README.md', 'LICENSE'],
-    sideEffects: line === 'vue2',
+    files: [
+      '*.js',
+      '*.cjs',
+      '*.d.ts',
+      '*.d.cts',
+      'types',
+      'README.md',
+      'LICENSE',
+    ],
+    sideEffects:
+      line === 'vue2' ? ['./polyfills.js', './polyfills.cjs'] : false,
     peerDependencies: { vue: line === 'vue2' ? '^2.6.14 || ^2.7.0' : '^3.0.0' },
     license: 'MIT',
     author: 'mirari',

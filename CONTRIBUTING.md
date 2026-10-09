@@ -76,7 +76,7 @@ If npm publishing succeeds but GitHub Release creation fails, re-run only the fa
 - Vue 2 minimum is explicitly 2.6.14; releases before 2.6.14 are outside the validated support range.
 - Output paths change to root-level `index.js`, `index.cjs`, and `index.umd.js`; update direct CDN/deep-file URLs. Package-root imports use `exports` and need no path change.
 - Declaration entries are generated rather than maintained separately; public component types avoid exposing build-time Vue internal generics.
-- screenfull is updated from 5 to 6 and bundled in every format. Vue 3 targets ES2018. Vue 2 bundles selected core-js polyfills, then Babel transforms all output (including dependencies and wrappers) for IE 11. Vue 2 output is marked as having side effects so bundlers retain polyfill initialization.
+- screenfull is updated from 5 to 6 and bundled in every format. Vue 3 targets ES2018. Vue 2 exposes selected core-js polyfills through the optional `vue-fullscreen/polyfills` entry. The main bundle contains no core-js. Babel transforms both outputs for IE 11; only the polyfill files are marked as having side effects. `check:ie11` covers both this entry and independently supplied application polyfills.
 - `teleport` defaults to `false`, matching existing code (old README examples incorrectly documented `true`).
 - Native request rejection restores styles/DOM and removes listeners. Component errors use `error`; directive errors use the native `fullscreen-error` event.
 - Missing directive selectors now report an error instead of silently targeting the body.
