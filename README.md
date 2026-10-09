@@ -4,7 +4,7 @@ Fullscreen components, directives and a promise-based API for **Vue 2 and Vue 3*
 
 **[Documentation & interactive examples](https://vue-fullscreen.mirari.cc/)** · [Documentation source](./docs/index.md) · [Contributing](./CONTRIBUTING.md)
 
-The new VitePress site is prepared on this branch; the hosted URL will show it after the documentation workflow is deployed.
+The VitePress site is published at the existing custom domain from the `gh-pages` branch.
 
 ## Install
 

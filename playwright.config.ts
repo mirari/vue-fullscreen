@@ -3,6 +3,8 @@ export default defineConfig({
   testDir: './tests/browser',
   use: {
     browserName: 'chromium',
+    // Use full Chromium's new headless mode; headless shell lacks native fullscreen.
+    channel: 'chromium',
     headless: true,
     launchOptions: {
       executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,

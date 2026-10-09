@@ -4,6 +4,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4174/',
     browserName: 'chromium',
+    // Use full Chromium's new headless mode; headless shell lacks native fullscreen.
+    channel: 'chromium',
     launchOptions: {
       executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
     },

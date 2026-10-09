@@ -45,7 +45,10 @@ for (const kind of ['component', 'directive', 'api']) {
       await page.goto('./examples')
       const demo = page.locator(`[data-demo="${kind}"]`)
       await expect(demo).toBeVisible()
-      if (native) await demo.getByLabel('仅网页全屏').uncheck()
+      if (native) {
+        expect(await page.evaluate(() => document.fullscreenEnabled)).toBe(true)
+        await demo.getByLabel('仅网页全屏').uncheck()
+      }
       await demo
         .getByRole('button', {
           name: kind === 'directive' ? '点击指令按钮' : '进入全屏',

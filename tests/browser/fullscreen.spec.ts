@@ -7,6 +7,8 @@ for (const port of [4172, 4173]) {
       const errors: string[] = []
       page.on('pageerror', (error) => errors.push(error.message))
       await page.goto(`http://localhost:${port}/${pageOnly ? '?pageOnly' : ''}`)
+      if (!pageOnly)
+        expect(await page.evaluate(() => document.fullscreenEnabled)).toBe(true)
       await page.locator('#enter').click()
       await expect(page.locator('#state')).toHaveText('true')
       await expect(page.locator('body > #target')).toBeVisible()
