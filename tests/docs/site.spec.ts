@@ -41,10 +41,10 @@ for (const english of [false, true]) {
       english ? /\/en\/guide\/getting-started$/ : /\/guide\/getting-started$/,
     )
     await page.reload()
-    await expect(page.locator('.vp-doc')).toContainText(
+    await expect(page.locator('.VPDoc .vp-doc')).toContainText(
       'npm install vue-fullscreen@next',
     )
-    await expect(page.locator('.vp-doc')).not.toContainText(
+    await expect(page.locator('.VPDoc .vp-doc')).not.toContainText(
       'npm install vue-fullscreen@legacy',
     )
     await page.getByRole('button', { name: text.search, exact: true }).click()
@@ -133,7 +133,9 @@ for (const english of [false, true]) {
       .getByRole('link', { name: 'Vue 2', exact: true })
       .click()
     await expect(page).toHaveURL(english ? /\/en\/vue2\/$/ : /\/vue2\/$/)
-    await expect(page.locator('.vp-doc')).toContainText('vue-fullscreen@legacy')
+    await expect(page.locator('.VPDoc .vp-doc')).toContainText(
+      'vue-fullscreen@legacy',
+    )
     const sidebar = page.locator('.VPSidebar')
     const links = await sidebar
       .locator('a[href]')
@@ -144,8 +146,8 @@ for (const english of [false, true]) {
     await sidebar
       .getByRole('link', { name: english ? 'Component' : '组件', exact: true })
       .click()
-    await expect(page.locator('.vp-doc')).toContainText('input')
-    await expect(page.locator('.vp-doc')).not.toContainText('modelValue')
+    await expect(page.locator('.VPDoc .vp-doc')).toContainText('input')
+    await expect(page.locator('.VPDoc .vp-doc')).not.toContainText('modelValue')
     await page.locator('.VPNavBarTranslations button').click()
     await page
       .locator('.VPNavBarTranslations')
@@ -200,3 +202,73 @@ test('language switch keeps the Vue 3 page', async ({ page }) => {
     'Enter fullscreen',
   )
 })
+
+for (const vue2 of [false, true]) {
+  for (const native of [false, true]) {
+    test(`${vue2 ? 'Vue 2' : 'Vue'} teleport comparison in ${native ? 'native' : 'page'} mode`, async ({
+      page,
+    }) => {
+      await page.goto(vue2 ? './vue2/examples' : './examples')
+      const scope = vue2 ? page.frameLocator('iframe') : page
+      const controls = vue2
+        ? scope.locator('main')
+        : page.locator('[data-demo="teleport"]')
+      if (native)
+        await (vue2 ? page : controls).getByLabel('仅网页全屏').uncheck()
+      const target = scope.locator(vue2 ? '#target' : '#teleport-target')
+      const popup = scope.locator(vue2 ? '#body-popup' : '.teleport-popup')
+      for (const teleport of [false, true]) {
+        await controls
+          .getByLabel('teleport', { exact: true })
+          .setChecked(teleport)
+        await controls
+          .getByRole('button', {
+            name: vue2 ? '进入组件全屏' : '进入全屏',
+            exact: true,
+          })
+          .click()
+        await expect(target).toHaveClass(/(?:teleport-active|fullscreen)/)
+        expect(
+          await target.evaluate((el) => el.parentElement === document.body),
+        ).toBe(teleport)
+        if (native) {
+          expect(
+            await target.evaluate((el) => document.fullscreenElement === el),
+          ).toBe(!teleport)
+          await target.getByRole('button', { name: '切换 body 弹窗' }).click()
+          await expect(popup).toBeAttached()
+          // Visibility alone cannot detect exclusion from the fullscreen top layer.
+          await expect
+            .poll(() =>
+              popup.evaluate((el) => {
+                const r = el.getBoundingClientRect()
+                return el.contains(
+                  document.elementFromPoint(
+                    r.x + r.width / 2,
+                    r.y + r.height / 2,
+                  ),
+                )
+              }),
+            )
+            .toBe(teleport)
+        } else {
+          const fillsViewport = await target.evaluate((el) => {
+            const r = el.getBoundingClientRect()
+            return (
+              Math.abs(r.width - innerWidth) < 2 &&
+              Math.abs(r.height - innerHeight) < 2
+            )
+          })
+          expect(fillsViewport).toBe(teleport)
+        }
+        await target
+          .getByRole('button', { name: '退出全屏', exact: true })
+          .click()
+        await expect(target).not.toHaveClass(/(?:teleport-active|fullscreen)/)
+        expect(
+          await target.evaluate((el) => el.parentElement === document.body),
+        ).toBe(false)
+      }
+    })
+  }
+}

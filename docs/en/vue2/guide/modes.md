@@ -43,3 +43,5 @@ Moving an element can affect inherited styles and ancestor selectors such as `.d
 ```
 
 Use the [examples](/en/vue2/examples) to compare the options.
+
+See [the popup and transformed-parent examples](/en/vue2/examples#fullscreen-with-body-mounted-popups) to compare both settings step by step.

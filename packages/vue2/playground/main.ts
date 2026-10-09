@@ -27,11 +27,41 @@ const text = zh
 document.documentElement.lang = zh ? 'zh-CN' : 'en'
 
 new Vue({
-  data: { active: false, error: '' },
+  data: { active: false, error: '', teleport: true },
+  mounted() {
+    const popup = document.createElement('aside')
+    popup.id = 'body-popup'
+    popup.hidden = true
+    popup.textContent = zh
+      ? '这个弹窗直接挂载在 body 下。'
+      : 'This popup is mounted directly under body.'
+    const close = document.createElement('button')
+    close.textContent = zh ? '关闭弹窗' : 'Close popup'
+    close.onclick = () => {
+      popup.hidden = true
+    }
+    popup.append(close)
+    document.body.append(popup)
+  },
+  beforeDestroy() {
+    document.querySelector('#body-popup')?.remove()
+  },
   render(h) {
     return h('main', [
       h('h1', text.title),
       h('p', text.help),
+      h('label', [
+        h('input', {
+          attrs: { type: 'checkbox', id: 'teleport', disabled: this.active },
+          domProps: { checked: this.teleport },
+          on: {
+            change: (event: Event) => {
+              this.teleport = (event.target as HTMLInputElement).checked
+            },
+          },
+        }),
+        'teleport',
+      ]),
       h(
         'button',
         {
@@ -48,10 +78,12 @@ new Vue({
         component,
         {
           attrs: { id: 'target' },
-          props: { value: this.active, pageOnly, teleport: true },
+          props: { value: this.active, pageOnly, teleport: this.teleport },
           on: {
             input: (v: boolean) => {
               this.active = v
+              const popup = document.querySelector<HTMLElement>('#body-popup')
+              if (popup) popup.hidden = true
             },
             error: (e: Error) => {
               this.error = e.message
@@ -60,6 +92,20 @@ new Vue({
         },
         [
           h('p', text.content),
+          h(
+            'button',
+            {
+              attrs: { id: 'popup' },
+              on: {
+                click: () => {
+                  const popup =
+                    document.querySelector<HTMLElement>('#body-popup')
+                  if (popup) popup.hidden = !popup.hidden
+                },
+              },
+            },
+            zh ? '切换 body 弹窗' : 'Toggle body popup',
+          ),
           h(
             'button',
             {

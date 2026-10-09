@@ -21,3 +21,22 @@ output {
   display: block;
   margin: 1rem;
 }
+
+#target.fullscreen {
+  z-index: 1000;
+}
+#body-popup {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  max-width: 280px;
+  padding: 16px;
+  background: white;
+  color: #172554;
+  border: 2px solid #2563eb;
+  z-index: 1001;
+}
+main {
+  transform: translateZ(0);
+  overflow: hidden;
+}
