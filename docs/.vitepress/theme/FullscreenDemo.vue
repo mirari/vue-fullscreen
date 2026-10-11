@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
-import { useData, withBase } from 'vitepress'
+import { useData } from 'vitepress'
 import {
   api,
   component as Fullscreen,
@@ -16,22 +16,17 @@ const pageOnly = ref(false)
 const teleport = ref(true)
 const error = ref('')
 const target = ref<HTMLElement>()
-const photos = [
-  { id: 'DSCF2734', width: 4896, height: 3264 },
-  { id: 'DSCF3389', width: 3840, height: 2560 },
-  { id: 'IMG_20241001_140036', width: 4080, height: 3060 },
-  { id: 'IMG_20250726_130738', width: 4096, height: 3072 },
-  { id: 'IMG_20260427_170326', width: 4096, height: 3072 },
-  { id: 'P1020132', width: 3776, height: 2520 },
-].map((photo, index) => ({
-  ...photo,
+// Use the original demo's image service with stable IDs across sizes.
+const photos = Array.from({ length: 6 }, (_, index) => ({
+  id: 10 + index,
   zh: `图片 ${index + 1}`,
   en: `Image ${index + 1}`,
 }))
 const selected = ref(0)
 const photo = computed(() => photos[selected.value])
-const photoUrl = (id: string, size: 'thumb' | 'preview' | 'full' = 'thumb') =>
-  withBase(`/images/gallery/${id}-${size}.webp`)
+const photoSizes = { thumb: '128/72', preview: '640/360', full: '1280/720' }
+const photoUrl = (id: number, size: 'thumb' | 'preview' | 'full' = 'thumb') =>
+  `https://picsum.photos/id/${id}/${photoSizes[size]}`
 function movePhoto(offset: number) {
   selected.value = (selected.value + offset + photos.length) % photos.length
 }
@@ -159,8 +154,8 @@ onBeforeUnmount(() => {
           class="gallery-image"
           :src="photoUrl(photo.id, active ? 'full' : 'preview')"
           :alt="english ? photo.en : photo.zh"
-          :width="photo.width"
-          :height="photo.height"
+          width="1280"
+          height="720"
           decoding="async"
         />
         <button

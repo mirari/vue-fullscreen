@@ -1,5 +1,15 @@
 import { expect, test } from '@playwright/test'
 
+// Keep interaction tests independent of the external image service.
+test.beforeEach(async ({ page }) => {
+  await page.route('https://picsum.photos/**', (route) =>
+    route.fulfill({
+      contentType: 'image/svg+xml',
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720"><rect width="1280" height="720" fill="#406b8a"/></svg>',
+    }),
+  )
+})
+
 for (const english of [false, true]) {
   const prefix = english ? './en/' : './'
   const text = english
@@ -97,8 +107,8 @@ for (const english of [false, true]) {
         await expect
           .poll(async () => {
             const box = await fullImage.boundingBox()
-            // First photo is 3:2; compare the visible image, not its letterbox.
-            return Math.min(box!.height, box!.width / 1.5)
+            // Photos are 16:9; compare the visible image, not its letterbox.
+            return Math.min(box!.height, (box!.width * 9) / 16)
           })
           .toBeGreaterThan(preview!.height * 1.5)
         expect(
@@ -315,25 +325,9 @@ for (const english of [false, true]) {
 
       await expect(demo.locator('.gallery-thumbnails')).toBeHidden()
       await expect(demo.locator('.gallery-thumbnails button')).toHaveCount(6)
-      // Check every shipped variant, including photos beyond the switching sample.
-      const sources = await demo
-        .locator('.gallery-thumbnails img')
-        .evaluateAll((images) =>
-          images.map((image) => (image as HTMLImageElement).src),
-        )
-      for (const source of sources) {
-        for (const size of ['thumb', 'preview', 'full']) {
-          const response = await page.request.get(
-            source.replace('-thumb.', `-${size}.`),
-          )
-          expect(response.ok()).toBe(true)
-          expect(response.headers()['content-type']).toContain('image/webp')
-        }
-      }
-
       await expect(
         demo.locator('.gallery-thumbnails img').first(),
-      ).toHaveAttribute('src', /\/images\/gallery\/DSCF2734-thumb\.webp$/)
+      ).toHaveAttribute('src', /picsum\.photos\/id\/10\/128\/72$/)
       await expect
         .poll(() =>
           image.evaluate(
@@ -349,7 +343,7 @@ for (const english of [false, true]) {
         .click()
       await expect(image).toHaveAttribute(
         'src',
-        /\/images\/gallery\/DSCF3389-preview\.webp$/,
+        /picsum\.photos\/id\/11\/640\/360$/,
       )
       await demo
         .getByRole('button', {
@@ -362,7 +356,7 @@ for (const english of [false, true]) {
       await expect(target.locator('.gallery-thumbnails')).toBeVisible()
       await expect(image).toHaveAttribute(
         'src',
-        /\/images\/gallery\/DSCF3389-full\.webp$/,
+        /picsum\.photos\/id\/11\/1280\/720$/,
       )
       await target
         .getByRole('button', {
@@ -372,7 +366,7 @@ for (const english of [false, true]) {
         .click()
       await expect(image).toHaveAttribute(
         'src',
-        /\/images\/gallery\/IMG_20241001_140036-full\.webp$/,
+        /picsum\.photos\/id\/12\/1280\/720$/,
       )
       await expect
         .poll(() =>
@@ -385,7 +379,7 @@ for (const english of [false, true]) {
       await page.keyboard.press('ArrowLeft')
       await expect(image).toHaveAttribute(
         'src',
-        /\/images\/gallery\/DSCF3389-full\.webp$/,
+        /picsum\.photos\/id\/11\/1280\/720$/,
       )
       await target
         .getByRole('button', {
@@ -397,7 +391,7 @@ for (const english of [false, true]) {
       await expect(demo.locator('.gallery-count')).toHaveText('2 / 6')
       await expect(image).toHaveAttribute(
         'src',
-        /\/images\/gallery\/DSCF3389-preview\.webp$/,
+        /picsum\.photos\/id\/11\/640\/360$/,
       )
     })
   }
