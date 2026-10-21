@@ -9,8 +9,8 @@ hero:
       text: 快速上手
       link: /guide/getting-started
     - theme: alt
-      text: 交互示例
-      link: /examples
+      text: 完整 API
+      link: /reference/api
 features:
   - title: 组件
     details: 使用 v-model 控制全屏状态。用户退出全屏时，绑定值会同步更新。

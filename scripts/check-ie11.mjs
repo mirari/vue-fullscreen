@@ -98,7 +98,7 @@ for (const provider of ['optional entry', 'app-owned core-js']) {
       assert.equal(typeof w.Promise, 'function')
       assert.equal(typeof w.Promise.prototype.finally, 'function')
       assert.equal(typeof w.WeakMap, 'function')
-      const { api, directive } = w.VueFullscreen
+      const { fullscreen: api, vFullscreen: directive } = w.VueFullscreen
       assert.equal(api.isEnabled, native)
       const target = w.document.querySelector('#target')
       await api.request(target, { teleport: true, fullscreenClass: 'full one' })

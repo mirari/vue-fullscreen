@@ -17,9 +17,9 @@
 </template>
 
 <script>
-import { directive } from 'vue-fullscreen'
+import { vFullscreen } from 'vue-fullscreen'
 export default {
-  directives: { fullscreen: directive },
+  directives: { fullscreen: vFullscreen },
   data: () => ({ error: '' }),
 }
 </script>
@@ -46,7 +46,7 @@ export default {
 
 `.pageOnly` 和 `.teleport` 对应同名配置。对象中的显式选项优先于修饰符。例如 `.pageOnly="{ pageOnly: false }"` 最终使用原生模式。
 
-对象还支持 `fullscreenClass` 与 `callback(active)`。指令使用共享 API，所以 `api.exit()` 可以退出由指令开启的全屏。
+对象还支持 `fullscreenClass` 与 `callback(active)`。指令使用共享 API，所以 `fullscreen.exit()` 可以退出由指令开启的全屏。
 
 ## 捕获失败
 

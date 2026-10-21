@@ -1,6 +1,6 @@
 import { createServer } from 'node:http'
 import { readFile } from 'node:fs/promises'
-import { resolve, extname } from 'node:path'
+import { resolve, extname, sep } from 'node:path'
 const root = resolve(process.argv[2])
 createServer(async (req, res) => {
   if (req.url === '/favicon.ico') {
@@ -15,7 +15,7 @@ createServer(async (req, res) => {
         '/index.html',
       ),
   )
-  if (!path.startsWith(root + '/')) {
+  if (!path.startsWith(root + sep)) {
     res.writeHead(403).end()
     return
   }

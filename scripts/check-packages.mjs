@@ -1,6 +1,7 @@
 import { build } from 'vite'
 import { runInNewContext } from 'node:vm'
 import assert from 'node:assert/strict'
+import { execNpm } from './exec-npm.mjs'
 import { execFileSync } from 'node:child_process'
 import {
   mkdtempSync,
@@ -10,7 +11,7 @@ import {
   mkdirSync,
 } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { resolve, join } from 'node:path'
+import { resolve, join, dirname } from 'node:path'
 const root = process.cwd()
 mkdirSync('artifacts', { recursive: true })
 for (const [line, versions] of [
@@ -18,8 +19,7 @@ for (const [line, versions] of [
   ['vue3', ['3.0.0', '3.5.43']],
 ]) {
   const pack = JSON.parse(
-    execFileSync(
-      'npm',
+    execNpm(
       ['pack', `./dist/${line}`, '--json', '--pack-destination', 'artifacts'],
       { encoding: 'utf8' },
     ),
@@ -29,6 +29,9 @@ for (const [line, versions] of [
   if (
     manifest.name !== 'vue-fullscreen' ||
     !paths.includes('SCREENFULL-LICENSE') ||
+    !paths.includes('CHANGELOG.md') ||
+    readFileSync(`dist/${line}/CHANGELOG.md`, 'utf8') !==
+      readFileSync(`packages/${line}/CHANGELOG.md`, 'utf8') ||
     (line === 'vue2' &&
       (!paths.includes('CORE-JS-LICENSE') ||
         !manifest.sideEffects?.includes('./polyfills.js') ||
@@ -44,8 +47,7 @@ for (const [line, versions] of [
         join(directory, 'package.json'),
         JSON.stringify({ private: true, type: 'module' }),
       )
-      execFileSync(
-        'npm',
+      execNpm(
         [
           'install',
           '--ignore-scripts',
@@ -88,7 +90,17 @@ for (const [line, versions] of [
         assert.equal(typeof sandbox.WeakMap, 'function')
         console.log('Optional polyfill import survives production tree shaking')
       }
-      const esm = `${polyfillImport}import plugin, { api, component, directive, screenfull } from 'vue-fullscreen'; if (!plugin.install || !component || !directive || !screenfull || api.isFullscreen) throw Error('Invalid exports'); console.log('SSR ESM OK')`
+      const composable = line === 'vue3' ? ', useFullscreen' : ''
+      const pluginImport = line === 'vue2' ? 'plugin, ' : ''
+      const invalidPlugin = (namespace) =>
+        line === 'vue2'
+          ? `!${namespace}.default?.install`
+          : `'default' in ${namespace}`
+      const checkComposable =
+        line === 'vue3'
+          ? "const controls = useFullscreen(); if (controls.isFullscreen.value || controls.isSupported.value) throw Error('Invalid SSR composable');"
+          : ''
+      const esm = `${polyfillImport}import * as exports from 'vue-fullscreen'; import ${pluginImport}{ fullscreen, Fullscreen, vFullscreen, screenfull${composable} } from 'vue-fullscreen'; if (${invalidPlugin('exports')} || !Fullscreen || !vFullscreen || !screenfull || fullscreen.isFullscreen) throw Error('Invalid exports'); ${checkComposable} console.log('SSR ESM OK')`
       execFileSync('node', ['--input-type=module', '-e', esm], {
         cwd: directory,
         stdio: 'inherit',
@@ -98,7 +110,7 @@ for (const [line, versions] of [
         [
           '--input-type=commonjs',
           '-e',
-          `${line === 'vue2' ? "require('vue-fullscreen/polyfills');" : ''} const p = require('vue-fullscreen'); if (!p.default.install || !p.api || !p.component || !p.directive) throw Error('Invalid CJS exports'); console.log('SSR CJS OK')`,
+          `${line === 'vue2' ? "require('vue-fullscreen/polyfills');" : ''} const p = require('vue-fullscreen'); if (${invalidPlugin('p')} || !p.fullscreen || !p.Fullscreen || !p.vFullscreen || (${line === 'vue3'} && !p.useFullscreen)) throw Error('Invalid CJS exports'); console.log('SSR CJS OK')`,
         ],
         { cwd: directory, stdio: 'inherit' },
       )
@@ -113,7 +125,7 @@ for (const [line, versions] of [
         const { runInNewContext } = require('node:vm');
         const context = { Vue: require('vue') };
         runInNewContext(readFileSync(join(dirname(require.resolve('vue-fullscreen/package.json')), 'index.umd.js'), 'utf8'), context);
-        if (!context.VueFullscreen.default.install || !context.VueFullscreen.api) throw Error('Invalid browser-global exports');
+        if (${invalidPlugin('context.VueFullscreen')} || !context.VueFullscreen.fullscreen || !context.VueFullscreen.Fullscreen || !context.VueFullscreen.vFullscreen) throw Error('Invalid browser-global exports');
         console.log('UMD OK');
       `,
         ],
@@ -132,7 +144,7 @@ for (const [line, versions] of [
         const dom = new JSDOM('<main id="mount"></main>');
         for (const key of ['window', 'document', 'Element', 'HTMLElement', 'SVGElement', 'Node']) globalThis[key] = dom.window[key];
         const vue = await import('vue');
-        const { component } = await import('vue-fullscreen');
+        const { Fullscreen: component } = await import('vue-fullscreen');
         let instance, close;
         if (${JSON.stringify(line)} === 'vue2') {
           const app = new vue.default({ render(h) { return h(component, { ref: 'fs', props: { pageOnly: true, teleport: true } }, ['content']) } }).$mount('#mount');
@@ -153,7 +165,17 @@ for (const [line, versions] of [
         ],
         { cwd: directory, stdio: 'inherit' },
       )
-      const source = `${polyfillImport}import plugin, { api, component, directive, type ApiOptions } from 'vue-fullscreen'; const options: ApiOptions = { pageOnly: true }; const result: Promise<void> = api.request(undefined, options); void [plugin, component, directive, result];\n`
+      const removedPluginTypes =
+        line === 'vue3'
+          ? `import * as exports from 'vue-fullscreen'; import type { ComponentCustomProperties } from 'vue';
+// @ts-expect-error Vue 3 has no plugin default export.
+exports.default;
+// @ts-expect-error Vue 3 does not augment instance globals.
+type RemovedGlobal = ComponentCustomProperties['$fullscreen'];
+// @ts-expect-error Plugin installation options belong to Vue 2 only.
+type RemovedOptions = import('vue-fullscreen').InstallationOptions;`
+          : ''
+      const source = `${polyfillImport}import ${pluginImport}{ fullscreen, Fullscreen, vFullscreen${composable}, type ApiOptions } from 'vue-fullscreen'; const options: ApiOptions = { pageOnly: true }; const result: Promise<void> = fullscreen.request(undefined, options); ${checkComposable} void [${line === 'vue2' ? 'plugin, ' : ''}Fullscreen, vFullscreen, result];\n${removedPluginTypes}\n`
       writeFileSync(join(directory, 'consumer.mts'), source)
       writeFileSync(join(directory, 'consumer.cts'), source)
       execFileSync(
@@ -176,6 +198,7 @@ for (const [line, versions] of [
       )
       console.log(`${line}: installed tarball verified with Vue ${version}`)
     } finally {
+      assert.equal(dirname(resolve(directory)), resolve(tmpdir()))
       rmSync(directory, { recursive: true, force: true })
     }
   }

@@ -3,31 +3,22 @@
 ## 导出
 
 ```ts
-import VueFullscreen, {
-  component,
-  directive,
-  api,
+import {
+  Fullscreen,
+  vFullscreen,
+  useFullscreen,
+  fullscreen,
   screenfull,
   type ApiOptions,
-  type InstallationOptions,
   type VueFullscreenApi,
   type DirectiveOptions,
+  type UseFullscreenOptions,
+  type UseFullscreenTarget,
+  type UseFullscreenReturn,
 } from 'vue-fullscreen'
 ```
 
-默认导出是安装插件。`screenfull` 是底层原生全屏工具；直接使用它不会执行本库的网页全屏、样式和 teleport 管理。
-
-## 插件
-
-```ts
-app.use(VueFullscreen, { name: 'fs' }) // Vue 3
-```
-
-| 选项   | 类型     | 默认值         | 作用                               |
-| ------ | -------- | -------------- | ---------------------------------- |
-| `name` | `string` | `'fullscreen'` | 同时决定组件名、指令名和实例属性名 |
-
-`name: 'fs'` 注册 `<fs>`、`v-fs` 和 `$fs`。默认的 `$fullscreen` 已提供类型增强；自定义名称需在项目中补充类型。
+`screenfull` 是底层原生全屏工具；直接使用它不会执行本库的网页全屏、样式和 teleport 管理。
 
 ## 组件
 
@@ -65,12 +56,36 @@ app.use(VueFullscreen, { name: 'fs' }) // Vue 3
 
 直接调用方法时捕获返回 Promise 的拒绝。组件卸载时清理监听器和被移动的 DOM。
 
+## useFullscreen
+
+```ts
+useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): UseFullscreenReturn
+```
+
+Vue 3 组合式入口。目标为元素、模板 ref 或 getter，省略时使用 body。每次调用独立管理状态，在组件卸载时清理。
+
+| 返回值                      | 类型                     | 说明                           |
+| --------------------------- | ------------------------ | ------------------------------ |
+| `isFullscreen`              | `Readonly<Ref<boolean>>` | 随实际退出同步的响应式状态     |
+| `isSupported`               | `ComputedRef<boolean>`   | 原生全屏可用性；不影响网页全屏 |
+| `enter` / `exit` / `toggle` | `(): Promise<void>`      | 进入、退出、切换               |
+
+### UseFullscreenOptions
+
+| 选项              | 类型                     | 默认值         |
+| ----------------- | ------------------------ | -------------- |
+| `pageOnly`        | `boolean`、ref 或 getter | `false`        |
+| `teleport`        | `boolean`、ref 或 getter | `false`        |
+| `fullscreenClass` | `string`、ref 或 getter  | `'fullscreen'` |
+
+选项在每次进入时读取。原生能力不支持时自动使用网页全屏，请求失败时恢复 DOM 并拒绝 Promise。
+
 ## API 单例
 
 ```ts
-api.request(target?: Element | null, options?: ApiOptions): Promise<void>
-api.toggle(target?: Element | null, options?: ApiOptions, force?: boolean): Promise<void>
-api.exit(): Promise<void>
+fullscreen.request(target?: Element | null, options?: ApiOptions): Promise<void>
+fullscreen.toggle(target?: Element | null, options?: ApiOptions, force?: boolean): Promise<void>
+fullscreen.exit(): Promise<void>
 ```
 
 `target` 省略或为 `null` 时使用 body；运行时目标必须是 HTML 元素。SSR 中可以导入包，调用操作会因缺少浏览器环境而拒绝。
@@ -101,15 +116,15 @@ interface DirectiveOptions extends ApiOptions {
 }
 ```
 
-修饰符 `.pageOnly`、`.teleport` 设置默认选项，对象中的显式值优先。错误通过原生 `fullscreen-error` 事件的 `detail` 属性传出。卸载指令会移除点击监听；由共享 API 开启的会话应通过 `api.exit()` 退出。
+修饰符 `.pageOnly`、`.teleport` 设置默认选项，对象中的显式值优先。错误通过原生 `fullscreen-error` 事件的 `detail` 属性传出。卸载指令会移除点击监听；由共享 API 开启的会话应通过 `fullscreen.exit()` 退出。
 
 ## 构建格式
 
-| 用途       | 入口                                             |
-| ---------- | ------------------------------------------------ |
-| ESM        | `import ... from 'vue-fullscreen'`               |
-| CommonJS   | `require('vue-fullscreen')`；插件位于 `.default` |
-| 浏览器全局 | `index.umd.js`；导出 `window.VueFullscreen`      |
-| 类型声明   | 由 `exports` 按 ESM/CJS 选择对应声明             |
+| 用途       | 入口                                            |
+| ---------- | ----------------------------------------------- |
+| ESM        | `import ... from 'vue-fullscreen'`              |
+| CommonJS   | `require('vue-fullscreen')`；按属性读取命名导出 |
+| 浏览器全局 | `index.umd.js`；导出 `window.VueFullscreen`     |
+| 类型声明   | 由 `exports` 按 ESM/CJS 选择对应声明            |
 
-UMD 需要先加载匹配的 Vue 全局构建，再使用 `VueFullscreen.default` 安装插件。直接引用文件时，请核对所安装版本的包入口。
+UMD 需要先加载匹配的 Vue 全局构建，再从 `VueFullscreen` 读取命名导出，例如 `VueFullscreen.Fullscreen`、`VueFullscreen.vFullscreen` 和 `VueFullscreen.useFullscreen`。组件和指令可在使用它们的组件中通过 `components`、`directives` 局部注册。直接引用文件时，请核对所安装版本的包入口。

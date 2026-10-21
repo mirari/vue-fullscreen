@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import { expect, it } from 'vitest'
-import plugin, { component } from '../src/index'
+import plugin, { Fullscreen } from '../src/index'
 it('preserves Vue 2 v-model, deprecated methods and destroys teleported nodes', async () => {
   Vue.use(plugin, { name: 'fs' })
   const host = document.createElement('main')
@@ -14,7 +14,7 @@ it('preserves Vue 2 v-model, deprecated methods and destroys teleported nodes', 
         this.visible
           ? [
               h(
-                component,
+                Fullscreen,
                 {
                   ref: 'fullscreen',
                   props: { value: this.active, pageOnly: true, teleport: true },
@@ -35,7 +35,7 @@ it('preserves Vue 2 v-model, deprecated methods and destroys teleported nodes', 
   }).$mount(host)
   vm.active = true
   await Vue.nextTick()
-  const child = vm.$refs.fullscreen as InstanceType<typeof component>
+  const child = vm.$refs.fullscreen as InstanceType<typeof Fullscreen>
   expect(child.getState()).toBe(true)
   expect(document.querySelector('#vue2-target')!.parentNode).toBe(document.body)
   document.dispatchEvent(new KeyboardEvent('keyup', { key: 'Escape' }))

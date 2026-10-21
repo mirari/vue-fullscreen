@@ -3,31 +3,22 @@
 ## Exports
 
 ```ts
-import VueFullscreen, {
-  component,
-  directive,
-  api,
+import {
+  Fullscreen,
+  vFullscreen,
+  useFullscreen,
+  fullscreen,
   screenfull,
   type ApiOptions,
-  type InstallationOptions,
   type VueFullscreenApi,
   type DirectiveOptions,
+  type UseFullscreenOptions,
+  type UseFullscreenTarget,
+  type UseFullscreenReturn,
 } from 'vue-fullscreen'
 ```
 
-The default export is the plugin. `screenfull` is the underlying native fullscreen utility; calling it directly does not manage page-only mode, styles or teleport.
-
-## Plugin
-
-```ts
-app.use(VueFullscreen, { name: 'fs' })
-```
-
-| Option | Type     | Default        | Purpose                                         |
-| ------ | -------- | -------------- | ----------------------------------------------- |
-| `name` | `string` | `'fullscreen'` | Component, directive and instance property name |
-
-`name: 'fs'` registers `<fs>`, `v-fs` and `$fs`. The default `$fullscreen` property has type augmentation; custom names require your own declaration.
+`screenfull` is the underlying native fullscreen utility; calling it directly does not manage page-only mode, styles or teleport.
 
 ## Component
 
@@ -65,12 +56,36 @@ Do not supply conflicting model values.
 
 Handle rejected Promises when calling methods directly. The component cleans up listeners and moved DOM nodes on unmount.
 
+## useFullscreen
+
+```ts
+useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): UseFullscreenReturn
+```
+
+Vue 3 composable. The target accepts an element, template ref or getter and defaults to body. Each call owns its state and cleans up on component unmount.
+
+| Return value                | Type                     | Meaning                                                  |
+| --------------------------- | ------------------------ | -------------------------------------------------------- |
+| `isFullscreen`              | `Readonly<Ref<boolean>>` | Reactive state synchronized with actual exits            |
+| `isSupported`               | `ComputedRef<boolean>`   | Native API availability; page-only mode works regardless |
+| `enter` / `exit` / `toggle` | `(): Promise<void>`      | Enter, exit or toggle                                    |
+
+### UseFullscreenOptions
+
+| Option            | Type                     | Default        |
+| ----------------- | ------------------------ | -------------- |
+| `pageOnly`        | `boolean`, ref or getter | `false`        |
+| `teleport`        | `boolean`, ref or getter | `false`        |
+| `fullscreenClass` | `string`, ref or getter  | `'fullscreen'` |
+
+Options are read on each entry. Unsupported browsers fall back to page-only mode; failed native requests restore the DOM and reject.
+
 ## API singleton
 
 ```ts
-api.request(target?: Element | null, options?: ApiOptions): Promise<void>
-api.toggle(target?: Element | null, options?: ApiOptions, force?: boolean): Promise<void>
-api.exit(): Promise<void>
+fullscreen.request(target?: Element | null, options?: ApiOptions): Promise<void>
+fullscreen.toggle(target?: Element | null, options?: ApiOptions, force?: boolean): Promise<void>
+fullscreen.exit(): Promise<void>
 ```
 
 An omitted or null target defaults to the body. At runtime, the target must be an HTML element. Operations reject when no browser environment exists.
@@ -101,15 +116,15 @@ interface DirectiveOptions extends ApiOptions {
 }
 ```
 
-`.pageOnly` and `.teleport` set options; explicit object values take precedence. Errors appear in `detail` on a native `fullscreen-error` event. Removing the directive removes its click listener. Use `api.exit()` to end a shared API session.
+`.pageOnly` and `.teleport` set options; explicit object values take precedence. Errors appear in `detail` on a native `fullscreen-error` event. Removing the directive removes its click listener. Use `fullscreen.exit()` to end a shared API session.
 
 ## Module formats
 
-| Use            | Entry                                                 |
-| -------------- | ----------------------------------------------------- |
-| ESM            | `import ... from 'vue-fullscreen'`                    |
-| CommonJS       | `require('vue-fullscreen')`; the plugin is `.default` |
-| Browser global | `index.umd.js`; exposes `window.VueFullscreen`        |
-| TypeScript     | `exports` selects ESM or CJS declarations             |
+| Use            | Entry                                                           |
+| -------------- | --------------------------------------------------------------- |
+| ESM            | `import ... from 'vue-fullscreen'`                              |
+| CommonJS       | `require('vue-fullscreen')`; access named exports as properties |
+| Browser global | `index.umd.js`; exposes `window.VueFullscreen`                  |
+| TypeScript     | `exports` selects ESM or CJS declarations                       |
 
-Load the matching Vue global build before the UMD bundle, then install `VueFullscreen.default`. Check your installed version's package entries when linking to files directly.
+Load the matching Vue global build before the UMD bundle, then access named exports such as `VueFullscreen.Fullscreen`, `VueFullscreen.vFullscreen` and `VueFullscreen.useFullscreen`. Register components and directives locally through the consuming component's `components` and `directives` options. Check your installed version's package entries when linking to files directly.

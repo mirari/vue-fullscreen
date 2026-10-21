@@ -10,31 +10,23 @@ function navigation(english: boolean, vue2 = false) {
   return {
     nav: [
       {
-        text: english ? 'Guide' : '指南',
+        text: english ? 'Getting started' : '开始使用',
         link: link('/guide/getting-started'),
       },
-      { text: english ? 'Examples' : '交互示例', link: link('/examples') },
+      { text: english ? 'Usage' : '使用方法', link: link('/guide/component') },
       {
-        text: english ? 'API reference' : 'API 参考',
+        text: english ? 'Reference' : '参考',
         link: link('/reference/api'),
-      },
-      {
-        text: english ? 'Compatibility' : '兼容性',
-        link: link('/guide/compatibility'),
       },
       { text: 'Vue 2', link: english ? '/en/vue2/' : '/vue2/' },
     ],
     sidebar: [
       {
-        text: `${vue2 ? 'Vue 2 · ' : ''}${english ? 'Getting started' : '开始使用'}`,
+        text: english ? 'Getting started' : '开始使用',
         items: [
           {
-            text: english ? 'Installation' : '快速上手',
+            text: english ? 'Quick start' : '快速上手',
             link: link('/guide/getting-started'),
-          },
-          {
-            text: english ? 'Fullscreen modes' : '全屏方式',
-            link: link('/guide/modes'),
           },
           {
             text: english ? 'Compatibility' : '兼容性',
@@ -54,7 +46,6 @@ function navigation(english: boolean, vue2 = false) {
             link: link('/guide/directive'),
           },
           { text: 'API', link: link('/guide/api') },
-          { text: english ? 'Examples' : '交互示例', link: link('/examples') },
         ],
       },
       {

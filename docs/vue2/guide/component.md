@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { component as Fullscreen } from 'vue-fullscreen'
+import { Fullscreen } from 'vue-fullscreen'
 
 export default {
   components: { Fullscreen },
@@ -48,3 +48,20 @@ async enterPanel() {
 模板中的组件需要设置 `ref="panel"`。实例提供 `request()`、`exit()`、`toggle(force?)`，以及兼容方法 `enter()`、`getState()` 和属性 `support`。所有选项见 [API 参考](/vue2/reference/api#组件)。
 
 `fullscreen` / `update:fullscreen` 作为兼容模型保留；新代码可以使用 `v-model`。组件销毁时会清理事件和被移动的 DOM。
+
+## 切换页面内容时保持全屏
+
+把全屏容器放在会被替换的内容之外。切换标签页如此，使用 Vue Router 时也一样：让 `<router-view>` 位于稳定的全屏容器内部。
+
+```vue
+<fullscreen v-model="active" teleport :exit-on-click-wrapper="false">
+  <nav>
+    <router-link to="/chart">图表</router-link>
+    <router-link to="/table">表格</router-link>
+  </nav>
+  <router-view />
+  <button @click="active = false">退出全屏</button>
+</fullscreen>
+```
+
+这段模板放在持久存在的应用布局中，前提是已注册全屏插件并配置路由。SPA 路由只替换内部视图，全屏容器需要保持挂载。如果每个路由页面各自创建全屏组件，切换时销毁组件就会退出全屏。跳转到另一个文档或刷新页面不能保留全屏。

@@ -8,7 +8,7 @@ The directive toggles fullscreen when its element is clicked. It does not requir
 
 ```vue
 <script setup>
-import { directive as vFullscreen } from 'vue-fullscreen'
+import { vFullscreen } from 'vue-fullscreen'
 import { ref } from 'vue'
 
 const error = ref('')
@@ -29,7 +29,7 @@ const error = ref('')
 </template>
 ```
 
-With the global plugin installed, use `v-fullscreen` directly without a local import.
+With a regular `setup()` function or the Options API, register the directive locally in the component’s `directives` option as `fullscreen: vFullscreen`.
 
 ## Binding values
 
@@ -52,7 +52,7 @@ With the global plugin installed, use `v-fullscreen` directly without a local im
 
 `.pageOnly` and `.teleport` set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
 
-The binding object also accepts `fullscreenClass` and `callback(active)`. The directive uses the shared API, so `api.exit()` can exit a session started by a directive.
+The binding object also accepts `fullscreenClass` and `callback(active)`. The directive uses the shared API, so `fullscreen.exit()` can exit a session started by a directive.
 
 ## Errors
 

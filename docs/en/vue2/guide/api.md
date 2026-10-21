@@ -15,13 +15,13 @@ Import the API to control an existing element. Every operation returns a Promise
 </template>
 
 <script>
-import { api } from 'vue-fullscreen'
+import { fullscreen } from 'vue-fullscreen'
 export default {
   data: () => ({ active: false, error: '' }),
   methods: {
     async enter() {
       try {
-        await api.request(this.$refs.target, {
+        await fullscreen.request(this.$refs.target, {
           pageOnly: true,
           teleport: true,
           callback: (active) => {
@@ -34,28 +34,29 @@ export default {
     },
     async exit() {
       try {
-        await api.exit()
+        await fullscreen.exit()
       } catch (error) {
         this.error = error.message
       }
     },
   },
   beforeDestroy() {
-    if (api.element === this.$refs.target) void api.exit().catch(() => {})
+    if (fullscreen.element === this.$refs.target)
+      void fullscreen.exit().catch(() => {})
   },
 }
 </script>
 ```
 
-This example uses page-only mode. In native mode, await `api.exit()` in a route leave guard before removing the target.
+This example uses page-only mode. In native mode, await `fullscreen.exit()` in a route leave guard before removing the target.
 
 ## Toggle or force a state
 
 ```ts
-await api.toggle(element, { pageOnly: true }) // Toggle
-await api.toggle(element, { pageOnly: true }, true) // Enter
-await api.toggle(element, undefined, false) // Exit
-await api.exit() // No-op when inactive
+await fullscreen.toggle(element, { pageOnly: true }) // Toggle
+await fullscreen.toggle(element, { pageOnly: true }, true) // Enter
+await fullscreen.toggle(element, undefined, false) // Exit
+await fullscreen.exit() // No-op when inactive
 ```
 
 `request()` defaults to `document.body`. Calling it while active does not switch targets; exit first, then request the new target.
@@ -63,10 +64,10 @@ await api.exit() // No-op when inactive
 ## Read state
 
 ```ts
-api.isFullscreen // Whether this controller is active
-api.element // Current target; null after exit
-api.isEnabled // Native API support, not permission for a specific request
-api.options // Current session options
+fullscreen.isFullscreen // Whether this controller is active
+fullscreen.element // Current target; null after exit
+fullscreen.isEnabled // Native API support, not permission for a specific request
+fullscreen.options // Current session options
 ```
 
 These are ordinary properties, not Vue reactive refs. Use `callback` to update Vue state, or use the component's `v-model`.

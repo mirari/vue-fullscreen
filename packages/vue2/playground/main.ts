@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-import { api, component } from '../src/index'
+import { fullscreen, Fullscreen } from '../src/index'
 import './style.css'
 const options = new URLSearchParams(location.search)
 const pageOnly = options.has('pageOnly')
@@ -11,6 +11,9 @@ const text = zh
       help: '组件与 API 示例。按 Esc 退出。',
       enter: '进入组件全屏',
       content: '全屏内容',
+      details: '详情',
+      hiddenPopup:
+        '弹窗已挂载到 body，但在当前原生全屏元素之外。退出并开启 teleport 后再试。',
       exit: '退出全屏',
       toggle: '切换 API 全屏',
       api: 'API 内容',
@@ -20,6 +23,9 @@ const text = zh
       help: 'Component and API examples. Use Escape to exit.',
       enter: 'Enter component fullscreen',
       content: 'Fullscreen content',
+      details: 'Details',
+      hiddenPopup:
+        'The popup is mounted under body, outside the current native fullscreen element. Exit and enable teleport to see it.',
       exit: 'Exit',
       toggle: 'Toggle API fullscreen',
       api: 'API content',
@@ -27,18 +33,26 @@ const text = zh
 document.documentElement.lang = zh ? 'zh-CN' : 'en'
 
 new Vue({
-  data: { active: false, error: '', teleport: true },
+  data: { active: false, error: '', teleport: true, popup: false },
+  watch: {
+    popup(value: boolean) {
+      const popup = document.querySelector<HTMLElement>('#body-popup')
+      if (popup) popup.hidden = !value
+    },
+  },
   mounted() {
     const popup = document.createElement('aside')
     popup.id = 'body-popup'
     popup.hidden = true
+    popup.setAttribute('role', 'dialog')
+    popup.setAttribute('aria-label', text.details)
     popup.textContent = zh
       ? '这个弹窗直接挂载在 body 下。'
       : 'This popup is mounted directly under body.'
     const close = document.createElement('button')
     close.textContent = zh ? '关闭弹窗' : 'Close popup'
     close.onclick = () => {
-      popup.hidden = true
+      this.popup = false
     }
     popup.append(close)
     document.body.append(popup)
@@ -75,15 +89,14 @@ new Vue({
         text.enter,
       ),
       h(
-        component,
+        Fullscreen,
         {
           attrs: { id: 'target' },
           props: { value: this.active, pageOnly, teleport: this.teleport },
           on: {
             input: (v: boolean) => {
               this.active = v
-              const popup = document.querySelector<HTMLElement>('#body-popup')
-              if (popup) popup.hidden = true
+              if (!v) this.popup = false
             },
             error: (e: Error) => {
               this.error = e.message
@@ -95,17 +108,22 @@ new Vue({
           h(
             'button',
             {
-              attrs: { id: 'popup' },
+              attrs: {
+                id: 'popup',
+                'aria-expanded': String(this.popup),
+                'aria-controls': 'body-popup',
+              },
               on: {
                 click: () => {
-                  const popup =
-                    document.querySelector<HTMLElement>('#body-popup')
-                  if (popup) popup.hidden = !popup.hidden
+                  this.popup = !this.popup
                 },
               },
             },
-            zh ? '切换 body 弹窗' : 'Toggle body popup',
+            text.details,
           ),
+          this.active && this.popup && !this.teleport && !pageOnly
+            ? h('p', { attrs: { role: 'status' } }, text.hiddenPopup)
+            : null,
           h(
             'button',
             {
@@ -126,7 +144,7 @@ new Vue({
           attrs: { id: 'api' },
           on: {
             click: () =>
-              api
+              fullscreen
                 .toggle(document.querySelector('#api-target'), {
                   pageOnly,
                   teleport: true,

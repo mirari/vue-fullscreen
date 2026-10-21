@@ -15,13 +15,13 @@
 </template>
 
 <script>
-import { api } from 'vue-fullscreen'
+import { fullscreen } from 'vue-fullscreen'
 export default {
   data: () => ({ active: false, error: '' }),
   methods: {
     async enter() {
       try {
-        await api.request(this.$refs.target, {
+        await fullscreen.request(this.$refs.target, {
           pageOnly: true,
           teleport: true,
           callback: (active) => {
@@ -34,28 +34,29 @@ export default {
     },
     async exit() {
       try {
-        await api.exit()
+        await fullscreen.exit()
       } catch (error) {
         this.error = error.message
       }
     },
   },
   beforeDestroy() {
-    if (api.element === this.$refs.target) void api.exit().catch(() => {})
+    if (fullscreen.element === this.$refs.target)
+      void fullscreen.exit().catch(() => {})
   },
 }
 </script>
 ```
 
-示例使用网页全屏。原生模式下，应在路由离开守卫中等待 `api.exit()`，再移除目标。
+示例使用网页全屏。原生模式下，应在路由离开守卫中等待 `fullscreen.exit()`，再移除目标。
 
 ## 切换与强制状态
 
 ```ts
-await api.toggle(element, { pageOnly: true }) // 根据当前状态切换
-await api.toggle(element, { pageOnly: true }, true) // 强制进入
-await api.toggle(element, undefined, false) // 强制退出
-await api.exit() // 已退出时不执行操作
+await fullscreen.toggle(element, { pageOnly: true }) // 根据当前状态切换
+await fullscreen.toggle(element, { pageOnly: true }, true) // 强制进入
+await fullscreen.toggle(element, undefined, false) // 强制退出
+await fullscreen.exit() // 已退出时不执行操作
 ```
 
 `request()` 默认控制 `document.body`。已处于全屏时再次 `request()` 不会切换目标；先退出，再请求新目标。
@@ -63,10 +64,10 @@ await api.exit() // 已退出时不执行操作
 ## 读取状态
 
 ```ts
-api.isFullscreen // 当前控制器是否处于全屏
-api.element // 当前目标；退出后为 null
-api.isEnabled // 浏览器是否支持原生全屏，不代表请求一定获准
-api.options // 当前会话配置
+fullscreen.isFullscreen // 当前控制器是否处于全屏
+fullscreen.element // 当前目标；退出后为 null
+fullscreen.isEnabled // 浏览器是否支持原生全屏，不代表请求一定获准
+fullscreen.options // 当前会话配置
 ```
 
 这些是普通属性，不是 Vue 的响应式引用。想让页面随 Esc 等操作更新，请使用 `callback` 同步 Vue 状态，或使用组件的 `v-model`。

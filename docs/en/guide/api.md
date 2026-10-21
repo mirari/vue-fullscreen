@@ -1,79 +1,58 @@
 # API
 
-The API controls an existing DOM element. Each operation returns a Promise.
+`useFullscreen()` provides VueUse-style reactive state and controls, without a state callback.
 
 <ClientOnly><FullscreenDemo kind="api" /></ClientOnly>
 
-## Request fullscreen
+## Specify a target
 
 ```vue
 <script setup>
-import { ref, onBeforeUnmount } from 'vue'
-import { api } from 'vue-fullscreen'
+import { ref } from 'vue'
+import { useFullscreen } from 'vue-fullscreen'
 
 const target = ref()
-const active = ref(false)
 const error = ref('')
-
-async function enter() {
-  try {
-    await api.request(target.value, {
-      pageOnly: true,
-      teleport: true,
-      callback: (value) => {
-        active.value = value
-      },
-    })
-  } catch (reason) {
-    error.value = reason.message
-  }
-}
-async function exit() {
-  try {
-    await api.exit()
-  } catch (reason) {
-    error.value = reason.message
-  }
-}
-onBeforeUnmount(() => {
-  if (api.element === target.value) void api.exit().catch(() => {})
+const { isFullscreen, enter, exit, toggle } = useFullscreen(target, {
+  pageOnly: true,
+  teleport: true,
 })
 </script>
 
 <template>
-  <button @click="enter">Enter fullscreen</button>
+  <button @click="enter().catch((e) => (error = e.message))">
+    Enter fullscreen
+  </button>
   <section ref="target">
     <h2>Panel</h2>
-    <button v-if="active" @click="exit">Exit fullscreen</button>
+    <button v-if="isFullscreen" @click="exit">Exit fullscreen</button>
+    <button @click="toggle">Toggle fullscreen</button>
   </section>
   <p v-if="error" role="alert">{{ error }}</p>
 </template>
 ```
 
-This example uses page-only mode, which restores the DOM immediately on exit. In native mode, await `api.exit()` in a route leave guard before removing the target. For a component-owned area, the [component](/en/guide/component) handles its own lifecycle.
+The target accepts a DOM element, template ref or getter. Omitting it uses `document.body`. The target is resolved on entry; entering while already active does not switch targets.
 
-## Toggle or force a state
+## State and options
+
+- `isFullscreen`: readonly reactive state that follows Escape and browser exits.
+- `isSupported`: native Fullscreen API availability. Page-only mode still works when it is `false`.
+- `enter()`, `exit()`, `toggle()`: return Promises and reject if a native request fails.
+- `pageOnly`, `teleport`: both default to `false`. They also accept refs or getters, resolved on entry.
+- `fullscreenClass`: class applied while active; defaults to `'fullscreen'`.
+
+Each call owns an independent controller. Component unmount restores moved nodes and removes listeners, exiting fullscreen. Native requests must run directly from a click or key handler, before awaiting network requests.
+
+## Imperative calls
+
+Use the `fullscreen` singleton for code outside components or sessions shared with directives:
 
 ```ts
-await api.toggle(element, { pageOnly: true }) // Toggle
-await api.toggle(element, { pageOnly: true }, true) // Enter
-await api.toggle(element, undefined, false) // Exit
-await api.exit() // No-op when inactive
+import { fullscreen } from 'vue-fullscreen'
+
+await fullscreen.request(element, { pageOnly: true, teleport: true })
+await fullscreen.exit()
 ```
 
-`request()` defaults to `document.body`. Calling it while active does not switch targets; exit first, then request the new target.
-
-## Read state
-
-```ts
-api.isFullscreen // Whether this controller is active
-api.element // Current target; null after exit
-api.isEnabled // Native API support, not permission for a specific request
-api.options // Current session options
-```
-
-These are ordinary properties, not Vue reactive refs. Use `callback` to update Vue state, or use the component's `v-model`.
-
-Native requests must be initiated by a user gesture. Call `request()` directly from a click or key handler, before awaiting network requests.
-
-See the [API reference](/en/reference/api#api-singleton) for method signatures and options.
+The singleton exposes ordinary state properties. Prefer `useFullscreen()` inside Vue 3 components. See the [API reference](/en/reference/api#usefullscreen) for complete signatures.

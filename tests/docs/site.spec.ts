@@ -1,4 +1,51 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+
+async function expectSidebar(page: Page, english: boolean, vue2 = false) {
+  const sidebar = page.locator('.VPSidebar')
+  const prefix = (english ? '/en' : '') + (vue2 ? '/vue2' : '')
+  await expect(sidebar.getByRole('button')).toHaveText(
+    english
+      ? ['Getting started', 'Usage', 'Reference']
+      : ['开始使用', '使用方法', '参考'],
+  )
+  await expect(sidebar.getByRole('link')).toHaveText(
+    english
+      ? [
+          'Quick start',
+          'Compatibility',
+          'Component',
+          'Directive',
+          'API',
+          'API reference',
+          'FAQ',
+          'Feedback',
+        ]
+      : [
+          '快速上手',
+          '兼容性',
+          '组件',
+          '指令',
+          'API',
+          '完整 API',
+          '常见问题',
+          '问题反馈',
+        ],
+  )
+  expect(
+    await sidebar
+      .locator('a[href]')
+      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href'))),
+  ).toEqual([
+    vue2 ? `${prefix}/` : `${prefix}/guide/getting-started`,
+    `${prefix}/guide/compatibility`,
+    `${prefix}/guide/component`,
+    `${prefix}/guide/directive`,
+    `${prefix}/guide/api`,
+    `${prefix}/reference/api`,
+    `${prefix}/guide/faq`,
+    `${prefix}/contributing`,
+  ])
+}
 
 // Keep interaction tests independent of the external image service.
 test.beforeEach(async ({ page }) => {
@@ -14,24 +61,24 @@ for (const english of [false, true]) {
   const prefix = english ? './en/' : './'
   const text = english
     ? {
-        start: 'Getting started',
+        start: 'Quick start',
         search: 'Search',
-        examples: 'Examples',
+        usage: 'Usage',
         pageOnly: 'Page-only fullscreen',
         enter: 'Enter fullscreen',
         directive: 'Toggle with directive',
         exit: 'Exit fullscreen',
-        guide: 'Guide',
+        guide: 'Getting started',
       }
     : {
         start: '快速上手',
         search: '搜索文档',
-        examples: '交互示例',
+        usage: '使用方法',
         pageOnly: '仅网页全屏',
         enter: '进入全屏',
         directive: '点击指令按钮',
         exit: '退出全屏',
-        guide: '指南',
+        guide: '开始使用',
       }
 
   test(`${english ? 'English' : 'Chinese'} navigation, search and mobile layout`, async ({
@@ -49,11 +96,12 @@ for (const english of [false, true]) {
       english ? /\/en\/guide\/getting-started$/ : /\/guide\/getting-started$/,
     )
     await page.reload()
+    await expectSidebar(page, english)
     await expect(page.locator('.VPDoc .vp-doc')).toContainText(
-      'npm install vue-fullscreen@next',
+      'npm install vue-fullscreen',
     )
     await expect(page.locator('.VPDoc .vp-doc')).not.toContainText(
-      'npm install vue-fullscreen@legacy',
+      /npm install vue-fullscreen@(?:next|legacy)/,
     )
     await page.getByRole('button', { name: text.search, exact: true }).click()
     await page.locator('#localsearch-input').fill('teleport')
@@ -69,7 +117,7 @@ for (const english of [false, true]) {
     ).toBe(true)
     await page.getByRole('button', { name: 'mobile navigation' }).click()
     await expect(
-      page.getByRole('link', { name: text.examples, exact: true }).last(),
+      page.getByRole('link', { name: text.usage, exact: true }).last(),
     ).toBeVisible()
     expect(errors).toEqual([])
   })
@@ -81,7 +129,7 @@ for (const english of [false, true]) {
       }) => {
         const errors: string[] = []
         page.on('pageerror', (error) => errors.push(error.message))
-        await page.goto(`${prefix}examples`)
+        await page.goto(`${prefix}guide/${kind}`)
         const demo = page.locator(`[data-demo="${kind}"]`)
         await expect(demo).toBeVisible()
         const image = demo.locator('.gallery-image')
@@ -132,7 +180,7 @@ for (const english of [false, true]) {
   test(`${english ? 'en' : 'zh'} API cleanup before navigation`, async ({
     page,
   }) => {
-    await page.goto(`${prefix}examples`)
+    await page.goto(`${prefix}guide/api`)
     await page
       .locator('[data-demo="api"]')
       .getByRole('button', { name: text.enter })
@@ -158,6 +206,7 @@ for (const english of [false, true]) {
     await expect(page.locator('.VPDoc .vp-doc')).toContainText(
       'vue-fullscreen@legacy',
     )
+    await expectSidebar(page, english, true)
     const sidebar = page.locator('.VPSidebar')
     const links = await sidebar
       .locator('a[href]')
@@ -191,7 +240,7 @@ for (const english of [false, true]) {
     test(`${english ? 'en' : 'zh'} embedded Vue 2 ${native ? 'native' : 'page'} example`, async ({
       page,
     }) => {
-      await page.goto(`${prefix}vue2/examples`)
+      await page.goto(`${prefix}vue2/`)
       await expect(page.getByLabel(text.pageOnly)).not.toBeChecked()
       if (!native) await page.getByLabel(text.pageOnly).check()
       const frame = page.frameLocator('iframe')
@@ -226,74 +275,218 @@ test('language switch keeps the Vue 3 page', async ({ page }) => {
   )
 })
 
-for (const vue2 of [false, true]) {
+for (const english of [false, true]) {
   for (const native of [false, true]) {
-    test(`${vue2 ? 'Vue 2' : 'Vue'} teleport comparison in ${native ? 'native' : 'page'} mode`, async ({
+    test(`${english ? 'en' : 'zh'} getting started demonstrates teleport in ${native ? 'native' : 'page'} mode`, async ({
       page,
     }) => {
-      await page.goto(vue2 ? './vue2/examples' : './examples')
-      const scope = vue2 ? page.frameLocator('iframe') : page
-      const controls = vue2
-        ? scope.locator('main')
-        : page.locator('[data-demo="teleport"]')
-      await expect(
-        (vue2 ? page : controls).getByLabel('仅网页全屏'),
-      ).not.toBeChecked()
+      await page.goto(`${english ? './en/' : './'}guide/getting-started`)
+      const demo = page.locator('[data-demo="component"]')
+      const target = page.locator('#demo-component')
+      const popup = page.getByRole('dialog', {
+        name: english ? 'Image details' : '图片详情',
+      })
+      const popupButton = target.getByRole('button', {
+        name: english ? 'Details' : '详情',
+        exact: true,
+      })
+      const pageOnly = demo.getByLabel(
+        english ? 'Page-only fullscreen' : '仅网页全屏',
+      )
+      await expect(pageOnly).not.toBeChecked()
+      // The same button opens a working body popup before entering fullscreen.
+      await popupButton.click()
+      await expect(popup).toBeVisible()
+      expect(
+        await popup.evaluate((el) => {
+          const r = el.getBoundingClientRect()
+          return (
+            Math.abs(r.x + r.width / 2 - innerWidth / 2) < 1 &&
+            Math.abs(r.y + r.height / 2 - innerHeight / 2) < 1
+          )
+        }),
+      ).toBe(true)
+      await popupButton.click()
+      await expect(popup).toHaveCount(0)
+      await pageOnly.setChecked(!native)
+      for (const teleport of [false, true]) {
+        await demo.getByLabel('teleport', { exact: true }).setChecked(teleport)
+        // An existing body popup must also survive entry into fullscreen.
+        await popupButton.click()
+        await demo
+          .getByRole('button', {
+            name: english ? 'Enter fullscreen' : '进入全屏',
+            exact: true,
+          })
+          .click()
+        await expect(target).toHaveClass(/demo-fullscreen/)
+        expect(
+          await target.evaluate((el) => el.parentElement === document.body),
+        ).toBe(teleport)
+        await expect
+          .poll(() =>
+            target.evaluate((el) => {
+              const r = el.getBoundingClientRect()
+              return (
+                Math.abs(r.width - innerWidth) < 2 &&
+                Math.abs(r.height - innerHeight) < 2
+              )
+            }),
+          )
+          .toBe(true)
+        if (native) {
+          expect(
+            await target.evaluate(
+              (el) =>
+                document.fullscreenElement ===
+                (el.parentElement === document.body ? document.body : el),
+            ),
+          ).toBe(true)
+        }
+        await expect(popup).toBeAttached()
+        expect(
+          await popup.evaluate((el) => el.parentElement === document.body),
+        ).toBe(true)
+        await expect
+          .poll(() =>
+            popup.evaluate((el) => {
+              const r = el.getBoundingClientRect()
+              return el.contains(
+                document.elementFromPoint(
+                  r.x + r.width / 2,
+                  r.y + r.height / 2,
+                ),
+              )
+            }),
+          )
+          .toBe(!native || teleport)
+        if (native && !teleport)
+          await expect(target.getByRole('status')).toContainText(
+            english
+              ? 'outside the native fullscreen element'
+              : '不属于当前原生全屏元素',
+          )
+        // The Details button toggles even a popup excluded from native fullscreen.
+        await popupButton.click()
+        await expect(popup).toHaveCount(0)
+        await expect(popupButton).toHaveAttribute('aria-expanded', 'false')
+        await popupButton.click()
+        await expect(popup).toBeAttached()
+        await expect(popupButton).toHaveAttribute('aria-expanded', 'true')
+        // Also exercise opening the popup from within fullscreen.
+        if (!native || teleport) {
+          await popup
+            .getByRole('button', {
+              name: english ? 'Close popup' : '关闭弹窗',
+              exact: true,
+            })
+            .click()
+          await expect(popup).toHaveCount(0)
+          await popupButton.click()
+          await expect(popup).toBeVisible()
+        }
+        await target
+          .getByRole('button', {
+            name: english ? 'Exit fullscreen' : '退出全屏',
+            exact: true,
+          })
+          .click()
+        await expect(target).not.toHaveClass(/demo-fullscreen/)
+        await expect(demo.locator('#demo-component')).toBeVisible()
+        await expect(popup).toHaveCount(0)
+        expect(await page.evaluate(() => document.fullscreenElement)).toBeNull()
+      }
+    })
+  }
+}
+
+for (const english of [false, true]) {
+  for (const native of [false, true]) {
+    test(`${english ? 'en' : 'zh'} Vue 2 teleport comparison in ${native ? 'native' : 'page'} mode`, async ({
+      page,
+    }) => {
+      await page.goto(english ? './en/vue2/' : './vue2/')
+      const scope = page.frameLocator('iframe')
       if (!native)
-        await (vue2 ? page : controls).getByLabel('仅网页全屏').check()
-      const target = scope.locator(vue2 ? '#target' : '#teleport-target')
-      const popup = scope.locator(vue2 ? '#body-popup' : '.teleport-popup')
+        await page
+          .getByLabel(english ? 'Page-only fullscreen' : '仅网页全屏')
+          .check()
+      const controls = scope.locator('main')
+      const target = scope.locator('#target')
+      const popup = scope.locator('#body-popup')
       for (const teleport of [false, true]) {
         await controls
           .getByLabel('teleport', { exact: true })
           .setChecked(teleport)
         await controls
           .getByRole('button', {
-            name: vue2 ? '进入组件全屏' : '进入全屏',
+            name: english ? 'Enter component fullscreen' : '进入组件全屏',
             exact: true,
           })
           .click()
-        await expect(target).toHaveClass(/(?:teleport-active|fullscreen)/)
+        await expect(target).toHaveClass(/fullscreen/)
         expect(
           await target.evaluate((el) => el.parentElement === document.body),
         ).toBe(teleport)
-        if (native) {
-          expect(
-            await target.evaluate((el) => document.fullscreenElement === el),
-          ).toBe(!teleport)
-          await target.getByRole('button', { name: '切换 body 弹窗' }).click()
-          await expect(popup).toBeAttached()
-          // Visibility alone cannot detect exclusion from the fullscreen top layer.
-          await expect
-            .poll(() =>
-              popup.evaluate((el) => {
-                const r = el.getBoundingClientRect()
-                return el.contains(
-                  document.elementFromPoint(
-                    r.x + r.width / 2,
-                    r.y + r.height / 2,
-                  ),
-                )
-              }),
-            )
-            .toBe(teleport)
-        } else {
-          const fillsViewport = await target.evaluate((el) => {
+        expect(
+          await target.evaluate((el) => {
             const r = el.getBoundingClientRect()
             return (
               Math.abs(r.width - innerWidth) < 2 &&
               Math.abs(r.height - innerHeight) < 2
             )
-          })
-          expect(fillsViewport).toBe(teleport)
+          }),
+        ).toBe(true)
+        if (native) {
+          expect(
+            await target.evaluate((el) => document.fullscreenElement === el),
+          ).toBe(!teleport)
         }
+        const details = target.getByRole('button', {
+          name: english ? 'Details' : '详情',
+          exact: true,
+        })
+        await details.click()
+        await expect(popup).not.toHaveAttribute('hidden')
+        expect(
+          await popup.evaluate((el) => {
+            const r = el.getBoundingClientRect()
+            return (
+              Math.abs(r.x + r.width / 2 - innerWidth / 2) < 1 &&
+              Math.abs(r.y + r.height / 2 - innerHeight / 2) < 1
+            )
+          }),
+        ).toBe(true)
+        await expect
+          .poll(() =>
+            popup.evaluate((el) => {
+              const r = el.getBoundingClientRect()
+              return el.contains(
+                document.elementFromPoint(
+                  r.x + r.width / 2,
+                  r.y + r.height / 2,
+                ),
+              )
+            }),
+          )
+          .toBe(!native || teleport)
+        await details.click()
+        await expect(popup).toHaveAttribute('hidden')
+        await expect(details).toHaveAttribute('aria-expanded', 'false')
+        await details.click()
+        await expect(popup).not.toHaveAttribute('hidden')
+        await expect(details).toHaveAttribute('aria-expanded', 'true')
         await target
-          .getByRole('button', { name: '退出全屏', exact: true })
+          .getByRole('button', {
+            name: english ? 'Exit' : '退出全屏',
+            exact: true,
+          })
           .click()
-        await expect(target).not.toHaveClass(/(?:teleport-active|fullscreen)/)
+        await expect(target).not.toHaveClass(/fullscreen/)
         expect(
           await target.evaluate((el) => el.parentElement === document.body),
         ).toBe(false)
+        await expect(popup).toHaveAttribute('hidden')
       }
     })
   }

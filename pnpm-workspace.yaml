@@ -1,0 +1,7 @@
+packages:
+  - packages/vue2
+  - packages/vue3
+
+allowBuilds:
+  core-js: false
+  esbuild: true

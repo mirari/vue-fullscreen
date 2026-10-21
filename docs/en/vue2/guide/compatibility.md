@@ -85,13 +85,13 @@ Automated checks parse the emitted code as ES5 and exercise missing capabilities
 
 ## Capability detection and page-only fallback
 
-Read `api.isEnabled` in the browser to check whether the current document allows native fullscreen. It does not indicate whether fullscreen is active or guarantee that the next request will succeed.
+Read `fullscreen.isEnabled` in the browser to check whether the current document allows native fullscreen. It does not indicate whether fullscreen is active or guarantee that the next request will succeed.
 
 ```js
-import { api } from 'vue-fullscreen'
+import { fullscreen } from 'vue-fullscreen'
 
 // Read after mount or during a user interaction
-const nativeAvailable = api.isEnabled
+const nativeAvailable = fullscreen.isEnabled
 ```
 
 - When native fullscreen is unavailable, the component, directive and API fall back to page-only mode.
@@ -118,7 +118,7 @@ Users can press Esc or use browser exit controls. Loading another document, relo
 
 Do not assume your exit button is the only source of state changes. The component synchronizes actual state through `v-model`; use `callback` to track API and directive state. Page-only mode does not necessarily exit when changing applications, so keep an exit button visible.
 
-SPA route changes differ from loading another document: fullscreen can continue while the outer target remains mounted, whereas unmounting the fullscreen component exits it. See the [examples](/en/vue2/examples).
+SPA route changes differ from loading another document: fullscreen can continue while the outer target remains mounted, whereas unmounting the fullscreen component exits it. See [component usage](/en/vue2/guide/component#keep-fullscreen-while-changing-views).
 
 ## SSR
 

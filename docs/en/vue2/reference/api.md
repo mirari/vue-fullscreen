@@ -4,9 +4,9 @@
 
 ```ts
 import VueFullscreen, {
-  component,
-  directive,
-  api,
+  Fullscreen,
+  vFullscreen,
+  fullscreen,
   screenfull,
   type ApiOptions,
   type InstallationOptions,
@@ -71,9 +71,9 @@ Handle rejected Promises when calling methods directly. The component cleans up 
 ## API singleton
 
 ```ts
-api.request(target?: Element | null, options?: ApiOptions): Promise<void>
-api.toggle(target?: Element | null, options?: ApiOptions, force?: boolean): Promise<void>
-api.exit(): Promise<void>
+fullscreen.request(target?: Element | null, options?: ApiOptions): Promise<void>
+fullscreen.toggle(target?: Element | null, options?: ApiOptions, force?: boolean): Promise<void>
+fullscreen.exit(): Promise<void>
 ```
 
 An omitted or null target defaults to the body. At runtime, the target must be an HTML element. Operations reject when no browser environment exists.
@@ -104,7 +104,7 @@ interface DirectiveOptions extends ApiOptions {
 }
 ```
 
-`.pageOnly` and `.teleport` set options; explicit object values take precedence. Errors appear in `detail` on a native `fullscreen-error` event. Removing the directive removes its click listener. Use `api.exit()` to end a shared API session.
+`.pageOnly` and `.teleport` set options; explicit object values take precedence. Errors appear in `detail` on a native `fullscreen-error` event. Removing the directive removes its click listener. Use `fullscreen.exit()` to end a shared API session.
 
 ## Module formats
 

@@ -85,13 +85,13 @@ CommonJS 项目可先执行 `require('vue-fullscreen/polyfills')`，再执行 `r
 
 ## 能力检测与网页全屏降级
 
-在浏览器中读取 `api.isEnabled` 可判断当前文档是否允许使用原生全屏。它不表示是否已经进入全屏，也不保证下一次请求一定成功。
+在浏览器中读取 `fullscreen.isEnabled` 可判断当前文档是否允许使用原生全屏。它不表示是否已经进入全屏，也不保证下一次请求一定成功。
 
 ```js
-import { api } from 'vue-fullscreen'
+import { fullscreen } from 'vue-fullscreen'
 
 // 在组件挂载后或用户点击时读取
-const nativeAvailable = api.isEnabled
+const nativeAvailable = fullscreen.isEnabled
 ```
 
 - 原生全屏不可用时，组件、指令和 API 自动使用网页全屏。
@@ -118,7 +118,7 @@ const nativeAvailable = api.isEnabled
 
 不要假设只有自己的退出按钮会改变状态。组件通过 `v-model` 同步实际状态；API 和指令可通过 `callback` 更新页面状态。网页全屏不一定跟随切换应用自动退出，应保留可见的退出按钮。
 
-SPA 内部切换路由不等同于加载新文档：保留外层全屏目标时可以继续全屏，卸载目标组件则会退出。写法见[交互示例](/vue2/examples)。
+SPA 内部切换路由不等同于加载新文档：保留外层全屏目标时可以继续全屏，卸载目标组件则会退出。写法见[组件用法](/vue2/guide/component#切换页面内容时保持全屏)。
 
 ## SSR
 

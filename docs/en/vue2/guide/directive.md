@@ -17,9 +17,9 @@ Register the directive locally, then click the button to toggle a target element
 </template>
 
 <script>
-import { directive } from 'vue-fullscreen'
+import { vFullscreen } from 'vue-fullscreen'
 export default {
-  directives: { fullscreen: directive },
+  directives: { fullscreen: vFullscreen },
   data: () => ({ error: '' }),
 }
 </script>
@@ -46,7 +46,7 @@ export default {
 
 `.pageOnly` and `.teleport` set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
 
-The binding object also accepts `fullscreenClass` and `callback(active)`. The directive uses the shared API, so `api.exit()` can exit a session started by a directive.
+The binding object also accepts `fullscreenClass` and `callback(active)`. The directive uses the shared API, so `fullscreen.exit()` can exit a session started by a directive.
 
 ## Errors
 

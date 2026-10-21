@@ -27,16 +27,17 @@ output {
 }
 #body-popup {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  max-width: 280px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  box-sizing: border-box;
   padding: 16px;
   background: white;
   color: #172554;
   border: 2px solid #2563eb;
   z-index: 1001;
-}
-main {
-  transform: translateZ(0);
-  overflow: hidden;
 }

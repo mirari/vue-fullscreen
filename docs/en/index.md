@@ -6,11 +6,11 @@ hero:
   tagline: Control native or page-only fullscreen using a component, directive or API.
   actions:
     - theme: brand
-      text: Getting started
+      text: Quick start
       link: /en/guide/getting-started
     - theme: alt
-      text: Examples
-      link: /en/examples
+      text: API reference
+      link: /en/reference/api
 features:
   - title: Component
     details: Control fullscreen with v-model. The bound value updates when the user exits fullscreen.

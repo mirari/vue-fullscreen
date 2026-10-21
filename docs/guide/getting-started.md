@@ -1,65 +1,89 @@
 # 快速上手
 
-安装软件包，在应用中注册插件，然后通过页面状态控制全屏。
+在使用的位置按需导入组件、指令或 API。
 
 ## 1. 安装
 
 ```sh
-npm install vue-fullscreen@next
+npm install vue-fullscreen
 ```
 
 接口版本和安装渠道见[兼容性说明](/guide/compatibility)。
 
-## 2. 注册插件
+## 2. 基本使用方式
 
-```ts
-import { createApp } from 'vue'
-import VueFullscreen from 'vue-fullscreen'
-import App from './App.vue'
+以下三种方式任选其一。示例使用 `<script setup>`，要求 Vue 3.2+。
 
-createApp(App).use(VueFullscreen).mount('#app')
-```
+### 组件
 
-插件会一起注册 `<fullscreen>`、`v-fullscreen` 和实例属性 `$fullscreen`。只需要其中一种时，可以按页面局部导入，参见[组件](/guide/component)、[指令](/guide/directive)和 [API](/guide/api)。
-
-## 3. 连接页面状态
-
-下面的示例使用 Options API。`page-only` 表示网页全屏，移除这个属性后使用原生全屏。
+通过 `v-model` 控制内容区域的全屏状态。详细用法见[组件](/guide/component)。
 
 ```vue
-<template>
-  <div>
-    <button @click="active = true">查看全屏内容</button>
-    <fullscreen v-model="active" page-only teleport @error="handleError">
-      <h2>你的内容</h2>
-      <button @click="active = false">退出全屏</button>
-    </fullscreen>
-    <p v-if="error" role="alert">{{ error }}</p>
-  </div>
-</template>
+<script setup>
+import { ref } from 'vue'
+import { Fullscreen } from 'vue-fullscreen'
 
-<script>
-export default {
-  data() {
-    return { active: false, error: '' }
-  },
-  methods: {
-    handleError(error) {
-      this.active = false
-      this.error = error.message
-    },
-  },
-}
+const active = ref(false)
 </script>
+
+<template>
+  <Fullscreen v-model="active">
+    <button @click="active = !active">切换全屏</button>
+  </Fullscreen>
+</template>
 ```
 
-<ClientOnly><FullscreenDemo /></ClientOnly>
+### 指令
 
-## 选择使用方式
+点击按钮切换整个页面的全屏状态。详细用法见[指令](/guide/directive)。
 
-| 你想做什么                               | 推荐入口                 |
-| ---------------------------------------- | ------------------------ |
-| 让一个区域随着 `v-model` 进入和退出全屏  | [组件](/guide/component) |
-| 给已有按钮增加全屏操作，不改页面状态管理 | [指令](/guide/directive) |
-| 在业务函数里等待全屏完成、指定任意目标   | [API](/guide/api)        |
-| 比较原生全屏、网页全屏与 teleport        | [交互示例](/examples)    |
+```vue
+<script setup>
+import { vFullscreen } from 'vue-fullscreen'
+</script>
+
+<template>
+  <button v-fullscreen>切换页面全屏</button>
+</template>
+```
+
+### API
+
+通过 `useFullscreen()` 获取响应式状态和操作方法。详细用法见 [API](/guide/api)。
+
+```vue
+<script setup>
+import { useFullscreen } from 'vue-fullscreen'
+
+const { toggle } = useFullscreen()
+</script>
+
+<template>
+  <button @click="toggle">切换页面全屏</button>
+</template>
+```
+
+## 全屏选项
+
+|              | 原生全屏                       | 网页全屏                |
+| ------------ | ------------------------------ | ----------------------- |
+| 配置         | `pageOnly: false`（默认）      | `pageOnly: true`        |
+| 显示范围     | 浏览器提供的全屏区域           | 当前网页视口            |
+| 浏览器工具栏 | 由浏览器隐藏                   | 保留                    |
+| 用户手势     | 需要点击、按键等用户操作       | 不需要                  |
+| 退出         | 浏览器 Esc、退出按钮、`exit()` | Esc、退出按钮、`exit()` |
+
+浏览器支持、自动降级和 iframe 权限见[兼容性](/guide/compatibility)。
+
+### 试试「teleport」的作用
+
+`teleport` 将全屏目标临时移到 `body`，退出时恢复原位置。「详情」按钮切换挂载在 `body` 下的居中弹窗，模拟 UI 组件库的对话框。
+
+保持「仅网页全屏」关闭，按下面的步骤比较：
+
+1. **不勾选「teleport」**：进入全屏，点击「详情」。图片会铺满屏幕，但弹窗在全屏元素之外，无法显示。
+2. **退出并勾选「teleport」**：重新进入全屏，再点击「详情」。图片同样铺满屏幕，此时 `body` 是原生全屏元素，其下的弹窗也能显示。
+
+两种设置都会让图片区域进入全屏，区别是 **body 弹窗是否可见**。网页全屏下，两种设置的弹窗均可见。
+
+<ClientOnly><FullscreenDemo compare-teleport /></ClientOnly>

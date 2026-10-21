@@ -168,6 +168,7 @@ for (const line of ['vue2', 'vue3']) {
       '*.d.cts',
       'types',
       'README.md',
+      'CHANGELOG.md',
       'LICENSE',
     ],
     sideEffects:
@@ -189,6 +190,7 @@ for (const line of ['vue2', 'vue3']) {
     JSON.stringify(metadata, null, 2) + '\n',
   )
   await cp('README.md', `${destination}/README.md`)
+  await cp(`packages/${line}/CHANGELOG.md`, `${destination}/CHANGELOG.md`)
   await cp('LICENSE', `${destination}/LICENSE`)
   // screenfull is bundled, so ship its license too.
   await cp(

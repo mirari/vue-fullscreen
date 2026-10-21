@@ -6,12 +6,12 @@
 
 ## 局部使用
 
-可以直接导入组件，无需安装全局插件。下方 `<script setup>` 写法要求 Vue 3.2+；Vue 3.0/3.1 可以沿用快速上手页的 Options API 写法。
+在使用的组件中导入 `Fullscreen`。下方 `<script setup>` 写法要求 Vue 3.2+；Vue 3.0/3.1 可在 `components` 中注册 `Fullscreen`，并在普通 `setup()` 中返回状态。
 
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { component as Fullscreen } from 'vue-fullscreen'
+import { Fullscreen } from 'vue-fullscreen'
 
 const active = ref(false)
 const error = ref('')
@@ -52,7 +52,7 @@ function handleError(errorValue) {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { component as Fullscreen } from 'vue-fullscreen'
+import { Fullscreen } from 'vue-fullscreen'
 
 const panel = ref()
 const error = ref('')
@@ -73,3 +73,20 @@ async function enter() {
 ```
 
 完整的属性、事件和方法列表见[组件参考](/reference/api#组件)。
+
+## 切换页面内容时保持全屏
+
+把全屏容器放在会被替换的内容之外。切换标签页如此，使用 Vue Router 时也一样：让 `<router-view>` 位于稳定的全屏容器内部。
+
+```vue
+<Fullscreen v-model="active" teleport :exit-on-click-wrapper="false">
+  <nav>
+    <router-link to="/chart">图表</router-link>
+    <router-link to="/table">表格</router-link>
+  </nav>
+  <router-view />
+  <button @click="active = false">退出全屏</button>
+</Fullscreen>
+```
+
+这段模板放在持久存在的应用布局中，像前面的示例一样导入 `Fullscreen`、声明 `active`，并配置路由。SPA 路由只替换内部视图，全屏容器需要保持挂载。如果每个路由页面各自创建全屏组件，切换时销毁组件就会退出全屏。跳转到另一个文档或刷新页面不能保留全屏。

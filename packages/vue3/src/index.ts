@@ -6,27 +6,27 @@ import {
   onMounted,
   onBeforeUnmount,
   mergeProps,
+  computed,
+  readonly,
+  unref,
+  getCurrentInstance,
 } from 'vue'
-import type { App, Directive, DefineComponent } from 'vue'
+import type { Directive, DefineComponent, Ref, ComputedRef } from 'vue'
 import {
-  api,
   createFullscreen,
   componentProps,
   bindDirective,
   unbindDirective,
 } from '../../core/src/index'
 import type {
-  InstallationOptions,
-  VueFullscreenApi,
   DirectiveOptions,
   FullscreenProps,
   FullscreenInstance,
 } from '../../core/src/index'
-export { api, screenfull } from '../../core/src/index'
+export { api as fullscreen, api, screenfull } from '../../core/src/index'
 export type {
   ApiOptions,
   VueFullscreenApi,
-  InstallationOptions,
   DirectiveOptions,
 } from '../../core/src/index'
 
@@ -98,11 +98,11 @@ export interface Vue3FullscreenProps extends FullscreenProps {
 }
 // Keep declarations compatible with supported Vue 3 releases, rather than leaking
 // the build-time Vue version's internal DefineComponent generic parameters.
-export const component = implementation as unknown as DefineComponent<
+export const Fullscreen = implementation as unknown as DefineComponent<
   Vue3FullscreenProps,
   FullscreenInstance
 >
-export const directive: Directive<
+export const vFullscreen: Directive<
   HTMLElement,
   string | DirectiveOptions | undefined
 > = {
@@ -110,15 +110,58 @@ export const directive: Directive<
   updated: bindDirective,
   beforeUnmount: unbindDirective,
 }
-export default {
-  install(app: App, { name = 'fullscreen' }: InstallationOptions = {}) {
-    app.config.globalProperties[`$${name}`] = api
-    app.component(name, component)
-    app.directive(name, directive)
-  },
+/** @deprecated Import Fullscreen instead. */
+export const component = Fullscreen
+/** @deprecated Import vFullscreen instead. */
+export const directive = vFullscreen
+
+export type FullscreenValue<T> = T | Ref<T> | (() => T)
+export type UseFullscreenTarget = FullscreenValue<Element | null | undefined>
+export interface UseFullscreenOptions {
+  pageOnly?: FullscreenValue<boolean>
+  teleport?: FullscreenValue<boolean>
+  fullscreenClass?: FullscreenValue<string>
 }
-declare module 'vue' {
-  interface ComponentCustomProperties {
-    $fullscreen: VueFullscreenApi
+export interface UseFullscreenReturn {
+  isFullscreen: Readonly<Ref<boolean>>
+  /** Native Fullscreen API availability; page-only mode also works when false. */
+  isSupported: ComputedRef<boolean>
+  enter(): Promise<void>
+  exit(): Promise<void>
+  toggle(): Promise<void>
+}
+const resolveValue = <T>(value: FullscreenValue<T>): T =>
+  typeof value === 'function' ? (value as () => T)() : unref(value)
+
+export function useFullscreen(
+  target?: UseFullscreenTarget,
+  options: UseFullscreenOptions = {},
+): UseFullscreenReturn {
+  const controller = createFullscreen()
+  const active = ref(false)
+  const enter = () =>
+    controller.request(
+      target === undefined ? undefined : resolveValue(target),
+      {
+        pageOnly: resolveValue(options.pageOnly ?? false),
+        teleport: resolveValue(options.teleport ?? false),
+        fullscreenClass: resolveValue(options.fullscreenClass ?? 'fullscreen'),
+        callback: (value) => {
+          active.value = value
+        },
+      },
+    )
+  if (getCurrentInstance()) {
+    onBeforeUnmount(() => {
+      controller.dispose()
+      active.value = false
+    })
+  }
+  return {
+    isFullscreen: readonly(active),
+    isSupported: computed(() => controller.isEnabled),
+    enter,
+    exit: () => controller.exit(),
+    toggle: () => (controller.isFullscreen ? controller.exit() : enter()),
   }
 }

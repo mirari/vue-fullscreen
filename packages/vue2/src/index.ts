@@ -17,7 +17,7 @@ import type {
   FullscreenInstance,
   FullscreenProps,
 } from '../../core/src/index'
-export { api, screenfull } from '../../core/src/index'
+export { api as fullscreen, api, screenfull } from '../../core/src/index'
 export type {
   ApiOptions,
   VueFullscreenApi,
@@ -112,19 +112,23 @@ export interface Vue2FullscreenInstance extends Vue, FullscreenInstance {
   enter(): Promise<void>
   getState(): boolean
 }
-export const component = implementation as VueConstructor<
+export const Fullscreen = implementation as VueConstructor<
   Vue2FullscreenInstance & FullscreenProps & { value?: boolean }
 >
-export const directive: VueDirectiveOptions = {
+export const vFullscreen: VueDirectiveOptions = {
   inserted: bindDirective,
   update: bindDirective,
   unbind: unbindDirective,
 }
+/** @deprecated Import Fullscreen instead. */
+export const component = Fullscreen
+/** @deprecated Import vFullscreen instead. */
+export const directive = vFullscreen
 export default {
   install(ctor: typeof Vue, { name = 'fullscreen' }: InstallationOptions = {}) {
     ctor.prototype[`$${name}`] = api
-    ctor.component(name, component)
-    ctor.directive(name, directive)
+    ctor.component(name, Fullscreen)
+    ctor.directive(name, vFullscreen)
   },
 }
 declare module 'vue/types/vue.js' {

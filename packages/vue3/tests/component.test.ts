@@ -1,6 +1,6 @@
 import { createApp, h, nextTick, ref } from 'vue'
 import { expect, it } from 'vitest'
-import plugin, { component } from '../src/index'
+import { Fullscreen } from '../src/index'
 it('syncs v-model, forwards attributes and cleans up teleport on unmount', async () => {
   const model = ref(false),
     visible = ref(true),
@@ -11,7 +11,7 @@ it('syncs v-model, forwards attributes and cleans up teleport on unmount', async
     render: () =>
       visible.value
         ? h(
-            component,
+            Fullscreen,
             {
               modelValue: model.value,
               'onUpdate:modelValue': (v: boolean) => {
@@ -26,8 +26,6 @@ it('syncs v-model, forwards attributes and cleans up teleport on unmount', async
           )
         : null,
   })
-  app.use(plugin, { name: 'fs' })
-  expect(app.config.globalProperties.$fs).toBeDefined()
   app.mount(host)
   model.value = true
   await nextTick()

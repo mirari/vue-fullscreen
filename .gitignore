@@ -4,6 +4,7 @@ dist/
 artifacts/
 playwright-report/
 test-results/
+.playwright-cli/
 *.tgz
 .env*.local
 .DS_Store
@@ -12,3 +13,6 @@ docs/public/vue2-demo/
 tests/consumers/fixture/nuxt/.nuxt/
 tests/consumers/fixture/nuxt/.output/
 tests/consumers/fixture/public/
+.idea/
+output/
+.pnpm-store/

@@ -11,7 +11,7 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: 'npm run docs:build && npm run docs:preview -- --port 4174',
+    command: 'pnpm run docs:build && pnpm run docs:preview --port 4174',
     url: 'http://localhost:4174/',
     timeout: 120000,
     reuseExistingServer: false,

@@ -12,20 +12,30 @@
 
 ## 弹窗或下拉菜单看不到？
 
-尝试开启 `teleport`，让原生全屏的目标变成 body。弹窗本身的挂载位置和层级仍由 UI 库决定。网页全屏时可为 `fullscreenClass` 指定合适的背景、`z-index` 和滚动样式。
+浏览器只显示原生全屏元素及其后代，提高 `z-index` 无法显示其外部的弹窗。开启 `teleport` 并配置 UI 库将弹窗挂载到 `body`，或关闭 `teleport`、将弹窗直接挂载在全屏目标内部。可在[快速上手](/vue2/)对比效果。
 
 ## teleport 后样式变了？
 
 元素从原父节点移动到了 body。依赖祖先的 CSS 选择器和继承值可能失效；把关键样式放到目标自身的 class 上。退出时会恢复原 DOM 位置和被库修改的行内布局样式。
 
+通过 `fullscreenClass` 设置背景、滚动和层级；库不会强制设置这些样式：
+
+```css
+.my-fullscreen {
+  background: white;
+  overflow: auto;
+  z-index: 1000;
+}
+```
+
 ## SSR 或 Nuxt 可以用吗？
 
-可以在服务端导入包。只在浏览器挂载后读取 DOM，并在用户操作中请求原生全屏。不要在服务端调用 `api.request()`。VitePress 文档里的交互示例通过 `ClientOnly` 渲染。
+可以在服务端导入包。只在浏览器挂载后读取 DOM，并在用户操作中请求原生全屏。不要在服务端调用 `fullscreen.request()`。
 
 ## API 状态为什么没有更新页面？
 
-`api.isFullscreen` 不是响应式引用。使用 `callback` 写入 Vue 状态，或改用组件的 `v-model`。
+`fullscreen.isFullscreen` 不是响应式引用。使用 `callback` 写入 Vue 状态，或改用组件的 `v-model`。
 
 ## 切换路由后如何清理？
 
-组件会在卸载时清理。直接使用 API 或指令时，在路由移除全屏目标之前等待 `api.exit()`。指令卸载只负责移除点击处理器，不代表它拥有整个共享 API 会话。
+组件会在卸载时清理。直接使用 API 或指令时，在路由移除全屏目标之前等待 `fullscreen.exit()`。指令卸载只负责移除点击处理器，不代表它拥有整个共享 API 会话。

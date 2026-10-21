@@ -4,9 +4,9 @@
 
 ```ts
 import VueFullscreen, {
-  component,
-  directive,
-  api,
+  Fullscreen,
+  vFullscreen,
+  fullscreen,
   screenfull,
   type ApiOptions,
   type InstallationOptions,
@@ -71,9 +71,9 @@ Vue.use(VueFullscreen, { name: 'fs' }) // Vue 2
 ## API 单例
 
 ```ts
-api.request(target?: Element | null, options?: ApiOptions): Promise<void>
-api.toggle(target?: Element | null, options?: ApiOptions, force?: boolean): Promise<void>
-api.exit(): Promise<void>
+fullscreen.request(target?: Element | null, options?: ApiOptions): Promise<void>
+fullscreen.toggle(target?: Element | null, options?: ApiOptions, force?: boolean): Promise<void>
+fullscreen.exit(): Promise<void>
 ```
 
 `target` 省略或为 `null` 时使用 body；运行时目标必须是 HTML 元素。SSR 中可以导入包，调用操作会因缺少浏览器环境而拒绝。
@@ -104,7 +104,7 @@ interface DirectiveOptions extends ApiOptions {
 }
 ```
 
-修饰符 `.pageOnly`、`.teleport` 设置默认选项，对象中的显式值优先。错误通过原生 `fullscreen-error` 事件的 `detail` 属性传出。卸载指令会移除点击监听；由共享 API 开启的会话应通过 `api.exit()` 退出。
+修饰符 `.pageOnly`、`.teleport` 设置默认选项，对象中的显式值优先。错误通过原生 `fullscreen-error` 事件的 `detail` 属性传出。卸载指令会移除点击监听；由共享 API 开启的会话应通过 `fullscreen.exit()` 退出。
 
 ## 构建格式
 

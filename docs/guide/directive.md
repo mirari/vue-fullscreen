@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { directive as vFullscreen } from 'vue-fullscreen'
+import { vFullscreen } from 'vue-fullscreen'
 import { ref } from 'vue'
 
 const error = ref('')
@@ -29,7 +29,7 @@ const error = ref('')
 </template>
 ```
 
-安装全局插件后，可直接使用 `v-fullscreen`，无需局部导入。
+普通 `setup()` 或 Options API 中，在组件的 `directives` 选项里用 `fullscreen: vFullscreen` 局部注册。
 
 ## 三种绑定形式
 
@@ -52,7 +52,7 @@ const error = ref('')
 
 `.pageOnly` 和 `.teleport` 对应同名配置。对象中的显式选项优先于修饰符。例如 `.pageOnly="{ pageOnly: false }"` 最终使用原生模式。
 
-对象还支持 `fullscreenClass` 与 `callback(active)`。指令使用共享 API，所以 `api.exit()` 可以退出由指令开启的全屏。
+对象还支持 `fullscreenClass` 与 `callback(active)`。指令使用共享 API，所以 `fullscreen.exit()` 可以退出由指令开启的全屏。
 
 ## 捕获失败
 

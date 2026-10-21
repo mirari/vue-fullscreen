@@ -2,13 +2,13 @@
 
 ## Package and API versions
 
-Install the Vue 3 package with:
+Stable Vue 3 releases use the default `latest` channel:
 
 ```sh
-npm install vue-fullscreen@next
+npm install vue-fullscreen
 ```
 
-This API reference describes `4.0.0`, which is not yet published. The `next` channel currently provides `3.1.3`; some error events and package entry paths differ. Check [npm](https://www.npmjs.com/package/vue-fullscreen) for published versions.
+This API reference describes `4.0.0`, which is not yet published. For Vue 2, use `vue-fullscreen@legacy`; see [Vue 2 compatibility](/en/vue2/guide/compatibility).
 
 ## Supported environments
 
@@ -18,7 +18,7 @@ This API reference describes `4.0.0`, which is not yet published. The `next` cha
 | Browser target | ES2018; Internet Explorer is not supported             |
 | SSR            | Importing is supported; operations require the browser |
 
-Examples using `<script setup>` require Vue 3.2+. For Vue 3.0/3.1, use the Options API example in [Getting started](/en/guide/getting-started). Vue 3.0's declarations may require `skipLibCheck` with modern TypeScript.
+Examples using `<script setup>` require Vue 3.2+. For Vue 3.0/3.1, use a regular `setup()` function and register imported components and directives through the `components` and `directives` options. Vue 3.0's declarations may require `skipLibCheck` with modern TypeScript.
 
 ## Model events
 
@@ -57,13 +57,13 @@ This package requires Vue 3 and does not support IE. Adding a `Promise` polyfill
 
 ## Capability detection and page-only fallback
 
-Read `api.isEnabled` in the browser to check whether the current document allows native fullscreen. It does not indicate whether fullscreen is active or guarantee that the next request will succeed.
+Read `fullscreen.isEnabled` in the browser to check whether the current document allows native fullscreen. It does not indicate whether fullscreen is active or guarantee that the next request will succeed.
 
 ```js
-import { api } from 'vue-fullscreen'
+import { fullscreen } from 'vue-fullscreen'
 
 // Read after mount or during a user interaction
-const nativeAvailable = api.isEnabled
+const nativeAvailable = fullscreen.isEnabled
 ```
 
 - When native fullscreen is unavailable, the component, directive and API fall back to page-only mode.
@@ -90,7 +90,7 @@ Users can press Esc or use browser exit controls. Loading another document, relo
 
 Do not assume your exit button is the only source of state changes. The component synchronizes actual state through `v-model`; use `callback` to track API and directive state. Page-only mode does not necessarily exit when changing applications, so keep an exit button visible.
 
-SPA route changes differ from loading another document: fullscreen can continue while the outer target remains mounted, whereas unmounting the fullscreen component exits it. See the [examples](/en/examples).
+SPA route changes differ from loading another document: fullscreen can continue while the outer target remains mounted, whereas unmounting the fullscreen component exits it. See [component usage](/en/guide/component#keep-fullscreen-while-changing-views).
 
 ## SSR
 

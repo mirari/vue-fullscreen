@@ -2,13 +2,13 @@
 
 ## 安装渠道与接口版本
 
-Vue 3 使用 `next` 渠道：
+Vue 3 正式版使用默认的 `latest` 渠道：
 
 ```sh
-npm install vue-fullscreen@next
+npm install vue-fullscreen
 ```
 
-本文档的接口参考版本为 `4.0.0`，尚未发布。`next` 渠道目前提供 `3.1.3`，部分错误事件和包入口存在差异。可在 [npm](https://www.npmjs.com/package/vue-fullscreen) 查看已发布版本。
+本文档的接口参考版本为 `4.0.0`，尚未发布。Vue 2 用户请使用 `vue-fullscreen@legacy`，见 [Vue 2 兼容性说明](/vue2/guide/compatibility)。
 
 ## 支持范围
 
@@ -18,7 +18,7 @@ npm install vue-fullscreen@next
 | 浏览器 | ES2018；不支持 IE                |
 | SSR    | 支持导入；全屏操作仅在浏览器调用 |
 
-文档中使用 `<script setup>` 的示例要求 Vue 3.2+。Vue 3.0/3.1 可以使用[快速上手](/guide/getting-started)中的 Options API 写法。Vue 3.0 自身的类型声明在现代 TypeScript 下可能需要 `skipLibCheck`。
+文档中使用 `<script setup>` 的示例要求 Vue 3.2+。Vue 3.0/3.1 可使用普通 `setup()`，并通过 `components`、`directives` 局部注册导入的组件与指令。Vue 3.0 自身的类型声明在现代 TypeScript 下可能需要 `skipLibCheck`。
 
 ## 模型事件
 
@@ -57,13 +57,13 @@ iPad 原生全屏会显示浏览器提供的退出控件，下滑等系统手势
 
 ## 能力检测与网页全屏降级
 
-在浏览器中读取 `api.isEnabled` 可判断当前文档是否允许使用原生全屏。它不表示是否已经进入全屏，也不保证下一次请求一定成功。
+在浏览器中读取 `fullscreen.isEnabled` 可判断当前文档是否允许使用原生全屏。它不表示是否已经进入全屏，也不保证下一次请求一定成功。
 
 ```js
-import { api } from 'vue-fullscreen'
+import { fullscreen } from 'vue-fullscreen'
 
 // 在组件挂载后或用户点击时读取
-const nativeAvailable = api.isEnabled
+const nativeAvailable = fullscreen.isEnabled
 ```
 
 - 原生全屏不可用时，组件、指令和 API 自动使用网页全屏。
@@ -90,7 +90,7 @@ const nativeAvailable = api.isEnabled
 
 不要假设只有自己的退出按钮会改变状态。组件通过 `v-model` 同步实际状态；API 和指令可通过 `callback` 更新页面状态。网页全屏不一定跟随切换应用自动退出，应保留可见的退出按钮。
 
-SPA 内部切换路由不等同于加载新文档：保留外层全屏目标时可以继续全屏，卸载目标组件则会退出。写法见[交互示例](/examples)。
+SPA 内部切换路由不等同于加载新文档：保留外层全屏目标时可以继续全屏，卸载目标组件则会退出。写法见[组件用法](/guide/component#切换页面内容时保持全屏)。
 
 ## SSR
 

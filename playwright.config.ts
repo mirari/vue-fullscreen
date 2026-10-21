@@ -13,13 +13,13 @@ export default defineConfig({
   webServer: [
     {
       command:
-        'npm run dev -w @vue-fullscreen/vue2 -- --port 4172 --strictPort',
+        'pnpm --filter @vue-fullscreen/vue2 dev --port 4172 --strictPort',
       url: 'http://localhost:4172',
       reuseExistingServer: !process.env.CI,
     },
     {
       command:
-        'npm run dev -w @vue-fullscreen/vue3 -- --port 4173 --strictPort',
+        'pnpm --filter @vue-fullscreen/vue3 dev --port 4173 --strictPort',
       url: 'http://localhost:4173',
       reuseExistingServer: !process.env.CI,
     },

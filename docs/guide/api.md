@@ -1,82 +1,56 @@
 # API
 
-API 不依赖组件模板，适合控制已有 DOM。所有操作都返回 Promise。
+`useFullscreen()` 提供 VueUse 风格的组合式 API，可直接获取响应式状态，无需维护回调。
 
 <ClientOnly><FullscreenDemo kind="api" /></ClientOnly>
 
-## 指定目标并等待结果
+## 指定目标
 
 ```vue
 <script setup>
-import { ref, onBeforeUnmount } from 'vue'
-import { api } from 'vue-fullscreen'
+import { ref } from 'vue'
+import { useFullscreen } from 'vue-fullscreen'
 
 const target = ref()
-const active = ref(false)
 const error = ref('')
-
-async function enter() {
-  try {
-    await api.request(target.value, {
-      pageOnly: true,
-      teleport: true,
-      callback: (value) => {
-        active.value = value
-      },
-    })
-  } catch (reason) {
-    error.value = reason.message
-  }
-}
-async function exit() {
-  try {
-    await api.exit()
-  } catch (reason) {
-    error.value = reason.message
-  }
-}
-
-onBeforeUnmount(() => {
-  if (api.element === target.value) void api.exit().catch(() => {})
+const { isFullscreen, enter, exit, toggle } = useFullscreen(target, {
+  pageOnly: true,
+  teleport: true,
 })
 </script>
 
 <template>
-  <button @click="enter">进入全屏</button>
+  <button @click="enter().catch((e) => (error = e.message))">进入全屏</button>
   <section ref="target">
     <h2>业务面板</h2>
-    <button v-if="active" @click="exit">退出全屏</button>
+    <button v-if="isFullscreen" @click="exit">退出全屏</button>
+    <button @click="toggle">切换全屏</button>
   </section>
   <p v-if="error" role="alert">{{ error }}</p>
 </template>
 ```
 
-示例使用网页模式，退出时立即恢复 DOM。原生模式下，如果页面路由将移除目标，应在路由离开守卫中 `await api.exit()`，再继续导航。普通组件场景推荐直接使用[组件封装](/guide/component)，由库管理生命周期。
+目标可以是 DOM 元素、模板 ref 或返回元素的 getter；省略时控制 `document.body`。每次进入时读取当前目标，已在全屏中不会切换目标。
 
-## 切换与强制状态
+## 状态与选项
+
+- `isFullscreen`：只读响应式状态，随 Esc 或浏览器退出操作同步更新。
+- `isSupported`：原生 Fullscreen API 可用性；为 `false` 时仍可使用网页全屏。
+- `enter()`、`exit()`、`toggle()`：返回 Promise，原生请求失败时会拒绝。
+- `pageOnly`、`teleport`：默认均为 `false`，也可以传入 ref 或 getter，在进入时读取。
+- `fullscreenClass`：全屏期间的样式类，默认 `'fullscreen'`。
+
+每次调用持有独立控制器。组件卸载时自动退出，恢复被移动的元素并移除监听器。原生全屏请求应直接由点击或按键触发，不要先等待网络请求。
+
+## 命令式调用
+
+组件外的业务代码或指令共享会话仍可使用 `fullscreen` 单例：
 
 ```ts
-await api.toggle(element, { pageOnly: true }) // 根据当前状态切换
-await api.toggle(element, { pageOnly: true }, true) // 强制进入
-await api.toggle(element, undefined, false) // 强制退出
-await api.exit() // 已退出时不执行操作
+import { fullscreen } from 'vue-fullscreen'
+
+await fullscreen.request(element, { pageOnly: true, teleport: true })
+await fullscreen.exit()
 ```
 
-`request()` 默认控制 `document.body`。已处于全屏时再次 `request()` 不会切换目标；先退出，再请求新目标。
-
-## 读取状态
-
-```ts
-api.isFullscreen // 当前控制器是否处于全屏
-api.element // 当前目标；退出后为 null
-api.isEnabled // 浏览器是否支持原生全屏，不代表请求一定获准
-api.options // 当前会话配置
-```
-
-这些是普通属性，不是 Vue 的响应式引用。想让页面随 Esc 等操作更新，请使用 `callback` 同步 Vue 状态，或使用组件的 `v-model`。
-
-::: tip 保留用户手势
-原生全屏请求要直接由点击、按键等操作触发。不要先等待网络请求再调用 `request()`，否则浏览器可能拒绝。
-:::
-
-完整签名见 [API 参考](/reference/api#api-单例)。
+单例的状态是普通属性；在 Vue 3 组件中优先使用 `useFullscreen()`。完整签名见 [API 参考](/reference/api#usefullscreen)。

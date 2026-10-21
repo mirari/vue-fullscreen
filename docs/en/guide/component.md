@@ -6,12 +6,12 @@ Wrap content in the component and use `v-model` to control fullscreen. When the 
 
 ## Local registration
 
-You can import the component without installing the plugin. This `<script setup>` example requires Vue 3.2+. For Vue 3.0/3.1, use the Options API shown in [Getting started](/en/guide/getting-started).
+Import `Fullscreen` in the component that uses it. This `<script setup>` example requires Vue 3.2+. For Vue 3.0/3.1, register `Fullscreen` in `components` and return state from a regular `setup()` function.
 
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { component as Fullscreen } from 'vue-fullscreen'
+import { Fullscreen } from 'vue-fullscreen'
 
 const active = ref(false)
 const error = ref('')
@@ -52,7 +52,7 @@ After a rejected request, reset your model to `false` so a later click can trigg
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { component as Fullscreen } from 'vue-fullscreen'
+import { Fullscreen } from 'vue-fullscreen'
 
 const panel = ref()
 const error = ref('')
@@ -73,3 +73,20 @@ async function enter() {
 ```
 
 See the [component reference](/en/reference/api#component) for all props, events and methods.
+
+## Keep fullscreen while changing views
+
+Keep the fullscreen container outside the view that changes. This applies to tabs as well as Vue Router: place `<router-view>` inside the stable container.
+
+```vue
+<Fullscreen v-model="active" teleport :exit-on-click-wrapper="false">
+  <nav>
+    <router-link to="/chart">Chart</router-link>
+    <router-link to="/table">Table</router-link>
+  </nav>
+  <router-view />
+  <button @click="active = false">Exit fullscreen</button>
+</Fullscreen>
+```
+
+This fragment belongs in the persistent application layout. Import `Fullscreen` and declare `active` as in the earlier examples, and configure your routes. SPA navigation replaces the inner view; the fullscreen container must remain mounted. Putting a separate fullscreen component inside each route destroys it on navigation and exits fullscreen. Loading another document or reloading the page cannot preserve fullscreen.
