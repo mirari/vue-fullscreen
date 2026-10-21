@@ -53,7 +53,7 @@ For IE 11 with Vue 2, load `import 'vue-fullscreen/polyfills'` before the compon
 
 Use Node 24.15+ (recommended) or Node 22.22.2+.
 
-The workspace uses pnpm 11.2.2, pinned in `packageManager`.
+Use the pnpm version pinned in the root `packageManager` field.
 
 ```sh
 pnpm install --frozen-lockfile
