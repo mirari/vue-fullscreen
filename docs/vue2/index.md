@@ -101,7 +101,7 @@ Vue.use(VueFullscreen)
   </fullscreen>
 </div>
 
-<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/vue@legacy"></script>
 <script src="https://unpkg.com/vue-fullscreen@legacy"></script>
 <script>
   Vue.use(VueFullscreen.default)

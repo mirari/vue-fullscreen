@@ -84,8 +84,8 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
   </fullscreen>
 </div>
 
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://unpkg.com/vue-fullscreen@latest"></script>
+<script src="https://unpkg.com/vue"></script>
+<script src="https://unpkg.com/vue-fullscreen"></script>
 <script>
   Vue.createApp({
     components: { fullscreen: VueFullscreen.Fullscreen },

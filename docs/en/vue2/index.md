@@ -101,7 +101,7 @@ Load the latest Vue 2 build and the package's `legacy` channel from UNPKG. Load 
   </fullscreen>
 </div>
 
-<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/vue@legacy"></script>
 <script src="https://unpkg.com/vue-fullscreen@legacy"></script>
 <script>
   Vue.use(VueFullscreen.default)

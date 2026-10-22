@@ -2,15 +2,23 @@
 
 ## Branch and version model
 
-The v4 rewrite is a fresh release history, beginning at the commit recorded in `release.config.json`. The old implementation's changelog and version tags are not used as the new release baseline. The Vue 2 adapter starts at `4.0.0` and stays on 4.x; the Vue 3 adapter starts at `5.0.0` and can advance to later majors. Both require an explicit major upgrade from the previously published 2.x/3.x packages.
+The rewrite has a fresh release history, beginning at the commit recorded in `release.config.json`. The old implementation's changelog and version tags are not used as the new release baseline. The Vue 2 adapter starts at `4.0.0` and stays on 4.x; the Vue 3 adapter starts at `5.0.0` and can advance to later majors. Both require an explicit major upgrade from the previously published 2.x/3.x packages.
 
-`master` is the default branch for all development and releases, including Vue 2 releases. It contains the reviewed v4 rewrite history. The temporary `v4` branch was used only for the bootstrap release `vue3-v5.0.0`; release validation now uses `master` for every tag.
+`master` is the default branch for all development and releases, including Vue 2 releases. Both adapters are maintained in this branch; npm channels such as `legacy` do not require separate Git branches.
 
 The internal workspace packages are private. Their versions independently determine the generated `vue-fullscreen` packages. A core change must pass both adapters' checks, but releasing both lines is optional.
 
 Use the pnpm version pinned in the root `packageManager` field and install with `pnpm install --frozen-lockfile`. `pnpm-workspace.yaml` includes both adapters; the root lockfile is `pnpm-lock.yaml`. The isolated published-package consumers intentionally use npm and their own lockfile, and CI publishes the verified tarball with npm trusted publishing.
 
 ## Checks
+
+Install Chromium before running browser tests:
+
+```sh
+pnpm exec playwright install chromium
+```
+
+On Linux CI or a machine missing browser system libraries, use `pnpm exec playwright install --with-deps chromium`. The browser tests use full Chromium; a headless-shell-only installation is insufficient for native fullscreen coverage.
 
 - `pnpm run lint`: formatting consistency using Prettier.
 - `pnpm run typecheck`: strict TypeScript checks for both adapters and shared core.
@@ -90,18 +98,18 @@ Only history from the rewrite commit onward is eligible. Each adapter uses its o
 | Vue 2 beta/rc | `vue2-beta`  |
 | Vue 3 beta/rc | `vue3-beta`  |
 
-The workflow re-runs all checks, publishes the exact verified tarball using npm OIDC/provenance, then creates a GitHub Release with that tarball. A stable Vue 3 release publishes to `latest`; Vue 2 releases use `legacy`. The historical `next` tag is left unchanged. Do not run different releases for the same version line concurrently, because npm tags follow the last successful publish.
+The workflow re-runs all checks, publishes the exact verified tarball using npm OIDC/provenance, then creates a GitHub Release with that tarball. A stable Vue 3 release publishes to `latest`; Vue 2 releases use `legacy`. The historical `next` tag is not used for current releases. Do not run different releases for the same version line concurrently, because npm tags follow the last successful publish.
 
 If npm publishing succeeds but GitHub Release creation fails, use GitHub Actions “Re-run failed jobs” or create that release using the existing tag and tarball; do not re-run successful npm publishing for an immutable version. If publication fails before npm accepts it, re-run the failed publish job. If the outcome is uncertain, inspect npm first.
 
 ## Migration notes
 
-- Component/directive/API import names and both Vue model conventions remain supported. Vue 2 retains its plugin; Vue 3 uses named imports without a plugin default export or instance globals.
-- Vue 3 exposes `Fullscreen`, `vFullscreen` and `useFullscreen(target, options)`. Each composable call owns its reactive state and session, with component unmount cleanup; calls outside components must exit explicitly. The `component` and `directive` aliases remain. Vue 2 retains its plugin and the `fullscreen` / `api` singleton.
+- Vue 3 exposes `Fullscreen`, `vFullscreen` and `useFullscreen(target, options)`. The default plugin export, `$fullscreen` instance property and API singleton have been removed; migrate old API calls to `useFullscreen()`. Each composable call owns its reactive state and session, with component unmount cleanup; calls outside components must exit explicitly. The deprecated `component` and `directive` aliases remain.
+- Vue 2 retains its default plugin export, `$fullscreen` instance property and `fullscreen` / `api` singleton. Use `v-model` for component state; the legacy `fullscreen` / `update:fullscreen` model remains supported in both adapters.
 - Vue 2 minimum is 2.4.0, when `inheritAttrs`, `$attrs` and `$listeners` became available. Public declarations use types shared by Vue 2.4 through 2.7 rather than the later `VueConstructor` export.
 - Output paths change to root-level `index.js`, `index.cjs`, and `index.umd.js`; update direct CDN/deep-file URLs. Package-root imports use `exports` and need no path change.
 - Declaration entries are generated rather than maintained separately; public component types avoid exposing build-time Vue internal generics.
-- screenfull is updated from 5 to 6 and bundled in every format. Vue 3 targets ES2018. Vue 2 exposes selected core-js polyfills through the optional `vue-fullscreen/polyfills` entry. The main bundle contains no core-js. Babel transforms both outputs for IE 11; only the polyfill files are marked as having side effects. `check:ie11` covers both this entry and independently supplied application polyfills.
+- screenfull is updated from 5 to 6 and bundled in every format. Vue 3 targets ES2018. Vue 2 exposes selected core-js polyfills through the optional `vue-fullscreen/polyfills` entry. The main bundle contains no core-js. Babel transforms the Vue 2 runtime and polyfill outputs for IE 11; only the polyfill files are marked as having side effects. `check:ie11` covers both this entry and independently supplied application polyfills.
 - `teleport` defaults to `false`, matching existing code (old README examples incorrectly documented `true`).
 - Native request rejection restores styles/DOM and removes listeners. Component errors use `error`; directive errors use the native `fullscreen-error` event.
 - Missing directive selectors now report an error instead of silently targeting the body.
@@ -109,7 +117,7 @@ If npm publishing succeeds but GitHub Release creation fails, use GitHub Actions
 
 ## VitePress documentation
 
-User-facing documentation lives in `docs/`, with Chinese navigation, local search and interactive component/directive/API examples. `README.md` is the npm/repository entry point.
+User-facing documentation lives in `docs/`, with Chinese and English navigation, separate Vue 2 and Vue 3 guides, local search and interactive component/directive/API examples. `README.md` is copied into both published packages and is also the repository entry point. Keep its links usable on npm: use absolute repository URLs for files that are not included in the package.
 
 - `pnpm run docs:dev`: develop at `/`.
 - `pnpm run docs:build`: SSR/static build, including dead-link checks.
