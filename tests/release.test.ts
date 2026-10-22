@@ -87,8 +87,6 @@ function fixture() {
     'release.config.json',
     JSON.stringify({
       sourceBranch: 'master',
-      bootstrapBranch: 'v4',
-      bootstrapTag: 'vue3-v5.0.0',
       refactorCommit: refactor,
     }),
   )
@@ -278,16 +276,20 @@ it('rejects invalid versions and restores metadata when notes cannot be written'
   expect(JSON.parse(f.read('packages/vue3/package.json')).version).toBe('5.0.0')
 }, 60000)
 
-it('allows only the bootstrap on v4, then requires master independently of v4', () => {
+it('requires every release to belong to master without a bootstrap exception', () => {
   const f = fixture()
   f.git('update-ref', 'refs/remotes/origin/master', f.legacy)
   f.git('update-ref', 'refs/remotes/origin/v4', 'HEAD')
-  expect(f.branch('vue3-v5.0.0')).toContain('verified release commit on v4')
+  expect(() => f.branch('vue3-v5.0.0')).toThrow()
   expect(() => f.branch('vue3-v5.0.1')).toThrow()
   expect(() => f.branch('vue2-v4.0.0')).toThrow()
   f.git('update-ref', 'refs/remotes/origin/master', 'HEAD')
+  f.git('update-ref', '-d', 'refs/remotes/origin/v4')
+  expect(f.branch('vue3-v5.0.0')).toContain('verified release commit on master')
+  expect(f.branch('vue2-v4.0.0')).toContain('verified release commit on master')
   f.write('packages/core/later.js', 'later')
   f.commit('fix: maintain fullscreen on master')
+  expect(() => f.branch('vue3-v5.0.1')).toThrow()
   f.git('update-ref', 'refs/remotes/origin/master', 'HEAD')
   expect(f.branch('vue3-v5.0.1')).toContain('verified release commit on master')
   expect(f.branch('vue2-v4.0.0')).toContain('verified release commit on master')

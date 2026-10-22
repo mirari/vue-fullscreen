@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - name: Verify release source (v4 bootstrap, then master)
+      - name: Verify release source on master
         env:
           RELEASE_TAG: ${{ github.ref_name }}
         run: node scripts/release-branch.mjs "$RELEASE_TAG"

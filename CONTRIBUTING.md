@@ -4,7 +4,7 @@
 
 The v4 rewrite is a fresh release history, beginning at the commit recorded in `release.config.json`. The old implementation's changelog and version tags are not used as the new release baseline. The Vue 2 adapter starts at `4.0.0` and stays on 4.x; the Vue 3 adapter starts at `5.0.0` and can advance to later majors. Both require an explicit major upgrade from the previously published 2.x/3.x packages.
 
-`master` is the default branch for all development and releases, including Vue 2 releases. It now contains the reviewed v4 rewrite history. The temporary `v4` branch was used only for the bootstrap release `vue3-v5.0.0` and has no ongoing release role. The bootstrap exception in `release.config.json` is retained for that historical tag.
+`master` is the default branch for all development and releases, including Vue 2 releases. It contains the reviewed v4 rewrite history. The temporary `v4` branch was used only for the bootstrap release `vue3-v5.0.0`; release validation now uses `master` for every tag.
 
 The internal workspace packages are private. Their versions independently determine the generated `vue-fullscreen` packages. A core change must pass both adapters' checks, but releasing both lines is optional.
 
