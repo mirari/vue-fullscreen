@@ -4,7 +4,7 @@
 
 The v4 rewrite is a fresh release history, beginning at the commit recorded in `release.config.json`. The old implementation's changelog and version tags are not used as the new release baseline. The Vue 2 adapter starts at `4.0.0` and stays on 4.x; the Vue 3 adapter starts at `5.0.0` and can advance to later majors. Both require an explicit major upgrade from the previously published 2.x/3.x packages.
 
-`v4` is a temporary development branch for this rewrite. Only the bootstrap release `vue3-v5.0.0` is released from `v4`. After that release succeeds, replace `master` with the reviewed v4 history. All later development and releases use `master`, including Vue 2 releases. Release validation uses this explicit policy instead of requiring the old master history before the first v4 release.
+`master` is the default branch for all development and releases, including Vue 2 releases. It now contains the reviewed v4 rewrite history. The temporary `v4` branch was used only for the bootstrap release `vue3-v5.0.0` and has no ongoing release role. The bootstrap exception in `release.config.json` is retained for that historical tag.
 
 The internal workspace packages are private. Their versions independently determine the generated `vue-fullscreen` packages. A core change must pass both adapters' checks, but releasing both lines is optional.
 
@@ -37,7 +37,7 @@ All browser assertions run in Chromium. Local script URLs keep the tests indepen
 
 ## First-time GitHub/npm configuration
 
-1. Review and merge the rewrite into the temporary `v4` branch. Push the bootstrap commit and its CATV tag to `origin/v4`. After publishing the bootstrap release and switching master, publish subsequent tags from commits on `origin/master`; changing the GitHub default branch is not required. Repository rules must allow maintainers to push `vue2-v*` / `vue3-v*` tags and the workflow's `GITHUB_TOKEN` to create GitHub Releases.
+1. Publish tags from commits on `origin/master`. Repository rules must allow maintainers to push `vue2-v*` / `vue3-v*` tags and the workflow's `GITHUB_TOKEN` to create GitHub Releases.
 2. In npm's **vue-fullscreen → Settings → Trusted Publisher**, configure GitHub Actions for owner `mirari`, repository `vue-fullscreen`, workflow `release.yml`, environment `npm`, with publishing allowed.
 3. Create the GitHub `npm` environment. Leave required reviewers unset for unattended publishing; configuring reviewers intentionally pauses the publish job for approval. The publish job requests `id-token: write` and uses Node 24's npm (OIDC support requires npm 11.5.1+). No `NPM_TOKEN` secret is required.
 4. The existing production site is `https://vue-fullscreen.mirari.cc/`, with static content on the `gh-pages` branch and its `CNAME` file. Keep this branch-based publishing configuration. `Documentation Pages` replaces the static payload with VitePress output and preserves the domain; no DNS change or source default-branch switch is needed.
@@ -48,27 +48,23 @@ These account settings cannot be supplied by repository code. Never test the rel
 
 Version preparation uses **commit-and-tag-version (CATV)**. Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/): `feat:` recommends a minor release, `fix:` recommends a patch, and `!` or `BREAKING CHANGE:` recommends a major release. CATV's standard recommendation treats other changes as patches; an explicit version or increment overrides it. Vue 2 stays on 4.x; Vue 3 can advance from 5.x to later majors.
 
-Commit implementation changes first, fetch release tags, then preview and create the first Vue 3 release:
+Start on an up-to-date `master`, commit implementation changes, then fetch release tags, preview and create a release:
 
 ```sh
+git switch master
+git pull --ff-only origin master
 git fetch origin --tags
-pnpm run release vue3 --first-release --dry-run
-pnpm run release vue3 --first-release
+pnpm run release vue3 --dry-run
+pnpm run release vue3
 git show --stat HEAD
-git push --follow-tags origin v4
+git push --follow-tags origin master
 ```
 
 `pnpm run release` uses CATV to update the selected adapter's version and changelog, generates `releases/<tag>.md`, then uses CATV's normal commit and annotated-tag steps. Tags are prefixed with `vue2-v` or `vue3-v` so each adapter has an independent release history. The command does not push or publish. Review the commit and tag before pushing. `--dry-run` changes no files, commits or tags and includes committed history only.
 
 Pushing a matching tag runs `release.yml`: check that the tag matches the package version and its commit belongs to the release source branch; run all checks and browser/consumer tests; publish the verified tarball to npm through OIDC; then create the GitHub Release with the generated notes and tarball. Pushing a branch without a tag does not publish. CI checks out the tagged commit, even when the branch has advanced. The commit subject, changed-file list and position in the branch history do not control publishing.
 
-`--first-release` keeps the adapter's current version. It is required once per version line and cannot be used once that line has release tags. After the Vue 3 bootstrap and master switch, create the first Vue 2 release:
-
-```sh
-git fetch origin --tags
-pnpm run release vue2 --first-release
-git push --follow-tags origin master
-```
+Both version lines have been initialized with `vue2-v4.0.0` and `vue3-v5.0.0`. `--first-release` keeps the adapter's current version and cannot be used again once that line has release tags.
 
 For subsequent releases, fetch tags first and choose the appropriate command, review the generated commit and tag, then `git push --follow-tags origin master`:
 
@@ -81,21 +77,11 @@ pnpm run release vue3 --prerelease beta   # start or continue a beta
 pnpm run release vue2 patch              # release Vue 2 independently
 ```
 
-`pnpm run release:prepare` is an optional way to generate only the version, changelog and notes without committing or tagging. If using it, review and commit the generated files, then create an annotated tag, for example `git tag -a vue3-v5.0.0 -m "5.0.0"`, before pushing. There is no required commit-message format or release-file whitelist.
+`pnpm run release:prepare` is an optional way to generate only the version, changelog and notes without committing or tagging. If using it, review and commit the generated files, then create an annotated tag matching the prepared version, for example `git tag -a vue3-v5.0.1 -m "5.0.1"`, before pushing. There is no required commit-message format or release-file whitelist.
 
 The pnpm lockfile does not record these private workspace packages' own versions, so a version-only bump leaves it unchanged. Normal release creation requires a clean working tree and full Git history. Failures before the release commit restore generated files and clear their staging; failures after a commit retain it for recovery.
 
 Only history from the rewrite commit onward is eligible. Each adapter uses its own tag prefix and excludes changes confined to the opposite adapter and its guide/reference pages. Shared core, build tooling, shared docs and mixed commits are eligible for both. CATV handles prerelease ranges: a continuing beta contains changes since the preceding beta, while the stable release includes changes that appeared during prereleases. Commit entries are generated as a whole; a mixed commit can appear in both changelogs. `docs`, `refactor` and `build` entries are visible; routine chores, tests and CI changes are hidden unless breaking.
-
-After the bootstrap package has been published and the GitHub Release has succeeded, switch master to that reviewed v4 history. Fetch the current remote refs and record the expected master SHA before the switch. An explicit refspec updates the remote branch without resetting a local checkout:
-
-```sh
-git fetch origin
-# Replace <recorded-master-sha> with the SHA just read from origin/master.
-git push origin origin/v4:refs/heads/master --force-with-lease=refs/heads/master:<recorded-master-sha>
-```
-
-Check that master now contains the published bootstrap commit, then base future work on master. `v4` has no ongoing release role. This branch replacement is a separate post-release operation, not an automatic side effect of CATV or CI. The initial adapter versions have not been published; their release notes will be generated by the first-release commands.
 
 | Version       | npm dist-tag |
 | ------------- | ------------ |
@@ -130,6 +116,6 @@ User-facing documentation lives in `docs/`, with Chinese navigation, local searc
 - `pnpm run docs:preview`: serve the production build.
 - `pnpm run test:docs`: build and test the production site with Chromium, including custom-domain root-path navigation and fullscreen examples.
 
-VitePress is pinned to its stable 1.6.4 release and uses its own compatible Vite dependency; the library still builds with Vite 8. The root Vue 3 dependency supplies the docs runtime, while the Vue 2 workspace keeps its own runtime. Demo imports resolve to the local Vue 3 adapter. The site labels the unpublished refactor versions explicitly.
+VitePress is pinned to its stable 1.6.4 release and uses its own compatible Vite dependency; the library still builds with Vite 8. The root Vue 3 dependency supplies the docs runtime, while the Vue 2 workspace keeps its own runtime. Demo imports resolve to the local Vue 3 adapter.
 
 The default base is `/`, matching `vue-fullscreen.mirari.cc`. For a separate project-subpath deployment use `DOCS_BASE=/vue-fullscreen/ pnpm run docs:build`. Keep the base consistent when serving previews. Browser tests exercise the production root path.
