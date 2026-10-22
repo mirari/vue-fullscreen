@@ -47,6 +47,27 @@ Run `pnpm run test:consumers` after installing Chromium. The command builds and 
 
 All browser assertions run in Chromium. Local script URLs keep the tests independent of third-party CDN availability; they exercise the same files a CDN serves. Nuxt uses its Node server output; this does not claim coverage of every Nitro deployment adapter. Existing `check:packages` tests additionally cover ESM/CJS imports and TypeScript declarations across supported Vue versions.
 
+## Consumer dependency security
+
+`tests/consumers/fixture` is a private test application with its own npm lockfile. Its Nuxt, Vite and Vue installations exercise packed releases; they are not dependencies of the published `vue-fullscreen` tarballs. Direct dependency updates must update both the manifest and lockfile; compatible transitive updates can change only the lockfile. Run `pnpm run test:consumers` from the repository root after either change.
+
+Run its audit against the official registry, since some registry mirrors do not implement the audit endpoint:
+
+```sh
+cd tests/consumers/fixture
+npm audit --registry=https://registry.npmjs.org
+```
+
+The following upstream findings remain in the fixture as of 2026-10-22. They are recorded for review, rather than treated as fixed or automatically dismissed:
+
+| Package      | Advisory                                                                                      | Exposure in this fixture                                                                                                                   |
+| ------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `braces`     | [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm); no patched release  | Nitro's `globby` / `fast-glob` build dependency. Keep glob patterns under repository control.                                              |
+| `node-forge` | [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv); no patched release  | Nitro's `listhen` dependency for TLS certificate handling. The consumer servers use local HTTP and do not verify untrusted RSA signatures. |
+| Vue 2        | [GHSA-5j4c-8p2g-v4jx](https://github.com/advisories/GHSA-5j4c-8p2g-v4jx); no public Vue 2 fix | The `vue2` alias deliberately tests 2.7.16. Its template compiler processes repository-authored HTML; do not compile untrusted templates.  |
+
+Recheck these advisories when updating the fixture and after an upstream fix is released. Replacing the Vue 2 alias with Vue 3 would remove Vue 2 coverage. Avoid `npm audit fix --force`: its suggested Nuxt downgrade and Vue major upgrade do not preserve the consumer test matrix.
+
 ## First-time GitHub/npm configuration
 
 1. Publish tags from commits on `origin/master`. Repository rules must allow maintainers to push `vue2-v*` / `vue3-v*` tags and the workflow's `GITHUB_TOKEN` to create GitHub Releases.
