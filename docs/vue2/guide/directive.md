@@ -2,6 +2,12 @@
 
 在 `directives` 中局部注册指令，点击按钮即可切换目标元素的全屏状态。
 
+::: tip 本页参考
+完整的绑定值、修饰符和选项见[**指令参考**](#参考)。
+:::
+
+<ClientOnly><Vue2Demo kind="directive" /></ClientOnly>
+
 ```vue
 <template>
   <div>
@@ -40,13 +46,15 @@ export default {
 </button>
 ```
 
-`target` 也可以是已经存在的 HTML 元素。选择器在点击时解析；未匹配到元素会派发错误事件，不会静默把 body 全屏。
+`target` 还支持 HTML 元素、Vue ref、组件实例（使用 `$el`）和 getter，进入全屏时解析当前目标。直接传入的字符串按 CSS 选择器处理，id 应写成 `'#report'`。
+
+无法解析目标时触发 `fullscreen-error`。省略 `target` 或直接传入 `null` 时使用 `document.body`。
 
 ## 修饰符与选项
 
 `.pageOnly` 和 `.teleport` 对应同名配置。对象中的显式选项优先于修饰符。例如 `.pageOnly="{ pageOnly: false }"` 最终使用原生模式。
 
-对象还支持 `fullscreenClass` 与 `callback(active)`。指令使用共享 API，所以 `fullscreen.exit()` 可以退出由指令开启的全屏。
+对象还支持 `fullscreenClass` 与 `callback(isFullscreen)`。指令使用共享 API，所以 `fullscreen.exit()` 可以退出由指令开启的全屏。
 
 ## 捕获失败
 
@@ -59,3 +67,19 @@ button.addEventListener('fullscreen-error', (event) => {
 ```
 
 如果按钮在全屏目标外面，原生全屏时可能看不到它。请在目标内部提供退出按钮，或让用户使用 Esc。
+
+## 参考
+
+```ts
+interface DirectiveOptions extends ApiOptions {
+  target?: FullscreenTarget
+}
+```
+
+| 选项              | 类型                              | 默认值          | 说明                                    |
+| ----------------- | --------------------------------- | --------------- | --------------------------------------- |
+| `target`          | `FullscreenTarget`                | `document.body` | 目标；直接传入的字符串按 CSS 选择器解析 |
+| `pageOnly`        | `boolean`                         | `false`         | 网页全屏                                |
+| `teleport`        | `boolean`                         | `false`         | 移动到 body；目标是 body 时自动关闭     |
+| `fullscreenClass` | `string`                          | `'fullscreen'`  | 激活时添加，退出时恢复                  |
+| `callback`        | `(isFullscreen: boolean) => void` | 无              | 状态变化回调                            |

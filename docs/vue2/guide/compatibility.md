@@ -2,26 +2,11 @@
 
 ## 软件包版本
 
-Vue 2 使用 `vue-fullscreen@legacy`。本文接口参考版本为 `2.7.0-beta.0`，尚未发布；`legacy` 目前提供 `2.6.3`，部分错误事件和包入口存在差异。
-
-## 支持范围
-
-支持 Vue `2.6.14` 和 `2.7.x`。发布构建以 IE 11 为兼容目标，所需的 JavaScript polyfill 可按需引入。导入包支持 SSR，全屏操作只能在浏览器中调用。
-
-## 模型事件
-
-```vue
-<fullscreen v-model="active">内容</fullscreen>
-
-<!-- 等价的显式绑定 -->
-<fullscreen :value="active" @input="active = $event" />
-```
-
-`fullscreen` / `update:fullscreen` 作为兼容模型保留。不要同时传入相互矛盾的模型值。
+支持 Vue `2.6.14` 和 `2.7.x`，使用 `vue-fullscreen@legacy`。本文接口参考版本为 `2.7.0-beta.0`，尚未发布；`legacy` 目前提供 `2.6.3`，部分错误事件和包入口存在差异。
 
 ## Fullscreen API 浏览器支持
 
-原生全屏由浏览器提供。完整版本列表见 [Can I use：Fullscreen API](https://caniuse.com/fullscreen)，设备限制见 [MDN 的 requestFullscreen 兼容性表](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility)。以下为常见环境概览，核对日期为 2026-10-09。
+原生全屏由浏览器提供。完整版本列表见 [Can I use：Fullscreen API](https://caniuse.com/fullscreen)，设备限制见 [MDN 的 requestFullscreen 兼容性表](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility)。以下为常见环境概览。
 
 | 浏览器 / 设备            | 原生全屏支持                                                        |
 | ------------------------ | ------------------------------------------------------------------- |
@@ -83,6 +68,18 @@ CommonJS 项目可先执行 `require('vue-fullscreen/polyfills')`，再执行 `r
 
 自动检查覆盖产物 ES5 语法，以及模拟缺失能力、ms 前缀全屏 API、网页降级、DOM 恢复和指令错误事件。这不是 IE 浏览器实机测试，部署前仍需在 IE 11 中验证实际应用。不支持 IE 10 及更早版本。VitePress 文档站和 Vite 示例页面本身需要现代浏览器。
 
+## 用户操作与 iframe 权限
+
+原生全屏**只能由**点击、触摸或按键等用户操作触发。不要先等待网络请求再调用全屏 API，以免用户激活状态过期。
+
+嵌入页面需要允许全屏，例如：
+
+```html
+<iframe src="/example/" allow="fullscreen" allowfullscreen></iframe>
+```
+
+父页面的 `Permissions-Policy` 仍可能限制全屏；仅添加 iframe 属性不能覆盖更严格的响应头策略。
+
 ## 能力检测与网页全屏降级
 
 在浏览器中读取 `fullscreen.isEnabled` 可判断当前文档是否允许使用原生全屏。它不表示是否已经进入全屏，也不保证下一次请求一定成功。
@@ -99,27 +96,3 @@ const nativeAvailable = fullscreen.isEnabled
 - 原生能力可用但请求被拒绝时，会报告错误并恢复 DOM，不会静默降级。API 调用应捕获 Promise 拒绝，组件使用 `error` 事件，指令使用 `fullscreen-error` 事件。
 
 网页全屏保留浏览器工具栏，只覆盖当前文档的视口。在 iframe 内，它只能覆盖 iframe 区域；`teleport` 也只会移动到该文档的 `body`，不能突破 iframe 边界。
-
-## 用户操作与 iframe 权限
-
-原生全屏需要点击、触摸或按键等用户操作触发。不要先等待网络请求再调用全屏 API，以免用户激活状态过期。
-
-嵌入页面需要允许全屏，例如：
-
-```html
-<iframe src="/example/" allow="fullscreen" allowfullscreen></iframe>
-```
-
-父页面的 `Permissions-Policy` 仍可能限制全屏；仅添加 iframe 属性不能覆盖更严格的响应头策略。
-
-## 退出全屏与状态同步
-
-用户可以按 Esc 或使用浏览器的退出控件。跳转到另一个文档、刷新、切换标签页或通过 Alt-Tab 切换应用，也可能导致浏览器退出原生全屏。具体行为由浏览器和系统决定，见 [MDN 全屏指南](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API/Guide#things_your_users_want_to_know)。
-
-不要假设只有自己的退出按钮会改变状态。组件通过 `v-model` 同步实际状态；API 和指令可通过 `callback` 更新页面状态。网页全屏不一定跟随切换应用自动退出，应保留可见的退出按钮。
-
-SPA 内部切换路由不等同于加载新文档：保留外层全屏目标时可以继续全屏，卸载目标组件则会退出。写法见[组件用法](/vue2/guide/component#切换页面内容时保持全屏)。
-
-## SSR
-
-导入包不需要浏览器环境，但 `request()` 等全屏操作只能在浏览器中执行。应在组件挂载后获取 DOM，再通过用户操作请求全屏。

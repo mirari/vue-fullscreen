@@ -1,17 +1,20 @@
 import DefaultTheme from 'vitepress/theme'
 import type { Theme } from 'vitepress'
+import { defineAsyncComponent } from 'vue'
 import FullscreenDemo from './FullscreenDemo.vue'
 import Vue2Demo from './Vue2Demo.vue'
 import './custom.css'
-import { fullscreen } from 'vue-fullscreen'
 
 export default {
   extends: DefaultTheme,
-  enhanceApp({ app, router }) {
+  enhanceApp({ app }) {
     app.component('FullscreenDemo', FullscreenDemo)
     app.component('Vue2Demo', Vue2Demo)
-    router.onBeforeRouteChange = async () => {
-      if (fullscreen.isFullscreen) await fullscreen.exit()
-    }
+    app.component(
+      'FullscreenPlayground',
+      defineAsyncComponent(
+        () => import('./playground/FullscreenPlayground.vue'),
+      ),
+    )
   },
 } satisfies Theme

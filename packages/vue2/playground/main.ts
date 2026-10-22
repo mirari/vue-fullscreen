@@ -1,17 +1,24 @@
 import Vue from 'vue'
 
-import { fullscreen, Fullscreen } from '../src/index'
+import { fullscreen, Fullscreen, vFullscreen } from '../src/index'
 import './style.css'
 const options = new URLSearchParams(location.search)
 const pageOnly = options.has('pageOnly')
+const comparison = options.get('compare')
+const kind = options.get('kind')
 const zh = options.get('lang') === 'zh'
 const text = zh
   ? {
       title: 'Vue 2 全屏示例',
       help: '组件与 API 示例。按 Esc 退出。',
+      pageHelp: '切换 pageOnly 后进入全屏，对比浏览器工具栏是否保留。',
+      teleportHelp: '进入全屏后点击图片，对比 body 弹窗是否可见。',
+      pageStatus: 'pageOnly: true · 保留浏览器工具栏',
+      nativeStatus: 'pageOnly: false · 浏览器隐藏工具栏',
       enter: '进入组件全屏',
       content: '全屏内容',
       details: '详情',
+      image: '图片',
       hiddenPopup:
         '弹窗已挂载到 body，但在当前原生全屏元素之外。退出并开启 teleport 后再试。',
       exit: '退出全屏',
@@ -21,9 +28,16 @@ const text = zh
   : {
       title: 'Vue 2 Fullscreen',
       help: 'Component and API examples. Use Escape to exit.',
+      pageHelp:
+        'Toggle pageOnly and enter fullscreen to compare browser toolbar visibility.',
+      teleportHelp:
+        'Enter fullscreen and click the image to compare body popup visibility.',
+      pageStatus: 'pageOnly: true · the browser toolbar stays visible',
+      nativeStatus: 'pageOnly: false · the browser hides its toolbar',
       enter: 'Enter component fullscreen',
       content: 'Fullscreen content',
       details: 'Details',
+      image: 'Image',
       hiddenPopup:
         'The popup is mounted under body, outside the current native fullscreen element. Exit and enable teleport to see it.',
       exit: 'Exit',
@@ -33,8 +47,17 @@ const text = zh
 document.documentElement.lang = zh ? 'zh-CN' : 'en'
 
 new Vue({
-  data: { active: false, error: '', teleport: true, popup: false },
+  directives: { fullscreen: vFullscreen },
+  data: {
+    active: false,
+    error: '',
+    teleport: !comparison,
+    popup: false,
+  },
   watch: {
+    active(value: boolean) {
+      if (!value) this.popup = false
+    },
     popup(value: boolean) {
       const popup = document.querySelector<HTMLElement>('#body-popup')
       if (popup) popup.hidden = !value
@@ -60,38 +83,118 @@ new Vue({
   beforeDestroy() {
     document.querySelector('#body-popup')?.remove()
   },
+  methods: {
+    changed(isFullscreen: boolean) {
+      this.active = isFullscreen
+    },
+    report(error: Error) {
+      this.error = error.message
+    },
+    enter() {
+      if (kind === 'api')
+        void fullscreen
+          .request('target', {
+            pageOnly,
+            teleport: this.teleport,
+            callback: this.changed,
+          })
+          .catch(this.report)
+      else this.active = true
+    },
+    exit() {
+      if (kind === 'api' || kind === 'directive')
+        void fullscreen.exit().catch(this.report)
+      else this.active = false
+    },
+  },
   render(h) {
+    const picture = h('img', {
+      class: 'demo-picture',
+      attrs: {
+        src: 'https://picsum.photos/id/10/1280/720',
+        alt: text.image,
+        width: 1280,
+        height: 720,
+      },
+    })
     return h('main', [
       h('h1', text.title),
-      h('p', text.help),
-      h('label', [
-        h('input', {
-          attrs: { type: 'checkbox', id: 'teleport', disabled: this.active },
-          domProps: { checked: this.teleport },
-          on: {
-            change: (event: Event) => {
-              this.teleport = (event.target as HTMLInputElement).checked
-            },
-          },
-        }),
-        'teleport',
-      ]),
+      h(
+        'p',
+        comparison === 'pageOnly'
+          ? text.pageHelp
+          : comparison === 'teleport'
+            ? text.teleportHelp
+            : text.help,
+      ),
+      comparison === 'pageOnly'
+        ? null
+        : h('label', [
+            h('input', {
+              attrs: {
+                type: 'checkbox',
+                id: 'teleport',
+                disabled: this.active,
+              },
+              domProps: { checked: this.teleport },
+              on: {
+                change: (event: Event) => {
+                  this.teleport = (event.target as HTMLInputElement).checked
+                },
+              },
+            }),
+            'teleport',
+          ]),
+      comparison || kind
+        ? h('p', [
+            h(
+              'code',
+              comparison === 'pageOnly'
+                ? `{ pageOnly: ${pageOnly} }`
+                : comparison === 'teleport'
+                  ? `{ teleport: ${this.teleport} }`
+                  : `{ pageOnly: ${pageOnly}, teleport: ${this.teleport} }`,
+            ),
+          ])
+        : null,
       h(
         'button',
         {
           attrs: { id: 'enter' },
+          directives:
+            kind === 'directive'
+              ? [
+                  {
+                    name: 'fullscreen',
+                    value: {
+                      target: '#target',
+                      pageOnly,
+                      teleport: this.teleport,
+                      callback: this.changed,
+                    },
+                  },
+                ]
+              : [],
           on: {
-            click: () => {
-              this.active = true
-            },
+            ...(kind === 'directive' ? {} : { click: this.enter }),
+            'fullscreen-error': (event: CustomEvent<Error>) =>
+              this.report(event.detail),
           },
         },
-        text.enter,
+        kind === 'directive'
+          ? zh
+            ? '点击指令按钮'
+            : 'Toggle with directive'
+          : kind === 'api'
+            ? zh
+              ? '进入全屏'
+              : 'Enter fullscreen'
+            : text.enter,
       ),
       h(
-        Fullscreen,
+        kind === 'directive' || kind === 'api' ? 'section' : Fullscreen,
         {
-          attrs: { id: 'target' },
+          attrs: { id: 'target', class: 'demo-target' },
           props: { value: this.active, pageOnly, teleport: this.teleport },
           on: {
             input: (v: boolean) => {
@@ -104,59 +207,73 @@ new Vue({
           },
         },
         [
-          h('p', text.content),
-          h(
-            'button',
-            {
-              attrs: {
-                id: 'popup',
-                'aria-expanded': String(this.popup),
-                'aria-controls': 'body-popup',
+          h('div', { class: 'picture-topbar' }, [
+            h('p', text.content),
+            h(
+              'button',
+              {
+                attrs: { id: 'exit' },
+                on: { click: this.exit },
               },
-              on: {
-                click: () => {
-                  this.popup = !this.popup
+              text.exit,
+            ),
+          ]),
+          comparison === 'pageOnly' && this.active
+            ? h(
+                'p',
+                { attrs: { role: 'status' } },
+                pageOnly ? text.pageStatus : text.nativeStatus,
+              )
+            : null,
+          comparison === 'pageOnly'
+            ? picture
+            : h(
+                'button',
+                {
+                  class: 'image-trigger',
+                  attrs: {
+                    id: 'popup',
+                    type: 'button',
+                    'aria-label': text.details,
+                    'aria-expanded': String(this.popup),
+                    'aria-controls': 'body-popup',
+                  },
+                  on: {
+                    click: () => {
+                      this.popup = !this.popup
+                    },
+                  },
                 },
-              },
-            },
-            text.details,
-          ),
+                [picture],
+              ),
           this.active && this.popup && !this.teleport && !pageOnly
             ? h('p', { attrs: { role: 'status' } }, text.hiddenPopup)
             : null,
-          h(
-            'button',
-            {
-              attrs: { id: 'exit' },
-              on: {
-                click: () => {
-                  this.active = false
-                },
-              },
-            },
-            text.exit,
-          ),
         ],
       ),
-      h(
-        'button',
-        {
-          attrs: { id: 'api' },
-          on: {
-            click: () =>
-              fullscreen
-                .toggle(document.querySelector('#api-target'), {
-                  pageOnly,
-                  teleport: true,
-                })
-                .catch((e) => {
-                  this.error = e.message
-                }),
-          },
-        },
-        text.toggle,
-      ),
-      h('section', { attrs: { id: 'api-target' } }, text.api),
+      comparison || kind
+        ? null
+        : h(
+            'button',
+            {
+              attrs: { id: 'api' },
+              on: {
+                click: () =>
+                  fullscreen
+                    .toggle(document.querySelector('#api-target'), {
+                      pageOnly,
+                      teleport: true,
+                    })
+                    .catch((e) => {
+                      this.error = e.message
+                    }),
+              },
+            },
+            text.toggle,
+          ),
+      comparison || kind
+        ? null
+        : h('section', { attrs: { id: 'api-target' } }, text.api),
       h('output', { attrs: { id: 'state' } }, String(this.active)),
       h('p', { attrs: { role: 'alert' } }, this.error),
     ])

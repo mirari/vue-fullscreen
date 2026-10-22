@@ -106,7 +106,7 @@ If npm publishing succeeds but GitHub Release creation fails, re-run only the fa
 ## Migration notes
 
 - Component/directive/API import names and both Vue model conventions remain supported. Vue 2 retains its plugin; Vue 3 uses named imports without a plugin default export or instance globals.
-- Prefer `Fullscreen`, `vFullscreen` and `fullscreen` for named imports; the old `component`, `directive` and `api` exports remain aliases. Vue 3 also exports `useFullscreen(target, options)` for independent reactive sessions with `pageOnly` and `teleport` support and component unmount cleanup.
+- Vue 3 exposes `Fullscreen`, `vFullscreen` and `useFullscreen(target, options)`. Each composable call owns its reactive state and session, with component unmount cleanup; calls outside components must exit explicitly. The `component` and `directive` aliases remain. Vue 2 retains its plugin and the `fullscreen` / `api` singleton.
 - Vue 2 minimum is explicitly 2.6.14; releases before 2.6.14 are outside the validated support range.
 - Output paths change to root-level `index.js`, `index.cjs`, and `index.umd.js`; update direct CDN/deep-file URLs. Package-root imports use `exports` and need no path change.
 - Declaration entries are generated rather than maintained separately; public component types avoid exposing build-time Vue internal generics.

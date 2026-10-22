@@ -1,8 +1,12 @@
 # FAQ
 
+## Why can't the page enter native fullscreen automatically on load?
+
+Native fullscreen **can only be triggered by** a user interaction such as a click, touch or key press. This is a browser user activation requirement. Request fullscreen directly in the event handler; waiting for a network response or timer may let user activation expire. Use `pageOnly: true` if content needs to expand automatically without a user interaction. See [user activation and iframe permissions](/en/vue2/guide/compatibility#user-activation-and-iframe-permissions).
+
 ## Why does a native fullscreen request fail?
 
-Check the error event or rejected Promise. The browser requires a direct user gesture; requests made after a network call, timer or automatic mount can be rejected. An iframe also needs permission from its host to use fullscreen.
+Check the error event or rejected Promise. An iframe also needs permission from its host to use fullscreen.
 
 `isEnabled` only indicates API support. Try `pageOnly` to distinguish native permission issues from other problems.
 
@@ -31,11 +35,3 @@ Apply background, scrolling and stacking styles through `fullscreenClass`. The l
 ## Can I use SSR or Nuxt?
 
 The package can be imported on the server. Read DOM elements after mount and request native fullscreen from a browser user action. Do not call `fullscreen.request()` on the server.
-
-## Why does API state not update the UI?
-
-`fullscreen.isFullscreen` is not a reactive ref. Use `callback` to update Vue state, or use the component's `v-model`.
-
-## How should I handle route changes?
-
-The component cleans up on unmount. When using the API or directive directly, await `fullscreen.exit()` before the route removes the target. Removing a directive only removes its click listener; it does not own the shared API session.

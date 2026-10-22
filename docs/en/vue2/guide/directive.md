@@ -2,6 +2,12 @@
 
 Register the directive locally, then click the button to toggle a target element.
 
+::: tip On this page
+See the [**directive reference**](#reference) for all binding values, modifiers and options.
+:::
+
+<ClientOnly><Vue2Demo kind="directive" /></ClientOnly>
+
 ```vue
 <template>
   <div>
@@ -40,13 +46,15 @@ export default {
 </button>
 ```
 
-`target` may also be an existing HTML element. Selectors are resolved on click. A selector with no matching element reports an error rather than targeting the body.
+`target` also accepts HTML elements, Vue refs, component instances (using `$el`) and getters. The current target is resolved on entry. Strings passed directly are CSS selectors; use `'#report'` for an id.
+
+An unresolved target dispatches `fullscreen-error`. Omitting `target` or passing `null` directly uses `document.body`.
 
 ## Modifiers and options
 
 `.pageOnly` and `.teleport` set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
 
-The binding object also accepts `fullscreenClass` and `callback(active)`. The directive uses the shared API, so `fullscreen.exit()` can exit a session started by a directive.
+The binding object also accepts `fullscreenClass` and `callback(isFullscreen)`. The directive uses the shared API, so `fullscreen.exit()` can exit a session started by a directive.
 
 ## Errors
 
@@ -59,3 +67,19 @@ button.addEventListener('fullscreen-error', (event) => {
 ```
 
 A button outside the fullscreen target may not be visible in native mode. Put an exit button inside the target, or use Esc.
+
+## Reference
+
+```ts
+interface DirectiveOptions extends ApiOptions {
+  target?: FullscreenTarget
+}
+```
+
+| Option            | Type                              | Default         | Purpose                                      |
+| ----------------- | --------------------------------- | --------------- | -------------------------------------------- |
+| `target`          | `FullscreenTarget`                | `document.body` | Target; direct strings are CSS selectors     |
+| `pageOnly`        | `boolean`                         | `false`         | Use page-only mode                           |
+| `teleport`        | `boolean`                         | `false`         | Move to the body; disabled for a body target |
+| `fullscreenClass` | `string`                          | `'fullscreen'`  | Class to add while active                    |
+| `callback`        | `(isFullscreen: boolean) => void` | None            | Report changes in state                      |

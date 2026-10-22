@@ -16,7 +16,7 @@ function navigation(english: boolean, vue2 = false) {
       { text: english ? 'Usage' : '使用方法', link: link('/guide/component') },
       {
         text: english ? 'Reference' : '参考',
-        link: link('/reference/api'),
+        link: link('/guide/faq'),
       },
       { text: 'Vue 2', link: english ? '/en/vue2/' : '/vue2/' },
     ],
@@ -46,15 +46,16 @@ function navigation(english: boolean, vue2 = false) {
             link: link('/guide/directive'),
           },
           { text: 'API', link: link('/guide/api') },
+          { text: 'Playground', link: link('/playground') },
+          {
+            text: english ? 'More examples' : '更多示例',
+            link: link('/guide/examples'),
+          },
         ],
       },
       {
         text: english ? 'Reference' : '参考',
         items: [
-          {
-            text: english ? 'API reference' : '完整 API',
-            link: link('/reference/api'),
-          },
           { text: english ? 'FAQ' : '常见问题', link: link('/guide/faq') },
           {
             text: english ? 'Feedback' : '问题反馈',

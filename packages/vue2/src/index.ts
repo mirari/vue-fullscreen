@@ -20,6 +20,7 @@ import type {
 export { api as fullscreen, api, screenfull } from '../../core/src/index'
 export type {
   ApiOptions,
+  FullscreenTarget,
   VueFullscreenApi,
   InstallationOptions,
   DirectiveOptions,
@@ -64,11 +65,11 @@ const implementation = Vue.extend({
         pageOnly: this.pageOnly,
         teleport: this.teleport,
         fullscreenClass: this.fullscreenClass,
-        callback: (value) => {
-          this.isFullscreen = value
-          this.$emit('change', value)
-          this.$emit('input', value)
-          this.$emit('update:fullscreen', value)
+        callback: (isFullscreen) => {
+          this.isFullscreen = isFullscreen
+          this.$emit('change', isFullscreen)
+          this.$emit('input', isFullscreen)
+          this.$emit('update:fullscreen', isFullscreen)
         },
       })
     },

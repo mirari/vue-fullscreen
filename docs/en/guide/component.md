@@ -2,6 +2,10 @@
 
 Wrap content in the component and use `v-model` to control fullscreen. When the user exits with Esc, the bound value returns to `false`.
 
+::: tip On this page
+See the [**component reference**](#reference) for all props, events and methods.
+:::
+
 <ClientOnly><FullscreenDemo /></ClientOnly>
 
 ## Local registration
@@ -37,16 +41,6 @@ function handleError(reason) {
 </template>
 ```
 
-## State and events
-
-The model uses `modelValue` and `update:modelValue`. `v-model` connects these automatically.
-
-- `change(active)` reports a change in fullscreen state.
-- `error(error)` reports a rejected operation triggered by a model change or wrapper click.
-- `update:fullscreen` supports the deprecated `fullscreen` prop. Prefer `v-model`.
-
-After a rejected request, reset your model to `false` so a later click can trigger another change. When you call an instance method directly, handle its returned Promise with `try/catch`.
-
 ## Component methods
 
 ```vue
@@ -72,21 +66,38 @@ async function enter() {
 </template>
 ```
 
-See the [component reference](/en/reference/api#component) for all props, events and methods.
+## Reference
 
-## Keep fullscreen while changing views
+### Props
 
-Keep the fullscreen container outside the view that changes. This applies to tabs as well as Vue Router: place `<router-view>` inside the stable container.
+| Prop                 | Type      | Default        | Purpose                                                               |
+| -------------------- | --------- | -------------- | --------------------------------------------------------------------- |
+| `modelValue`         | `boolean` | `false`        | `v-model` value                                                       |
+| `pageOnly`           | `boolean` | `false`        | Fill the page; automatic fallback if native fullscreen is unavailable |
+| `teleport`           | `boolean` | `false`        | Move the element to the body while active                             |
+| `fullscreenClass`    | `string`  | `'fullscreen'` | Class applied while active                                            |
+| `exitOnClickWrapper` | `boolean` | `true`         | Exit on wrapper background clicks, not child clicks                   |
+| `fullscreen`         | `boolean` | `false`        | Deprecated model prop                                                 |
 
-```vue
-<Fullscreen v-model="active" teleport :exit-on-click-wrapper="false">
-  <nav>
-    <router-link to="/chart">Chart</router-link>
-    <router-link to="/table">Table</router-link>
-  </nav>
-  <router-view />
-  <button @click="active = false">Exit fullscreen</button>
-</Fullscreen>
-```
+Do not supply conflicting model values.
 
-This fragment belongs in the persistent application layout. Import `Fullscreen` and declare `active` as in the earlier examples, and configure your routes. SPA navigation replaces the inner view; the fullscreen container must remain mounted. Putting a separate fullscreen component inside each route destroys it on navigation and exits fullscreen. Loading another document or reloading the page cannot preserve fullscreen.
+### Events
+
+| Event               | Argument     | Purpose                                                      |
+| ------------------- | ------------ | ------------------------------------------------------------ |
+| `change`            | `boolean`    | Fullscreen state changed                                     |
+| `update:modelValue` | `boolean`    | Synchronize `v-model`                                        |
+| `update:fullscreen` | `boolean`    | Synchronize the deprecated model                             |
+| `error`             | Error object | A model change or wrapper click triggered a failed operation |
+
+### Instance members
+
+| Member         | Type / signature                   | Purpose                  |
+| -------------- | ---------------------------------- | ------------------------ |
+| `request`      | `(): Promise<void>`                | Enter fullscreen         |
+| `exit`         | `(): Promise<void>`                | Exit fullscreen          |
+| `toggle`       | `(force?: boolean): Promise<void>` | Toggle or force a state  |
+| `isFullscreen` | `boolean`                          | Current fullscreen state |
+| `isEnabled`    | `boolean`                          | Native API support       |
+
+Handle rejected Promises when calling methods directly. The component cleans up listeners and moved DOM nodes on unmount.

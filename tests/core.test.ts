@@ -3,6 +3,7 @@ import {
   api,
   bindDirective,
   createFullscreen,
+  disposeDirective,
   unbindDirective,
 } from '../packages/core/src/index'
 import screenfull from 'screenfull'
@@ -51,6 +52,74 @@ function target() {
   return document.querySelector<HTMLElement>('#target')!
 }
 describe('fullscreen lifecycle', () => {
+  it.each(['target', '#target', 'panel:1', '#panel:1'])(
+    'resolves the id %s on each request without CSS selector parsing',
+    async (id) => {
+      const node = target()
+      node.id = id.charAt(0) === '#' ? id.slice(1) : id
+      const controller = createFullscreen()
+      await controller.request(id, { pageOnly: true })
+      expect(controller.element).toBe(node)
+      await controller.exit()
+      const replacement = node.cloneNode() as HTMLElement
+      node.replaceWith(replacement)
+      await controller.toggle(id, { pageOnly: true })
+      expect(controller.element).toBe(replacement)
+      await controller.exit()
+    },
+  )
+  it('resolves ref values, component roots and getters at request time', async () => {
+    const first = target()
+    const second = document.createElement('div')
+    document.body.append(second)
+    const component = { $el: first, value: 'component model' }
+    const templateRef = { value: component }
+    const controller = createFullscreen()
+    for (const input of [templateRef, component, () => first]) {
+      await controller.request(input, { pageOnly: true })
+      expect(controller.element).toBe(first)
+      await controller.exit()
+    }
+    templateRef.value = { ...component, $el: second }
+    await controller.request(templateRef, { pageOnly: true })
+    expect(controller.element).toBe(second)
+    await controller.exit()
+    // Form controls also have a value property, but are already DOM targets.
+    const formControl = document.createElement('input')
+    formControl.value = 'missing-id'
+    document.body.append(formControl)
+    await controller.request(formControl, { pageOnly: true })
+    expect(controller.element).toBe(formControl)
+    await controller.exit()
+  })
+  it('rejects unresolved targets without entering body fullscreen and can retry', async () => {
+    const controller = createFullscreen()
+    const templateRef: { value: HTMLElement | null | undefined } = {
+      value: null,
+    }
+    for (const input of [
+      templateRef,
+      { value: undefined },
+      () => null,
+      '#missing',
+    ]) {
+      await expect(controller.request(input)).rejects.toThrow(
+        /HTML element|target not found/,
+      )
+      expect(controller.element).toBeNull()
+      expect(controller.isFullscreen).toBe(false)
+      expect(document.body.classList.contains('fullscreen')).toBe(false)
+    }
+    await expect(
+      controller.request(() => {
+        throw new Error('Target unavailable')
+      }),
+    ).rejects.toThrow('Target unavailable')
+    templateRef.value = target()
+    await controller.request(templateRef, { pageOnly: true })
+    expect(controller.element).toBe(templateRef.value)
+    await controller.exit()
+  })
   it('restores teleported position, inline priorities and existing classes', async () => {
     const node = target(),
       parent = node.parentNode,
@@ -155,6 +224,34 @@ describe('fullscreen lifecycle', () => {
   })
 })
 describe('directive lifecycle', () => {
+  it('cleans up the owning directive while allowing other bound buttons to enter again', async () => {
+    const node = target()
+    const parent = node.parentNode
+    const first = document.createElement('button')
+    const second = document.createElement('button')
+    const binding = {
+      value: { target: node, pageOnly: true, teleport: true },
+      modifiers: {},
+    }
+    bindDirective(first, binding)
+    bindDirective(second, binding)
+    first.click()
+    expect(node.parentNode).toBe(document.body)
+    // A second directive can act as the exit control for the same session.
+    second.click()
+    expect(api.isFullscreen).toBe(false)
+    second.click()
+    disposeDirective(first)
+    expect(api.isFullscreen).toBe(true)
+    disposeDirective(second)
+    expect(node.parentNode).toBe(parent)
+    expect(node.className).toBe('existing')
+    expect(api.isFullscreen).toBe(false)
+    bindDirective(first, binding)
+    first.click()
+    expect(api.isFullscreen).toBe(true)
+    disposeDirective(first)
+  })
   it('updates the click binding once and removes it on unbind', async () => {
     const node = target(),
       button = document.createElement('button')

@@ -1,0 +1,71 @@
+name: 问题反馈 / Bug report
+description: 报告可复现的问题 / Report a reproducible problem
+title: '[Bug]: '
+body:
+  - type: markdown
+    attributes:
+      value: 可以使用中文或英文填写。 / You can write in Chinese or English.
+  - type: input
+    id: package-version
+    attributes:
+      label: vue-fullscreen 版本 / vue-fullscreen version
+      placeholder: 实际安装的完整版本号 / Exact installed version
+    validations:
+      required: true
+  - type: input
+    id: vue-version
+    attributes:
+      label: Vue 版本 / Vue version
+      placeholder: 实际安装的完整版本号 / Exact installed version
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 运行环境 / Environment
+      description: 浏览器及版本、操作系统和设备。 / Browser and version, operating system and device.
+    validations:
+      required: true
+  - type: dropdown
+    id: usage
+    attributes:
+      label: 使用方式 / Usage
+      multiple: true
+      options:
+        - 组件 / Component
+        - 指令 / Directive
+        - useFullscreen (Vue 3)
+        - fullscreen / $fullscreen (Vue 2)
+        - 其他或不确定 / Other or unsure
+  - type: textarea
+    id: fullscreen-options
+    attributes:
+      label: 全屏配置 / Fullscreen options
+      description: 提供实际使用的配置，包括 pageOnly 和 teleport。 / Include your actual options, including pageOnly and teleport.
+      placeholder: |
+        pageOnly: ...
+        teleport: ...
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现代码与步骤 / Reproduction
+      description: 提供 CodePen、最小复现仓库或代码，并说明具体操作步骤。 / Include a CodePen, minimal repository or code, and the steps to reproduce.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期行为 / Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为 / Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 错误信息与补充材料 / Errors and additional context
+      description: 如有控制台错误、截图或录屏，请附在这里。 / Include console errors, screenshots or recordings if available.

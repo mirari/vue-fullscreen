@@ -92,15 +92,16 @@ for (const [line, versions] of [
       }
       const composable = line === 'vue3' ? ', useFullscreen' : ''
       const pluginImport = line === 'vue2' ? 'plugin, ' : ''
+      const singletonImport = line === 'vue2' ? 'fullscreen, ' : ''
       const invalidPlugin = (namespace) =>
         line === 'vue2'
-          ? `!${namespace}.default?.install`
-          : `'default' in ${namespace}`
+          ? `!${namespace}.default?.install || !${namespace}.fullscreen`
+          : `'default' in ${namespace} || 'fullscreen' in ${namespace} || 'api' in ${namespace} || !${namespace}.useFullscreen`
       const checkComposable =
         line === 'vue3'
           ? "const controls = useFullscreen(); if (controls.isFullscreen.value || controls.isSupported.value) throw Error('Invalid SSR composable');"
           : ''
-      const esm = `${polyfillImport}import * as exports from 'vue-fullscreen'; import ${pluginImport}{ fullscreen, Fullscreen, vFullscreen, screenfull${composable} } from 'vue-fullscreen'; if (${invalidPlugin('exports')} || !Fullscreen || !vFullscreen || !screenfull || fullscreen.isFullscreen) throw Error('Invalid exports'); ${checkComposable} console.log('SSR ESM OK')`
+      const esm = `${polyfillImport}import * as exports from 'vue-fullscreen'; import ${pluginImport}{ ${singletonImport}Fullscreen, vFullscreen, screenfull${composable} } from 'vue-fullscreen'; if (${invalidPlugin('exports')} || !Fullscreen || !vFullscreen || !screenfull) throw Error('Invalid exports'); ${checkComposable} console.log('SSR ESM OK')`
       execFileSync('node', ['--input-type=module', '-e', esm], {
         cwd: directory,
         stdio: 'inherit',
@@ -110,7 +111,7 @@ for (const [line, versions] of [
         [
           '--input-type=commonjs',
           '-e',
-          `${line === 'vue2' ? "require('vue-fullscreen/polyfills');" : ''} const p = require('vue-fullscreen'); if (${invalidPlugin('p')} || !p.fullscreen || !p.Fullscreen || !p.vFullscreen || (${line === 'vue3'} && !p.useFullscreen)) throw Error('Invalid CJS exports'); console.log('SSR CJS OK')`,
+          `${line === 'vue2' ? "require('vue-fullscreen/polyfills');" : ''} const p = require('vue-fullscreen'); if (${invalidPlugin('p')} || !p.Fullscreen || !p.vFullscreen) throw Error('Invalid CJS exports'); console.log('SSR CJS OK')`,
         ],
         { cwd: directory, stdio: 'inherit' },
       )
@@ -125,7 +126,7 @@ for (const [line, versions] of [
         const { runInNewContext } = require('node:vm');
         const context = { Vue: require('vue') };
         runInNewContext(readFileSync(join(dirname(require.resolve('vue-fullscreen/package.json')), 'index.umd.js'), 'utf8'), context);
-        if (${invalidPlugin('context.VueFullscreen')} || !context.VueFullscreen.fullscreen || !context.VueFullscreen.Fullscreen || !context.VueFullscreen.vFullscreen) throw Error('Invalid browser-global exports');
+        if (${invalidPlugin('context.VueFullscreen')} || !context.VueFullscreen.Fullscreen || !context.VueFullscreen.vFullscreen) throw Error('Invalid browser-global exports');
         console.log('UMD OK');
       `,
         ],
@@ -144,7 +145,7 @@ for (const [line, versions] of [
         const dom = new JSDOM('<main id="mount"></main>');
         for (const key of ['window', 'document', 'Element', 'HTMLElement', 'SVGElement', 'Node']) globalThis[key] = dom.window[key];
         const vue = await import('vue');
-        const { Fullscreen: component } = await import('vue-fullscreen');
+        const { Fullscreen: component, fullscreen, useFullscreen } = await import('vue-fullscreen');
         let instance, close;
         if (${JSON.stringify(line)} === 'vue2') {
           const app = new vue.default({ render(h) { return h(component, { ref: 'fs', props: { pageOnly: true, teleport: true } }, ['content']) } }).$mount('#mount');
@@ -159,6 +160,16 @@ for (const [line, versions] of [
         if (!instance.isFullscreen || !document.querySelector('body > .fullscreen')) throw Error('Component enter failed');
         await instance.exit();
         if (instance.isFullscreen || document.querySelector('.fullscreen')) throw Error('Component exit failed');
+        if (${JSON.stringify(line)} === 'vue2') {
+          await fullscreen.request(instance, { pageOnly: true });
+          if (fullscreen.element !== instance.$el) throw Error('Component target resolution failed');
+          await fullscreen.exit();
+        } else {
+          const controls = useFullscreen(instance, { pageOnly: true });
+          await controls.enter();
+          if (!controls.isFullscreen.value || !instance.$el.classList.contains('fullscreen')) throw Error('Component target resolution failed');
+          await controls.exit();
+        }
         close(); dom.window.close();
         console.log('Installed component lifecycle OK');
       `,
@@ -173,9 +184,31 @@ exports.default;
 // @ts-expect-error Vue 3 does not augment instance globals.
 type RemovedGlobal = ComponentCustomProperties['$fullscreen'];
 // @ts-expect-error Plugin installation options belong to Vue 2 only.
-type RemovedOptions = import('vue-fullscreen').InstallationOptions;`
+type RemovedOptions = import('vue-fullscreen').InstallationOptions;
+// @ts-expect-error Vue 3 exposes independent composables instead of a singleton.
+exports.fullscreen;
+// @ts-expect-error The singleton alias is not public in Vue 3.
+exports.api;
+// @ts-expect-error Singleton API types belong to Vue 2 only.
+type RemovedApi = import('vue-fullscreen').VueFullscreenApi;`
           : ''
-      const source = `${polyfillImport}import ${pluginImport}{ fullscreen, Fullscreen, vFullscreen${composable}, type ApiOptions } from 'vue-fullscreen'; const options: ApiOptions = { pageOnly: true }; const result: Promise<void> = fullscreen.request(undefined, options); ${checkComposable} void [${line === 'vue2' ? 'plugin, ' : ''}Fullscreen, vFullscreen, result];\n${removedPluginTypes}\n`
+      const targetTypes = `
+const element = document.createElement('section');
+const targetRef: FullscreenTarget = { value: element };
+const componentRoot: FullscreenTarget = { $el: element };
+${['element', 'targetRef', 'componentRoot', "'panel'", "'#panel'", '() => element'].map((target) => (line === 'vue2' ? `fullscreen.request(${target}, options);` : `useFullscreen(${target}, options);`)).join('\n')}
+${
+  line === 'vue3'
+    ? `import { ref } from 'vue';
+const vueTarget = ref<HTMLElement | null>(null);
+const componentTarget = ref<{ $el: HTMLElement } | null>(null);
+useFullscreen(vueTarget);
+useFullscreen(componentTarget);
+useFullscreen('#panel');`
+    : ''
+}
+`
+      const source = `${polyfillImport}import ${pluginImport}{ ${singletonImport}Fullscreen, vFullscreen${composable}, type ApiOptions, type FullscreenTarget } from 'vue-fullscreen'; const options: ApiOptions = { pageOnly: true }; const result: Promise<void> = ${line === 'vue2' ? 'fullscreen.request(undefined, options)' : 'useFullscreen(undefined, options).enter()'}; ${checkComposable} void [${line === 'vue2' ? 'plugin, ' : ''}Fullscreen, vFullscreen, result];\n${targetTypes}\n${removedPluginTypes}\n`
       writeFileSync(join(directory, 'consumer.mts'), source)
       writeFileSync(join(directory, 'consumer.cts'), source)
       execFileSync(

@@ -9,8 +9,8 @@ hero:
       text: 快速上手
       link: /guide/getting-started
     - theme: alt
-      text: 完整 API
-      link: /reference/api
+      text: Playground
+      link: /playground
 features:
   - title: 组件
     details: 使用 v-model 控制全屏状态。用户退出全屏时，绑定值会同步更新。
@@ -19,7 +19,7 @@ features:
     details: 为按钮添加点击切换全屏的行为，可指定目标元素和全屏选项。
     link: /guide/directive
   - title: API
-    details: 使用 request、toggle 和 exit 控制 DOM 元素，操作结果通过 Promise 返回。
+    details: 通过 useFullscreen 获取响应式状态，使用 enter、exit 和 toggle 控制全屏。
     link: /guide/api
 ---
 

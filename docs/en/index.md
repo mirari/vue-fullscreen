@@ -9,8 +9,8 @@ hero:
       text: Quick start
       link: /en/guide/getting-started
     - theme: alt
-      text: API reference
-      link: /en/reference/api
+      text: Playground
+      link: /en/playground
 features:
   - title: Component
     details: Control fullscreen with v-model. The bound value updates when the user exits fullscreen.
@@ -19,7 +19,7 @@ features:
     details: Toggle fullscreen when a button is clicked, with a target element and optional settings.
     link: /en/guide/directive
   - title: API
-    details: Control a DOM element with request, toggle and exit. Each operation returns a Promise.
+    details: Get reactive state and control fullscreen with useFullscreen, enter, exit and toggle.
     link: /en/guide/api
 ---
 

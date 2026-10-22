@@ -2,7 +2,7 @@
 
 ## Package and API versions
 
-Stable Vue 3 releases use the default `latest` channel:
+Vue `3.0+` is supported. Stable releases use the default `latest` channel:
 
 ```sh
 npm install vue-fullscreen
@@ -10,30 +10,9 @@ npm install vue-fullscreen
 
 This API reference describes `4.0.0`, which is not yet published. For Vue 2, use `vue-fullscreen@legacy`; see [Vue 2 compatibility](/en/vue2/guide/compatibility).
 
-## Supported environments
-
-| Item           | Support                                                |
-| -------------- | ------------------------------------------------------ |
-| Vue            | `3.0+`                                                 |
-| Browser target | ES2018; Internet Explorer is not supported             |
-| SSR            | Importing is supported; operations require the browser |
-
-Examples using `<script setup>` require Vue 3.2+. For Vue 3.0/3.1, use a regular `setup()` function and register imported components and directives through the `components` and `directives` options. Vue 3.0's declarations may require `skipLibCheck` with modern TypeScript.
-
-## Model events
-
-```vue
-<fullscreen v-model="active">Content</fullscreen>
-
-<!-- Equivalent explicit binding -->
-<fullscreen :model-value="active" @update:model-value="active = $event" />
-```
-
-The deprecated `fullscreen` / `update:fullscreen` pair is retained for compatibility. Do not control a component with conflicting model values.
-
 ## Fullscreen API browser support
 
-Native fullscreen is provided by the browser. See [Can I use: Fullscreen API](https://caniuse.com/fullscreen) for version coverage and [MDN's requestFullscreen compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility) for device restrictions. This overview was checked on 2026-10-09.
+Native fullscreen is provided by the browser. See [Can I use: Fullscreen API](https://caniuse.com/fullscreen) for version coverage and [MDN's requestFullscreen compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility) for device restrictions.
 
 | Browser / device         | Native fullscreen support                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------ |
@@ -55,26 +34,9 @@ iPad fullscreen displays browser-provided exit controls, and system gestures suc
 
 This package requires Vue 3 and does not support IE. Adding a `Promise` polyfill cannot supply the Proxy support required by Vue 3. For IE 11, use the separate [Vue 2 package and compatibility guide](/en/vue2/guide/compatibility).
 
-## Capability detection and page-only fallback
-
-Read `fullscreen.isEnabled` in the browser to check whether the current document allows native fullscreen. It does not indicate whether fullscreen is active or guarantee that the next request will succeed.
-
-```js
-import { fullscreen } from 'vue-fullscreen'
-
-// Read after mount or during a user interaction
-const nativeAvailable = fullscreen.isEnabled
-```
-
-- When native fullscreen is unavailable, the component, directive and API fall back to page-only mode.
-- Explicitly setting `pageOnly: true` (`page-only` on the component) always uses page-only mode.
-- If the native capability is available but a request is rejected, the library reports the error and restores the DOM without silently falling back. Catch API Promise rejections; use the component's `error` event or the directive's `fullscreen-error` event.
-
-Page-only mode keeps the browser toolbar and fills only the current document's viewport. Inside an iframe, it fills the frame. `teleport` moves the target to that document's `body`; it cannot escape the iframe boundary.
-
 ## User activation and iframe permissions
 
-Native fullscreen must be triggered by a click, touch or key interaction. Avoid waiting for a network request before calling the API, as user activation may expire.
+Native fullscreen **can only be triggered by** a user interaction such as a click, touch or key press. Avoid waiting for a network request before calling the API, as user activation may expire.
 
 An embedded document needs fullscreen permission, for example:
 
@@ -84,14 +46,20 @@ An embedded document needs fullscreen permission, for example:
 
 The parent document's `Permissions-Policy` can still restrict fullscreen. An iframe attribute cannot override a stricter response-header policy.
 
-## Exiting fullscreen and tracking state
+## Capability detection and page-only fallback
 
-Users can press Esc or use browser exit controls. Loading another document, reloading, switching tabs or changing applications with Alt-Tab can also exit native fullscreen. Behavior depends on the browser and operating system; see the [MDN fullscreen guide](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API/Guide#things_your_users_want_to_know).
+Read the `isSupported` ref returned by `useFullscreen()` in the browser to check whether the current document allows native fullscreen. It does not indicate whether fullscreen is active or guarantee that the next request will succeed.
 
-Do not assume your exit button is the only source of state changes. The component synchronizes actual state through `v-model`; use `callback` to track API and directive state. Page-only mode does not necessarily exit when changing applications, so keep an exit button visible.
+```js
+import { useFullscreen } from 'vue-fullscreen'
 
-SPA route changes differ from loading another document: fullscreen can continue while the outer target remains mounted, whereas unmounting the fullscreen component exits it. See [component usage](/en/guide/component#keep-fullscreen-while-changing-views).
+// Read after mount or during a user interaction
+const { isSupported } = useFullscreen()
+const nativeAvailable = isSupported.value
+```
 
-## SSR
+- When native fullscreen is unavailable, the component, directive and API fall back to page-only mode.
+- Explicitly setting `pageOnly: true` (`page-only` on the component) always uses page-only mode.
+- If the native capability is available but a request is rejected, the library reports the error and restores the DOM without silently falling back. Catch API Promise rejections; use the component's `error` event or the directive's `fullscreen-error` event.
 
-Importing the package does not require a browser, but fullscreen operations such as `request()` do. Obtain DOM elements after mount and request fullscreen during a user interaction.
+Page-only mode keeps the browser toolbar and fills only the current document's viewport. Inside an iframe, it fills the frame. `teleport` moves the target to that document's `body`; it cannot escape the iframe boundary.

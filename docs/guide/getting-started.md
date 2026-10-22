@@ -63,7 +63,51 @@ const { toggle } = useFullscreen()
 </template>
 ```
 
+## 其他导入方式
+
+### CommonJS
+
+```js
+const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
+```
+
+### 浏览器全局
+
+通过 UNPKG 加载 Vue 3 的最新版本和本包的 `latest` 渠道，先加载 Vue：
+
+::: info 发布渠道
+此示例使用尚未发布的 v4 接口。目前 npm 的 `latest` 仍指向 Vue 2 旧版；v4 发布到 `latest` 后即可使用。版本说明见[兼容性](/guide/compatibility)。
+:::
+
+```html
+<div id="app">
+  <fullscreen v-model="active">
+    <button @click="active = !active">
+      {{ active ? '退出全屏' : '进入全屏' }}
+    </button>
+  </fullscreen>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://unpkg.com/vue-fullscreen@latest"></script>
+<script>
+  Vue.createApp({
+    components: { fullscreen: VueFullscreen.Fullscreen },
+    data: () => ({ active: false }),
+  }).mount('#app')
+</script>
+```
+
+TypeScript 类型声明由 `exports` 根据 ESM 或 CommonJS 自动选择。
+
 ## 全屏选项
+
+### pageOnly
+
+`pageOnly` 决定使用原生全屏还是网页全屏，默认值为 `false`。
+
+- `false`：请求浏览器原生全屏，隐藏地址栏、标签栏等浏览器界面，适合看图、视频等沉浸式内容。
+- `true`：在当前网页内铺满视口，保留浏览器界面，适合编辑器、仪表盘等需要随时切换标签页的场景。
 
 |              | 原生全屏                       | 网页全屏                |
 | ------------ | ------------------------------ | ----------------------- |
@@ -73,17 +117,23 @@ const { toggle } = useFullscreen()
 | 用户手势     | 需要点击、按键等用户操作       | 不需要                  |
 | 退出         | 浏览器 Esc、退出按钮、`exit()` | Esc、退出按钮、`exit()` |
 
+<ClientOnly><FullscreenDemo compare-page-only /></ClientOnly>
+
 浏览器支持、自动降级和 iframe 权限见[兼容性](/guide/compatibility)。
 
-### 试试「teleport」的作用
+### teleport
 
-`teleport` 将全屏目标临时移到 `body`，退出时恢复原位置。「详情」按钮切换挂载在 `body` 下的居中弹窗，模拟 UI 组件库的对话框。
+`teleport` 决定是否将全屏目标临时移到 `document.body`，默认值为 `false`，退出全屏时恢复原位置。
 
-保持「仅网页全屏」关闭，按下面的步骤比较：
+原生全屏只显示全屏元素及其后代。如果内容中的对话框、下拉菜单等实际挂载在 `body` 下，开启 `teleport` 会让 `body` 成为原生全屏元素，使这些浮层也能显示。网页全屏下，移动目标还可以避免祖先元素的裁剪、定位或层叠上下文影响。
 
-1. **不勾选「teleport」**：进入全屏，点击「详情」。图片会铺满屏幕，但弹窗在全屏元素之外，无法显示。
-2. **退出并勾选「teleport」**：重新进入全屏，再点击「详情」。图片同样铺满屏幕，此时 `body` 是原生全屏元素，其下的弹窗也能显示。
+下方示例使用原生全屏，点击图片可切换挂载在 `body` 下的居中弹窗：
 
-两种设置都会让图片区域进入全屏，区别是 **body 弹窗是否可见**。网页全屏下，两种设置的弹窗均可见。
+| 配置              | 原生全屏元素 | 点击图片后的结果             |
+| ----------------- | ------------ | ---------------------------- |
+| `teleport: false` | 图片区域     | 弹窗在全屏元素之外，无法显示 |
+| `teleport: true`  | `body`       | 弹窗属于全屏元素，正常显示   |
+
+先关闭 `teleport` 进入全屏并点击图片，再退出、开启 `teleport` 后重复操作。**两种设置下图片区域都会全屏，区别是 body 弹窗是否可见**。
 
 <ClientOnly><FullscreenDemo compare-teleport /></ClientOnly>

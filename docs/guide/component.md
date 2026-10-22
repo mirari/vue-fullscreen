@@ -2,6 +2,10 @@
 
 把内容放进组件，用 `v-model` 控制。用户按 Esc 退出时，绑定的状态会自动变回 `false`。
 
+::: tip 本页参考
+完整的属性、事件和方法列表见[**组件参考**](#参考)。
+:::
+
 <ClientOnly><FullscreenDemo /></ClientOnly>
 
 ## 局部使用
@@ -37,16 +41,6 @@ function handleError(errorValue) {
 </template>
 ```
 
-## 状态与事件
-
-模型使用 `modelValue` / `update:modelValue`。模板里的 `v-model` 自动处理这些差异。
-
-- `change(active)`：全屏状态已发生变化，可以在这里同步其他 UI。
-- `error(error)`：由模型或点击触发的请求失败；展示错误或允许重试。
-- `update:fullscreen`：兼容旧的 `fullscreen` 属性，推荐新代码使用 `v-model`。
-
-请求失败时，请根据需要把外部模型恢复为 `false`，以便下一次点击重新触发变化。程序直接调用组件方法时，使用 `try/catch` 处理返回的 Promise。
-
 ## 用 ref 调用方法
 
 ```vue
@@ -72,21 +66,38 @@ async function enter() {
 </template>
 ```
 
-完整的属性、事件和方法列表见[组件参考](/reference/api#组件)。
+## 参考
 
-## 切换页面内容时保持全屏
+### 属性
 
-把全屏容器放在会被替换的内容之外。切换标签页如此，使用 Vue Router 时也一样：让 `<router-view>` 位于稳定的全屏容器内部。
+| 属性                 | 类型      | 默认值         | 说明                                  |
+| -------------------- | --------- | -------------- | ------------------------------------- |
+| `modelValue`         | `boolean` | `false`        | `v-model` 绑定值                      |
+| `pageOnly`           | `boolean` | `false`        | 仅填满网页；不支持原生 API 时自动启用 |
+| `teleport`           | `boolean` | `false`        | 全屏期间将元素移动到 body             |
+| `fullscreenClass`    | `string`  | `'fullscreen'` | 激活期间的 class                      |
+| `exitOnClickWrapper` | `boolean` | `true`         | 点击容器背景退出；点击子元素不会触发  |
+| `fullscreen`         | `boolean` | `false`        | 已废弃的模型属性，保留兼容            |
 
-```vue
-<Fullscreen v-model="active" teleport :exit-on-click-wrapper="false">
-  <nav>
-    <router-link to="/chart">图表</router-link>
-    <router-link to="/table">表格</router-link>
-  </nav>
-  <router-view />
-  <button @click="active = false">退出全屏</button>
-</Fullscreen>
-```
+不要同时用多个模型属性控制相互矛盾的状态。
 
-这段模板放在持久存在的应用布局中，像前面的示例一样导入 `Fullscreen`、声明 `active`，并配置路由。SPA 路由只替换内部视图，全屏容器需要保持挂载。如果每个路由页面各自创建全屏组件，切换时销毁组件就会退出全屏。跳转到另一个文档或刷新页面不能保留全屏。
+### 事件
+
+| 事件                | 参数      | 时机                             |
+| ------------------- | --------- | -------------------------------- |
+| `change`            | `boolean` | 全屏状态改变                     |
+| `update:modelValue` | `boolean` | 同步 `v-model`                   |
+| `update:fullscreen` | `boolean` | 同步旧模型属性                   |
+| `error`             | 错误对象  | 模型变化或容器点击触发的操作失败 |
+
+### 实例
+
+| 成员           | 类型 / 签名                        | 作用             |
+| -------------- | ---------------------------------- | ---------------- |
+| `request`      | `(): Promise<void>`                | 请求全屏         |
+| `exit`         | `(): Promise<void>`                | 退出全屏         |
+| `toggle`       | `(force?: boolean): Promise<void>` | 切换或指定状态   |
+| `isFullscreen` | `boolean`                          | 当前全屏状态     |
+| `isEnabled`    | `boolean`                          | 原生全屏是否可用 |
+
+直接调用方法时捕获返回 Promise 的拒绝。组件卸载时清理监听器和被移动的 DOM。

@@ -16,17 +16,18 @@ import {
   createFullscreen,
   componentProps,
   bindDirective,
-  unbindDirective,
+  disposeDirective,
 } from '../../core/src/index'
 import type {
   DirectiveOptions,
   FullscreenProps,
   FullscreenInstance,
+  FullscreenTarget,
 } from '../../core/src/index'
-export { api as fullscreen, api, screenfull } from '../../core/src/index'
+export { screenfull } from '../../core/src/index'
 export type {
   ApiOptions,
-  VueFullscreenApi,
+  FullscreenTarget,
   DirectiveOptions,
 } from '../../core/src/index'
 
@@ -108,7 +109,7 @@ export const vFullscreen: Directive<
 > = {
   mounted: bindDirective,
   updated: bindDirective,
-  beforeUnmount: unbindDirective,
+  beforeUnmount: disposeDirective,
 }
 /** @deprecated Import Fullscreen instead. */
 export const component = Fullscreen
@@ -116,7 +117,7 @@ export const component = Fullscreen
 export const directive = vFullscreen
 
 export type FullscreenValue<T> = T | Ref<T> | (() => T)
-export type UseFullscreenTarget = FullscreenValue<Element | null | undefined>
+export type UseFullscreenTarget = FullscreenTarget
 export interface UseFullscreenOptions {
   pageOnly?: FullscreenValue<boolean>
   teleport?: FullscreenValue<boolean>
@@ -140,17 +141,14 @@ export function useFullscreen(
   const controller = createFullscreen()
   const active = ref(false)
   const enter = () =>
-    controller.request(
-      target === undefined ? undefined : resolveValue(target),
-      {
-        pageOnly: resolveValue(options.pageOnly ?? false),
-        teleport: resolveValue(options.teleport ?? false),
-        fullscreenClass: resolveValue(options.fullscreenClass ?? 'fullscreen'),
-        callback: (value) => {
-          active.value = value
-        },
+    controller.request(target, {
+      pageOnly: resolveValue(options.pageOnly ?? false),
+      teleport: resolveValue(options.teleport ?? false),
+      fullscreenClass: resolveValue(options.fullscreenClass ?? 'fullscreen'),
+      callback: (isFullscreen) => {
+        active.value = isFullscreen
       },
-    )
+    })
   if (getCurrentInstance()) {
     onBeforeUnmount(() => {
       controller.dispose()

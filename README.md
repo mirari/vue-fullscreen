@@ -41,7 +41,7 @@ const active = ref(false)
 </template>
 ```
 
-Import `vFullscreen` for directive usage, or `useFullscreen` for VueUse-style reactive controls with `pageOnly` and `teleport` options. The `fullscreen` singleton remains available for imperative calls. See the [quick start guide](https://vue-fullscreen.mirari.cc/en/guide/getting-started).
+Import `vFullscreen` for directive usage, or `useFullscreen` for VueUse-style reactive controls with `pageOnly` and `teleport` options. See the [quick start guide](https://vue-fullscreen.mirari.cc/en/guide/getting-started).
 
 For Vue 2, register with `Vue.use(VueFullscreen)` and define `active` in `data`. See the [Vue 2 quick start](https://vue-fullscreen.mirari.cc/en/vue2/) for component, directive and API examples.
 

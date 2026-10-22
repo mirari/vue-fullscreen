@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 文档 / Documentation
+    url: https://vue-fullscreen.mirari.cc/
+    about: 查阅使用方法和常见问题。 / Read the usage guides and FAQ.

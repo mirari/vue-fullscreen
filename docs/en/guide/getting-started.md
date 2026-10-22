@@ -63,7 +63,51 @@ const { toggle } = useFullscreen()
 </template>
 ```
 
+## Other import methods
+
+### CommonJS
+
+```js
+const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
+```
+
+### Browser global
+
+Load the latest Vue 3 build and the package's `latest` channel from UNPKG. Load Vue first:
+
+::: info Package channel
+This example targets v4, which has not been published yet. The npm `latest` channel currently points to a Vue 2 release; the example will work after v4 is published to `latest`. See [compatibility](/en/guide/compatibility).
+:::
+
+```html
+<div id="app">
+  <fullscreen v-model="active">
+    <button @click="active = !active">
+      {{ active ? 'Exit fullscreen' : 'Enter fullscreen' }}
+    </button>
+  </fullscreen>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://unpkg.com/vue-fullscreen@latest"></script>
+<script>
+  Vue.createApp({
+    components: { fullscreen: VueFullscreen.Fullscreen },
+    data: () => ({ active: false }),
+  }).mount('#app')
+</script>
+```
+
+TypeScript declarations are selected automatically through `exports` for ESM and CommonJS.
+
 ## Fullscreen options
+
+### pageOnly
+
+`pageOnly` chooses between native and page-only fullscreen. Its default is `false`.
+
+- `false`: request native browser fullscreen and hide browser UI such as the address bar and tabs. Use it for immersive images or video.
+- `true`: fill the current page viewport and keep browser UI visible. Use it for editors or dashboards where users still need access to their tabs.
 
 |                 | Native                                  | Page-only                       |
 | --------------- | --------------------------------------- | ------------------------------- |
@@ -73,17 +117,23 @@ const { toggle } = useFullscreen()
 | User gesture    | Required                                | Not required                    |
 | Exit            | Browser Esc, an exit button or `exit()` | Esc, an exit button or `exit()` |
 
+<ClientOnly><FullscreenDemo compare-page-only /></ClientOnly>
+
 For browser support, automatic fallback and iframe permissions, see [compatibility](/en/guide/compatibility).
 
-### See what “teleport” changes
+### teleport
 
-The `teleport` option moves the fullscreen target to `body` and restores it on exit. The “Details” button toggles a centered popup mounted under `body`, like a dialog from a UI library.
+`teleport` temporarily moves the fullscreen target under `document.body` and restores its original position on exit. Its default is `false`.
 
-Keep “Page-only fullscreen” off and compare:
+Native fullscreen displays only the fullscreen element and its descendants. If dialogs or dropdowns from your content are mounted under `body`, enabling `teleport` makes `body` the native fullscreen element so those overlays can appear too. In page-only mode, moving the target can also avoid clipping, positioning and stacking contexts from ancestor elements.
 
-1. **Without “teleport”**: enter fullscreen and open image details. The panel fills the screen, but the popup is outside the fullscreen element and cannot appear.
-2. **Exit and enable “teleport”**: enter fullscreen and open image details again. The panel still fills the screen. Now `body` is the native fullscreen element, so its popup can appear too.
+The example below uses native fullscreen. Clicking the image toggles a centered popup mounted under `body`:
 
-Both settings make the image panel fullscreen. The difference is **whether the body popup is visible**. In page-only mode, the popup is visible with either setting.
+| Setting           | Native fullscreen element | Result after clicking the image                               |
+| ----------------- | ------------------------- | ------------------------------------------------------------- |
+| `teleport: false` | Image panel               | The popup is outside the fullscreen element and cannot appear |
+| `teleport: true`  | `body`                    | The popup is inside the fullscreen element and appears        |
+
+Enter fullscreen with `teleport` off and click the image. Exit, enable `teleport` and repeat. **Both settings make the image panel fullscreen; the difference is whether the body popup is visible.**
 
 <ClientOnly><FullscreenDemo compare-teleport /></ClientOnly>

@@ -2,26 +2,11 @@
 
 ## Package versions
 
-Use `vue-fullscreen@legacy` for Vue 2. This API reference describes `2.7.0-beta.0`, which is not yet published. The `legacy` channel currently provides `2.6.3`; some error events and package entry paths differ.
-
-## Supported environments
-
-Vue `2.6.14` and `2.7.x` are supported. Published builds target IE 11, with runtime polyfills available as an optional entry. Importing works during SSR, but fullscreen operations require the browser.
-
-## Model events
-
-```vue
-<fullscreen v-model="active">Content</fullscreen>
-
-<!-- Equivalent explicit binding -->
-<fullscreen :value="active" @input="active = $event" />
-```
-
-The `fullscreen` / `update:fullscreen` model is retained for compatibility. Do not pass conflicting model values.
+Vue `2.6.14` and `2.7.x` are supported through `vue-fullscreen@legacy`. This API reference describes `2.7.0-beta.0`, which is not yet published. The `legacy` channel currently provides `2.6.3`; some error events and package entry paths differ.
 
 ## Fullscreen API browser support
 
-Native fullscreen is provided by the browser. See [Can I use: Fullscreen API](https://caniuse.com/fullscreen) for version coverage and [MDN's requestFullscreen compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility) for device restrictions. This overview was checked on 2026-10-09.
+Native fullscreen is provided by the browser. See [Can I use: Fullscreen API](https://caniuse.com/fullscreen) for version coverage and [MDN's requestFullscreen compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility) for device restrictions.
 
 | Browser / device         | Native fullscreen support                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------ |
@@ -83,6 +68,18 @@ Modern browsers with these capabilities do not need the optional entry. Your app
 
 Automated checks parse the emitted code as ES5 and exercise missing capabilities, the ms-prefixed native API, page-only fallback, DOM restoration and directive errors in a simulated environment. This is not an actual IE browser run; verify your application on IE 11 before deployment. IE 10 and earlier are not supported. The VitePress documentation site and Vite demo pages require a modern browser.
 
+## User activation and iframe permissions
+
+Native fullscreen **can only be triggered by** a user interaction such as a click, touch or key press. Avoid waiting for a network request before calling the API, as user activation may expire.
+
+An embedded document needs fullscreen permission, for example:
+
+```html
+<iframe src="/example/" allow="fullscreen" allowfullscreen></iframe>
+```
+
+The parent document's `Permissions-Policy` can still restrict fullscreen. An iframe attribute cannot override a stricter response-header policy.
+
 ## Capability detection and page-only fallback
 
 Read `fullscreen.isEnabled` in the browser to check whether the current document allows native fullscreen. It does not indicate whether fullscreen is active or guarantee that the next request will succeed.
@@ -99,27 +96,3 @@ const nativeAvailable = fullscreen.isEnabled
 - If the native capability is available but a request is rejected, the library reports the error and restores the DOM without silently falling back. Catch API Promise rejections; use the component's `error` event or the directive's `fullscreen-error` event.
 
 Page-only mode keeps the browser toolbar and fills only the current document's viewport. Inside an iframe, it fills the frame. `teleport` moves the target to that document's `body`; it cannot escape the iframe boundary.
-
-## User activation and iframe permissions
-
-Native fullscreen must be triggered by a click, touch or key interaction. Avoid waiting for a network request before calling the API, as user activation may expire.
-
-An embedded document needs fullscreen permission, for example:
-
-```html
-<iframe src="/example/" allow="fullscreen" allowfullscreen></iframe>
-```
-
-The parent document's `Permissions-Policy` can still restrict fullscreen. An iframe attribute cannot override a stricter response-header policy.
-
-## Exiting fullscreen and tracking state
-
-Users can press Esc or use browser exit controls. Loading another document, reloading, switching tabs or changing applications with Alt-Tab can also exit native fullscreen. Behavior depends on the browser and operating system; see the [MDN fullscreen guide](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API/Guide#things_your_users_want_to_know).
-
-Do not assume your exit button is the only source of state changes. The component synchronizes actual state through `v-model`; use `callback` to track API and directive state. Page-only mode does not necessarily exit when changing applications, so keep an exit button visible.
-
-SPA route changes differ from loading another document: fullscreen can continue while the outer target remains mounted, whereas unmounting the fullscreen component exits it. See [component usage](/en/vue2/guide/component#keep-fullscreen-while-changing-views).
-
-## SSR
-
-Importing the package does not require a browser, but fullscreen operations such as `request()` do. Obtain DOM elements after mount and request fullscreen during a user interaction.

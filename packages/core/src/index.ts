@@ -2,13 +2,44 @@ import screenfull from 'screenfull'
 export { screenfull }
 
 export interface ApiOptions {
-  callback?: (fullscreen: boolean) => void
+  callback?: (isFullscreen: boolean) => void
   fullscreenClass?: string
   teleport?: boolean
   pageOnly?: boolean
 }
 export interface InstallationOptions {
   name?: string
+}
+type FullscreenTargetValue =
+  Element | string | { readonly $el: Element } | null | undefined
+export type FullscreenTarget =
+  | FullscreenTargetValue
+  | { readonly value: FullscreenTargetValue }
+  | (() => FullscreenTargetValue)
+
+function resolveTarget(target: FullscreenTarget): HTMLElement {
+  let node: FullscreenTargetValue
+  if (target == null) node = document.body
+  else if (typeof target === 'function') node = target()
+  else if (
+    typeof target === 'object' &&
+    !(target instanceof Element) &&
+    !('$el' in target) &&
+    'value' in target
+  )
+    node = target.value
+  else node = target
+  if (typeof node === 'string') {
+    const id = node.charAt(0) === '#' ? node.slice(1) : node
+    const found = document.getElementById(id)
+    if (!found) throw new Error(`Fullscreen target not found: ${node}`)
+    node = found
+  }
+  if (node && !(node instanceof Element) && typeof node === 'object')
+    node = node.$el
+  if (!(node instanceof HTMLElement))
+    throw new TypeError('Fullscreen target must resolve to an HTML element')
+  return node
 }
 export interface VueFullscreenApi {
   readonly options: Required<Omit<ApiOptions, 'callback'>> &
@@ -17,11 +48,11 @@ export interface VueFullscreenApi {
   readonly isFullscreen: boolean
   readonly isEnabled: boolean
   toggle(
-    target?: Element | null,
+    target?: FullscreenTarget,
     options?: ApiOptions,
     force?: boolean,
   ): Promise<void>
-  request(target?: Element | null, options?: ApiOptions): Promise<void>
+  request(target?: FullscreenTarget, options?: ApiOptions): Promise<void>
   exit(): Promise<void>
 }
 export interface FullscreenController extends VueFullscreenApi {
@@ -92,11 +123,12 @@ export function createFullscreen(): FullscreenController {
       if (active) return Promise.resolve()
       if (typeof document === 'undefined')
         return Promise.reject(new Error('Fullscreen requires a browser'))
-      const node = target ?? document.body
-      if (!(node instanceof HTMLElement))
-        return Promise.reject(
-          new TypeError('Fullscreen target must be an HTML element'),
-        )
+      let node: HTMLElement
+      try {
+        node = resolveTarget(target)
+      } catch (error) {
+        return Promise.reject(error)
+      }
       options = {
         fullscreenClass: 'fullscreen',
         teleport: false,
@@ -210,7 +242,7 @@ export function createFullscreen(): FullscreenController {
   }
   return controller
 }
-export const api = createFullscreen()
+export let api = createFullscreen()
 
 export const componentProps = {
   fullscreen: { type: Boolean, default: false },
@@ -220,17 +252,26 @@ export const componentProps = {
   teleport: { type: Boolean, default: false },
 }
 export interface DirectiveOptions extends ApiOptions {
-  target?: string | Element | null
+  target?: FullscreenTarget
 }
 export interface FullscreenBinding {
   value?: string | DirectiveOptions
   modifiers: Record<string, boolean | undefined>
 }
 const clicks = new WeakMap<HTMLElement, EventListener>()
+let directiveOwner: HTMLElement | null = null
 export function unbindDirective(el: HTMLElement) {
   const listener = clicks.get(el)
   if (listener) el.removeEventListener('click', listener)
   clicks.delete(el)
+}
+export function disposeDirective(el: HTMLElement) {
+  unbindDirective(el)
+  if (directiveOwner === el) {
+    directiveOwner = null
+    api.dispose()
+    api = createFullscreen()
+  }
 }
 export function bindDirective(el: HTMLElement, binding: FullscreenBinding) {
   unbindDirective(el)
@@ -245,13 +286,22 @@ export function bindDirective(el: HTMLElement, binding: FullscreenBinding) {
         typeof target === 'string' ? document.querySelector(target) : target
       if (typeof target === 'string' && !node)
         throw new Error(`Fullscreen target not found: ${target}`)
-      void api
+      const controller = api
+      if (!controller.element) directiveOwner = el
+      void controller
         .toggle(node, {
           teleport: !!binding.modifiers.teleport,
           pageOnly: !!binding.modifiers.pageOnly,
           ...options,
+          callback: (isFullscreen) => {
+            if (!isFullscreen && api === controller) directiveOwner = null
+            options.callback?.(isFullscreen)
+          },
         })
-        .catch(report)
+        .catch((error) => {
+          if (api === controller && !controller.element) directiveOwner = null
+          report(error)
+        })
     } catch (error) {
       report(error)
     }

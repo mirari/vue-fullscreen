@@ -29,6 +29,11 @@
 .demo-controls input {
   accent-color: var(--vp-c-brand-1);
 }
+.demo-controls .demo-config {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 12px;
+}
 .demo-button {
   border: 0;
   border-radius: 8px;
@@ -100,6 +105,19 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+.gallery-image-trigger {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.demo-surface .gallery-image-trigger:focus-visible {
+  outline-offset: -4px;
 }
 .demo-fullscreen .gallery-stage {
   flex: 1 1 0;

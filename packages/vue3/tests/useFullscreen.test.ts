@@ -3,12 +3,11 @@ import { afterEach, expect, it, vi } from 'vitest'
 import {
   Fullscreen,
   vFullscreen,
-  fullscreen,
   component,
   directive,
-  api,
   useFullscreen,
 } from '../src/index'
+import * as exports from '../src/index'
 
 const native = vi.hoisted(() => ({
   enabled: false,
@@ -51,7 +50,8 @@ afterEach(() => {
 it('exports descriptive names with compatible aliases', () => {
   expect(Fullscreen).toBe(component)
   expect(vFullscreen).toBe(directive)
-  expect(fullscreen).toBe(api)
+  expect(exports).not.toHaveProperty('fullscreen')
+  expect(exports).not.toHaveProperty('api')
 })
 
 it('resolves template refs and reactive options when entering and reacts to Escape', async () => {
@@ -90,6 +90,37 @@ it('uses the body by default and isolates page-only controllers', async () => {
   await first.exit()
   expect(document.body.style.position).toBe('')
 })
+
+it('rejects an unmounted template ref and supports component refs after mount', async () => {
+  const target = ref<{ $el: HTMLElement } | null>(null)
+  const controls = useFullscreen(target, { pageOnly: true })
+  await expect(controls.enter()).rejects.toThrow('HTML element')
+  expect(controls.isFullscreen.value).toBe(false)
+  expect(document.body.classList.contains('fullscreen')).toBe(false)
+  const node = document.createElement('div')
+  document.body.append(node)
+  target.value = { $el: node }
+  await controls.enter()
+  expect(node.classList.contains('fullscreen')).toBe(true)
+  await controls.exit()
+})
+
+it.each(['panel', '#panel'])(
+  'resolves %s at entry and requests native fullscreen synchronously',
+  async (id) => {
+    native.enabled = true
+    const controls = useFullscreen(id)
+    await expect(controls.enter()).rejects.toThrow('target not found')
+    const node = document.createElement('div')
+    node.id = 'panel'
+    document.body.append(node)
+    const entered = controls.enter()
+    expect(native.element).toBe(node)
+    await entered
+    expect(controls.isFullscreen.value).toBe(true)
+    await controls.exit()
+  },
+)
 
 it.each([false, true])(
   'tracks native exits and restores the target with teleport=%s',

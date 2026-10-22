@@ -1,0 +1,25 @@
+name: 功能建议 / Feature request
+description: 提出功能需求或改进建议 / Suggest a feature or improvement
+title: '[Feature]: '
+body:
+  - type: markdown
+    attributes:
+      value: 可以使用中文或英文填写。 / You can write in Chinese or English.
+  - type: textarea
+    id: problem
+    attributes:
+      label: 使用场景与问题 / Use case and problem
+      description: 希望解决什么问题？ / What problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议方案 / Proposed solution
+      description: 描述期望的行为或接口，可附代码示例。 / Describe the expected behavior or API, with code examples if helpful.
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 其他方案与补充信息 / Alternatives and additional context
