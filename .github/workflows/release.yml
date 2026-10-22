@@ -34,6 +34,16 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm run test:browser
       - run: pnpm run test:consumers
+      - name: Upload browser test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-release
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
       - id: release
         env:
           RELEASE_TAG: ${{ github.ref_name }}

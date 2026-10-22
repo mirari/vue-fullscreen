@@ -24,6 +24,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm run test:docs
+      - name: Upload documentation test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-docs
+          path: |
+            playwright-report/docs/
+            test-results/docs/
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Publish documentation to existing site branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:

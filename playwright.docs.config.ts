@@ -1,7 +1,16 @@
 import { defineConfig } from '@playwright/test'
 export default defineConfig({
   testDir: './tests/docs',
+  outputDir: 'test-results/docs',
+  reporter: process.env.CI
+    ? [
+        ['list'],
+        ['html', { outputFolder: 'playwright-report/docs', open: 'never' }],
+      ]
+    : 'list',
   use: {
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
     baseURL: 'http://localhost:4174/',
     browserName: 'chromium',
     // Use full Chromium's new headless mode; headless shell lacks native fullscreen.

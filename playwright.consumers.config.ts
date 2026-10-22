@@ -1,8 +1,20 @@
 import { defineConfig } from '@playwright/test'
 export default defineConfig({
   testDir: './tests/consumers',
+  outputDir: 'test-results/consumers',
+  reporter: process.env.CI
+    ? [
+        ['list'],
+        [
+          'html',
+          { outputFolder: 'playwright-report/consumers', open: 'never' },
+        ],
+      ]
+    : 'list',
   testMatch: '*.spec.ts',
   use: {
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
     browserName: 'chromium',
     channel: 'chromium',
     launchOptions: {

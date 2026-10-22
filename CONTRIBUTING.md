@@ -1,5 +1,7 @@
 # Maintenance and releases
 
+For issue-driven changes, follow the [Issue fixing workflow](./.github/ISSUE_FIXING.md).
+
 ## Branch and version model
 
 The rewrite has a fresh release history, beginning at the commit recorded in `release.config.json`. The old implementation's changelog and version tags are not used as the new release baseline. The Vue 2 adapter starts at `4.0.0` and stays on 4.x; the Vue 3 adapter starts at `5.0.0` and can advance to later majors. Both require an explicit major upgrade from the previously published 2.x/3.x packages.
@@ -30,6 +32,8 @@ On Linux CI or a machine missing browser system libraries, use `pnpm exec playwr
 - `pnpm run test:browser`: Chromium tests for both adapters in page and native fullscreen modes. Native exit uses the browser API because synthetic Escape is not a reliable native browser fullscreen command.
 
 CI runs checks on Node 22/24, browser and consumer tests on Node 24, and uploads both tarballs. Browser engines other than Chromium are not part of the automated coverage yet.
+
+Browser tests retain failure screenshots and traces. In CI, HTML reports and test output are uploaded even after failures and kept for 14 days, with separate directories for browser, documentation and consumer tests. See the [report instructions](./.github/ISSUE_FIXING.md#查看失败报告).
 
 ## Published-package consumer tests
 

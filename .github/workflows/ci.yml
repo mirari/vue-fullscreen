@@ -32,6 +32,16 @@ jobs:
         run: pnpm run test:docs
       - if: matrix.node == 24
         run: pnpm run test:consumers
+      - name: Upload browser test reports
+        if: always() && matrix.node == 24
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-ci
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         if: matrix.node == 24
         with:
