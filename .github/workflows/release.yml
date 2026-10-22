@@ -62,7 +62,7 @@ jobs:
         env:
           VERSION: ${{ needs.validate.outputs.version }}
           CHANNEL: ${{ needs.validate.outputs.channel }}
-        run: npm publish "artifacts/vue-fullscreen-$VERSION.tgz" --tag "$CHANNEL" --access public --provenance
+        run: npm publish "./artifacts/vue-fullscreen-$VERSION.tgz" --tag "$CHANNEL" --access public --provenance
   release:
     needs: [validate, publish]
     runs-on: ubuntu-latest
