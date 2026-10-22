@@ -75,10 +75,6 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
 
 通过 UNPKG 加载 Vue 3 的最新版本和本包的 `latest` 渠道，先加载 Vue：
 
-::: info 发布渠道
-此示例使用尚未发布的 v4 接口。目前 npm 的 `latest` 仍指向 Vue 2 旧版；v4 发布到 `latest` 后即可使用。版本说明见[兼容性](/guide/compatibility)。
-:::
-
 ```html
 <div id="app">
   <fullscreen v-model="active">

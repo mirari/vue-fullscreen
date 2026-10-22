@@ -8,7 +8,7 @@ Vue `3.0+` is supported. Stable releases use the default `latest` channel:
 npm install vue-fullscreen
 ```
 
-This API reference describes `4.0.0`, which is not yet published. For Vue 2, use `vue-fullscreen@legacy`; see [Vue 2 compatibility](/en/vue2/guide/compatibility).
+This API reference describes `5.0.0`. For Vue 2, use `vue-fullscreen@legacy`; see [Vue 2 compatibility](/en/vue2/guide/compatibility).
 
 ## Fullscreen API browser support
 

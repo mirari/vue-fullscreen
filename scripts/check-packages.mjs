@@ -15,7 +15,7 @@ import { resolve, join, dirname } from 'node:path'
 const root = process.cwd()
 mkdirSync('artifacts', { recursive: true })
 for (const [line, versions] of [
-  ['vue2', ['2.6.14', '2.7.16']],
+  ['vue2', ['2.4.0', '2.5.22', '2.6.0', '2.6.14', '2.7.16']],
   ['vue3', ['3.0.0', '3.5.43']],
 ]) {
   const pack = JSON.parse(
@@ -59,6 +59,14 @@ for (const [line, versions] of [
         ],
         { cwd: directory, stdio: 'pipe' },
       )
+      // Vue 2.5's scheduler keeps Node's global MessageChannel ports alive.
+      // Match the older Node environment and let Vue use its timer fallback.
+      const runtimeArgs = []
+      if (version.startsWith('2.5.')) {
+        const setup = join(directory, 'node-runtime.cjs')
+        writeFileSync(setup, 'globalThis.MessageChannel = undefined;\n')
+        runtimeArgs.push('--require', setup)
+      }
       const polyfillImport =
         line === 'vue2' ? "import 'vue-fullscreen/polyfills'; " : ''
       if (line === 'vue2') {
@@ -102,13 +110,14 @@ for (const [line, versions] of [
           ? "const controls = useFullscreen(); if (controls.isFullscreen.value || controls.isSupported.value) throw Error('Invalid SSR composable');"
           : ''
       const esm = `${polyfillImport}import * as exports from 'vue-fullscreen'; import ${pluginImport}{ ${singletonImport}Fullscreen, vFullscreen, screenfull${composable} } from 'vue-fullscreen'; if (${invalidPlugin('exports')} || !Fullscreen || !vFullscreen || !screenfull) throw Error('Invalid exports'); ${checkComposable} console.log('SSR ESM OK')`
-      execFileSync('node', ['--input-type=module', '-e', esm], {
+      execFileSync('node', [...runtimeArgs, '--input-type=module', '-e', esm], {
         cwd: directory,
         stdio: 'inherit',
       })
       execFileSync(
         'node',
         [
+          ...runtimeArgs,
           '--input-type=commonjs',
           '-e',
           `${line === 'vue2' ? "require('vue-fullscreen/polyfills');" : ''} const p = require('vue-fullscreen'); if (${invalidPlugin('p')} || !p.Fullscreen || !p.vFullscreen) throw Error('Invalid CJS exports'); console.log('SSR CJS OK')`,
@@ -118,6 +127,7 @@ for (const [line, versions] of [
       execFileSync(
         'node',
         [
+          ...runtimeArgs,
           '--input-type=commonjs',
           '-e',
           `
@@ -136,6 +146,7 @@ for (const [line, versions] of [
       execFileSync(
         'node',
         [
+          ...runtimeArgs,
           '--input-type=module',
           '-e',
           `
@@ -145,11 +156,17 @@ for (const [line, versions] of [
         const dom = new JSDOM('<main id="mount"></main>');
         for (const key of ['window', 'document', 'Element', 'HTMLElement', 'SVGElement', 'Node']) globalThis[key] = dom.window[key];
         const vue = await import('vue');
-        const { Fullscreen: component, fullscreen, useFullscreen } = await import('vue-fullscreen');
+        const { default: plugin, Fullscreen: component, fullscreen, useFullscreen } = await import('vue-fullscreen');
         let instance, close;
+        let keyEvents = 0;
+        const changes = [];
         if (${JSON.stringify(line)} === 'vue2') {
-          const app = new vue.default({ render(h) { return h(component, { ref: 'fs', props: { pageOnly: true, teleport: true } }, ['content']) } }).$mount('#mount');
+          vue.default.use(plugin);
+          const app = new vue.default({ render(h) { return h(component, { ref: 'fs', attrs: { 'data-probe': 'forwarded' }, props: { pageOnly: true, teleport: true }, on: { keydown: () => keyEvents++, input: value => changes.push(value) } }, ['content']) } }).$mount('#mount');
           instance = app.$refs.fs;
+          instance.$el.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'ArrowRight' }));
+          if (instance.$el.getAttribute('data-probe') !== 'forwarded' || keyEvents !== 1) throw Error('Attribute/listener forwarding failed');
+          if (instance.$fullscreen !== fullscreen) throw Error('Plugin installation failed');
           close = () => { app.$destroy(); app.$el.remove() };
         } else {
           const app = vue.createApp({ render() { return vue.h(component, { ref: 'fs', pageOnly: true, teleport: true }, () => 'content') } });
@@ -161,6 +178,7 @@ for (const [line, versions] of [
         await instance.exit();
         if (instance.isFullscreen || document.querySelector('.fullscreen')) throw Error('Component exit failed');
         if (${JSON.stringify(line)} === 'vue2') {
+          if (changes.join(',') !== 'true,false') throw Error('Model events failed');
           await fullscreen.request(instance, { pageOnly: true });
           if (fullscreen.element !== instance.$el) throw Error('Component target resolution failed');
           await fullscreen.exit();
@@ -209,8 +227,24 @@ useFullscreen('#panel');`
 }
 `
       const source = `${polyfillImport}import ${pluginImport}{ ${singletonImport}Fullscreen, vFullscreen${composable}, type ApiOptions, type FullscreenTarget } from 'vue-fullscreen'; const options: ApiOptions = { pageOnly: true }; const result: Promise<void> = ${line === 'vue2' ? 'fullscreen.request(undefined, options)' : 'useFullscreen(undefined, options).enter()'}; ${checkComposable} void [${line === 'vue2' ? 'plugin, ' : ''}Fullscreen, vFullscreen, result];\n${targetTypes}\n${removedPluginTypes}\n`
-      writeFileSync(join(directory, 'consumer.mts'), source)
-      writeFileSync(join(directory, 'consumer.cts'), source)
+      const vue2Types =
+        line === 'vue2'
+          ? `
+import type { Vue as VueInstance } from 'vue/types/vue.js';
+declare const Vue: typeof VueInstance;
+Vue.use(plugin);
+Vue.component('fullscreen', Fullscreen);
+Vue.directive('fullscreen', vFullscreen);
+const component = new Fullscreen({ propsData: { pageOnly: true } });
+const active: boolean = component.isFullscreen;
+const entered: Promise<void> = component.enter();
+const state: boolean = component.getState();
+component.$fullscreen.request(component);
+void [active, entered, state];
+`
+          : ''
+      writeFileSync(join(directory, 'consumer.mts'), source + vue2Types)
+      writeFileSync(join(directory, 'consumer.cts'), source + vue2Types)
       execFileSync(
         'node',
         [

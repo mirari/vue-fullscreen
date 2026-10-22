@@ -11,7 +11,7 @@ Fullscreen components, directives and a promise-based API for **Vue 2 and Vue 3*
 
 **[English documentation](https://vue-fullscreen.mirari.cc/en/)** · **[中文文档](https://vue-fullscreen.mirari.cc/)** · [Documentation source](./docs/index.md) · [Contributing](./CONTRIBUTING.md)
 
-The temporary `v4` branch prepares the **4.0.0** rewrite, which has not been published yet. After its first release, development and releases move to `master`. The npm badge and installation commands below refer to published packages.
+**5.x supports Vue 3**; **4.x supports Vue 2.4+** through the `legacy` channel. Both are new major versions of the rewritten library; upgrade explicitly from the previous 2.x/3.x releases.
 
 ## Install
 
@@ -45,7 +45,7 @@ Import `vFullscreen` for directive usage, or `useFullscreen` for VueUse-style re
 
 For Vue 2, register with `Vue.use(VueFullscreen)` and define `active` in `data`. See the [Vue 2 quick start](https://vue-fullscreen.mirari.cc/en/vue2/) for component, directive and API examples.
 
-Package-root imports support ESM and CJS, with TypeScript declarations. Browser-global builds expose `VueFullscreen` from `index.umd.js`. Vue is a peer dependency. Supported versions are Vue 2.6.14/2.7 and Vue 3.0+; Vue 2 builds target IE 11 with ES5 syntax and an optional `vue-fullscreen/polyfills` entry; Vue 3 builds target ES2018.
+Package-root imports support ESM and CJS, with TypeScript declarations. Browser-global builds expose `VueFullscreen` from `index.umd.js`. Vue is a peer dependency. Supported versions are Vue 2.4+ (Vue 2 adapter) and Vue 3.0+ (Vue 3 adapter); Vue 2 builds target IE 11 with ES5 syntax and an optional `vue-fullscreen/polyfills` entry; Vue 3 builds target ES2018.
 
 For IE 11 with Vue 2, load `import 'vue-fullscreen/polyfills'` before the component, or supply equivalent global polyfills in your application. Modern browsers can omit this import. See [Vue 2 compatibility](https://vue-fullscreen.mirari.cc/en/vue2/guide/compatibility) for script-tag loading and required capabilities.
 

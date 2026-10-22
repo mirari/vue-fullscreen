@@ -9,8 +9,8 @@ const manifest = JSON.parse(readFileSync(`dist/${line}/package.json`, 'utf8'))
 if (
   manifest.version !== version ||
   (line === 'vue2'
-    ? Number(version.split('.')[0]) !== 2
-    : Number(version.split('.')[0]) < 4)
+    ? Number(version.split('.')[0]) !== 4
+    : Number(version.split('.')[0]) < 5)
 )
   throw new Error('Tag does not match package version')
 readFileSync(`releases/${tag}.md`, 'utf8')

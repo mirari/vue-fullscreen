@@ -173,7 +173,7 @@ for (const line of ['vue2', 'vue3']) {
     ],
     sideEffects:
       line === 'vue2' ? ['./polyfills.js', './polyfills.cjs'] : false,
-    peerDependencies: { vue: line === 'vue2' ? '^2.6.14 || ^2.7.0' : '^3.0.0' },
+    peerDependencies: { vue: line === 'vue2' ? '^2.4.0' : '^3.0.0' },
     license: 'MIT',
     author: 'mirari',
     keywords: ['vue', 'fullscreen'],

@@ -16,12 +16,13 @@ const { values, positionals } = parseArgs({
   options: {
     'first-release': { type: 'boolean' },
     'dry-run': { type: 'boolean' },
+    prepare: { type: 'boolean' },
     prerelease: { type: 'string' },
     help: { type: 'boolean' },
   },
 })
 const usage =
-  'Usage: pnpm run release:prepare vue2|vue3 [patch|minor|major|version] [--first-release] [--prerelease beta|rc] [--dry-run]'
+  'Usage: pnpm run release[:prepare] vue2|vue3 [patch|minor|major|version] [--first-release] [--prerelease beta|rc] [--dry-run] [--prepare]'
 if (values.help) {
   console.log(usage)
   process.exit(0)
@@ -41,6 +42,8 @@ if (
 const dryRun = values['dry-run'] ?? false
 const firstRelease = values['first-release'] ?? false
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim()
+const originalHead = git('rev-parse', 'HEAD')
+let stagedForCommit = false
 if (!dryRun && git('status', '--porcelain'))
   throw new Error(
     'Commit working changes before preparing a release; --dry-run previews committed history without changing files',
@@ -70,10 +73,10 @@ const validateVersion = (version) => {
     !/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-(?:beta|rc)\.(?:0|[1-9]\d*))?$/.test(
       version,
     ) ||
-    (line === 'vue2' ? semver.major(version) !== 2 : semver.major(version) < 4)
+    (line === 'vue2' ? semver.major(version) !== 4 : semver.major(version) < 5)
   )
     throw new Error(
-      'Vue 2 requires 2.x; Vue 3 requires 4.x or newer; prereleases use beta.N or rc.N',
+      'Vue 2 requires 4.x; Vue 3 requires 5.x or newer; prereleases use beta.N or rc.N',
     )
   if (!firstRelease && !semver.gt(version, manifest.version))
     throw new Error('Version must increase')
@@ -165,15 +168,32 @@ try {
     mkdirSync('releases', { recursive: true })
     writeFileSync(changelogPath, formattedChangelog)
     writeFileSync(notesPath, formattedNotes)
-    console.log(
-      `Prepared ${tag}. Review the changelog and release notes, run checks, commit to the release source branch, then tag and push that commit. No commit, tag or publish was performed.`,
-    )
+    if (!values.prepare) {
+      git('add', '--', manifestPath, changelogPath, notesPath)
+      stagedForCommit = true
+      await catv({
+        packageFiles: [manifestPath],
+        bumpFiles: [],
+        skip: { bump: true, changelog: true },
+        commitAll: true,
+        tagPrefix: prefix,
+      })
+      console.log(
+        `Created the release commit and annotated tag ${tag}. Review them, then push with git push --follow-tags origin <branch>. CI publishes the tagged version after checks pass. No push or publish was performed.`,
+      )
+    } else {
+      console.log(
+        `Prepared ${tag}. Review and commit the generated files, then create and push the annotated tag ${tag}. No commit, tag or publish was performed.`,
+      )
+    }
   }
 } catch (error) {
-  if (!dryRun)
+  if (!dryRun && git('rev-parse', 'HEAD') === originalHead) {
+    if (stagedForCommit) git('restore', '--staged', '--', ...snapshots.keys())
     for (const [path, original] of snapshots) {
       if (original) writeFileSync(path, original)
       else if (existsSync(path)) unlinkSync(path)
     }
+  }
   throw error
 }

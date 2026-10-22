@@ -2,7 +2,7 @@
 
 ## Package versions
 
-Vue `2.6.14` and `2.7.x` are supported through `vue-fullscreen@legacy`. This API reference describes `2.7.0-beta.0`, which is not yet published. The `legacy` channel currently provides `2.6.3`; some error events and package entry paths differ.
+Vue 2 versions from `2.4.0` onward are supported through `vue-fullscreen@legacy`. This API reference describes `4.0.0`.
 
 ## Fullscreen API browser support
 

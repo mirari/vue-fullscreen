@@ -75,10 +75,6 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
 
 Load the latest Vue 3 build and the package's `latest` channel from UNPKG. Load Vue first:
 
-::: info Package channel
-This example targets v4, which has not been published yet. The npm `latest` channel currently points to a Vue 2 release; the example will work after v4 is published to `latest`. See [compatibility](/en/guide/compatibility).
-:::
-
 ```html
 <div id="app">
   <fullscreen v-model="active">

@@ -1,8 +1,9 @@
 import Vue from 'vue'
+import type { Vue as VueInstance } from 'vue/types/vue.js'
 import type {
+  ComponentOptions,
   DirectiveOptions as VueDirectiveOptions,
-  VueConstructor,
-} from 'vue'
+} from 'vue/types/options.js'
 import {
   api,
   createFullscreen,
@@ -108,25 +109,35 @@ const implementation = Vue.extend({
     )
   },
 })
-export interface Vue2FullscreenInstance extends Vue, FullscreenInstance {
-  readonly support: boolean
-  enter(): Promise<void>
-  getState(): boolean
+export type Vue2FullscreenInstance = VueInstance &
+  FullscreenInstance & {
+    readonly support: boolean
+    enter(): Promise<void>
+    getState(): boolean
+  }
+// Vue 2.4 predates VueConstructor; retain its static API and type our instance.
+export const Fullscreen = implementation as Pick<
+  typeof VueInstance,
+  keyof typeof VueInstance
+> & {
+  new (
+    options?: ComponentOptions<VueInstance>,
+  ): Vue2FullscreenInstance & FullscreenProps & { value?: boolean }
 }
-export const Fullscreen = implementation as VueConstructor<
-  Vue2FullscreenInstance & FullscreenProps & { value?: boolean }
->
 export const vFullscreen: VueDirectiveOptions = {
   inserted: bindDirective,
   update: bindDirective,
   unbind: unbindDirective,
 }
 /** @deprecated Import Fullscreen instead. */
-export const component = Fullscreen
+export const component: typeof Fullscreen = Fullscreen
 /** @deprecated Import vFullscreen instead. */
 export const directive = vFullscreen
 export default {
-  install(ctor: typeof Vue, { name = 'fullscreen' }: InstallationOptions = {}) {
+  install(
+    ctor: typeof VueInstance,
+    { name = 'fullscreen' }: InstallationOptions = {},
+  ) {
     ctor.prototype[`$${name}`] = api
     ctor.component(name, Fullscreen)
     ctor.directive(name, vFullscreen)

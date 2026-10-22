@@ -1,6 +1,6 @@
 {
   "sourceBranch": "master",
   "bootstrapBranch": "v4",
-  "bootstrapTag": "vue3-v4.0.0",
+  "bootstrapTag": "vue3-v5.0.0",
   "refactorCommit": "9b5935989779660e07bedb1405a41d9cc69d281c"
 }

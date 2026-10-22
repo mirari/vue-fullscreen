@@ -64,8 +64,8 @@ function fixture() {
   git('tag', 'v3.1.3')
   git('tag', 'v2.6.3')
   for (const [line, version] of [
-    ['vue3', '4.0.0'],
-    ['vue2', '2.7.0-beta.0'],
+    ['vue3', '5.0.0'],
+    ['vue2', '4.0.0'],
   ]) {
     write(
       `packages/${line}/package.json`,
@@ -88,7 +88,7 @@ function fixture() {
     JSON.stringify({
       sourceBranch: 'master',
       bootstrapBranch: 'v4',
-      bootstrapTag: 'vue3-v4.0.0',
+      bootstrapTag: 'vue3-v5.0.0',
       refactorCommit: refactor,
     }),
   )
@@ -99,7 +99,17 @@ function fixture() {
   commit('fix: Vue 3 adapter only')
   write('packages/core/shared.js', 'shared')
   commit('feat: shared fullscreen controls')
-  return { directory, git, write, read, commit, run, branch, legacy }
+  return {
+    directory,
+    git,
+    write,
+    read,
+    commit,
+    run,
+    prepare: (...args: string[]) => run('--prepare', ...args),
+    branch,
+    legacy,
+  }
 }
 afterEach(() => {
   for (const directory of directories.splice(0)) {
@@ -108,17 +118,65 @@ afterEach(() => {
   }
 })
 
+it('creates CATV commits and annotated tags that follow a normal branch push', () => {
+  const f = fixture()
+  const originalHead = f.git('rev-parse', 'HEAD')
+  const originalTags = f.git('tag')
+  f.run('vue3', '--first-release', '--dry-run')
+  expect(f.git('rev-parse', 'HEAD')).toBe(originalHead)
+  expect(f.git('tag')).toBe(originalTags)
+  expect(f.git('status', '--porcelain')).toBe('')
+  f.run('vue3', '--first-release')
+  const vue3Release = f.git('rev-parse', 'HEAD')
+  expect(f.git('rev-parse', 'HEAD^')).toBe(originalHead)
+  expect(f.git('cat-file', '-t', 'refs/tags/vue3-v5.0.0')).toBe('tag')
+  expect(f.git('rev-parse', 'vue3-v5.0.0^{commit}')).toBe(vue3Release)
+  expect(f.git('show', 'vue3-v5.0.0:releases/vue3-v5.0.0.md')).toContain(
+    '## 5.0.0',
+  )
+  expect(f.git('status', '--porcelain')).toBe('')
+  f.run('vue2', '--first-release')
+  expect(f.git('cat-file', '-t', 'refs/tags/vue2-v4.0.0')).toBe('tag')
+  f.write('packages/core/later.js', 'later')
+  f.commit('fix: follow-up after both releases')
+  const remote = join(f.directory, '.git', 'release-remote.git')
+  f.git('init', '--bare', remote)
+  f.git('remote', 'add', 'origin', remote)
+  f.git('push', '--follow-tags', 'origin', 'master')
+  const remoteTags = f.git('ls-remote', '--tags', 'origin')
+  expect(remoteTags).toContain(vue3Release + '\trefs/tags/vue3-v5.0.0^{}')
+  expect(remoteTags).toContain('refs/tags/vue2-v4.0.0')
+  expect(f.git('rev-parse', 'HEAD')).not.toBe(vue3Release)
+  f.run('vue2', 'patch')
+  expect(f.git('cat-file', '-t', 'refs/tags/vue2-v4.0.1')).toBe('tag')
+  expect(JSON.parse(f.read('packages/vue2/package.json')).version).toBe('4.0.1')
+}, 60000)
+
+it('restores generated files and clears staging when the release commit fails', () => {
+  const f = fixture()
+  const originalVersion = f.read('packages/vue3/package.json')
+  const originalChangelog = f.read('packages/vue3/CHANGELOG.md')
+  const originalHead = f.git('rev-parse', 'HEAD')
+  f.git('config', 'user.name', '')
+  expect(() => f.run('vue3', '--first-release')).toThrow()
+  expect(f.git('rev-parse', 'HEAD')).toBe(originalHead)
+  expect(f.git('status', '--porcelain')).toBe('')
+  expect(f.read('packages/vue3/package.json')).toBe(originalVersion)
+  expect(f.read('packages/vue3/CHANGELOG.md')).toBe(originalChangelog)
+  expect(() => f.read('releases/vue3-v5.0.0.md')).toThrow()
+}, 60000)
+
 it('starts fresh independent histories, previews safely, and uses CATV to bump workspace metadata', () => {
   const f = fixture()
   const originalVersion = f.read('packages/vue3/package.json')
   const originalLock = f.read('pnpm-lock.yaml')
-  expect(f.run('vue3', '--first-release', '--dry-run')).toContain(
-    'Preview: vue3-v4.0.0',
+  expect(f.prepare('vue3', '--first-release', '--dry-run')).toContain(
+    'Preview: vue3-v5.0.0',
   )
   expect(f.git('status', '--porcelain')).toBe('')
   expect(f.read('packages/vue3/package.json')).toBe(originalVersion)
   const tagsBefore = f.git('tag')
-  f.run('vue3', '--first-release')
+  f.prepare('vue3', '--first-release')
   const initial = f.read('packages/vue3/CHANGELOG.md')
   expect(initial).toContain('fresh fullscreen rewrite')
   expect(initial).toContain('shared fullscreen controls')
@@ -126,40 +184,40 @@ it('starts fresh independent histories, previews safely, and uses CATV to bump w
   expect(initial).not.toContain('Vue 2 adapter only')
   expect(initial).not.toContain('legacy breaking')
   expect(initial.match(/# Changelog/g)).toHaveLength(1)
-  expect(f.read('releases/vue3-v4.0.0.md')).toContain('## 4.0.0')
+  expect(f.read('releases/vue3-v5.0.0.md')).toContain('## 5.0.0')
   expect(f.git('tag')).toBe(tagsBefore)
   expect(f.git('diff', '--cached')).toBe('')
-  f.commit('chore(release): vue3-v4.0.0')
-  f.git('tag', 'vue3-v4.0.0')
+  f.commit('chore(release): vue3-v5.0.0')
+  f.git('tag', 'vue3-v5.0.0')
 
-  f.run('vue2', '--first-release')
+  f.prepare('vue2', '--first-release')
   const vue2Log = f.read('packages/vue2/CHANGELOG.md')
   expect(vue2Log).toContain('Vue 2 adapter only')
   expect(vue2Log).toContain('shared fullscreen controls')
   expect(vue2Log).not.toContain('Vue 3 adapter only')
   expect(vue2Log).not.toContain('legacy breaking')
-  f.commit('chore(release): vue2-v2.7.0-beta.0')
-  f.git('tag', 'vue2-v2.7.0-beta.0')
-  expect(f.run('vue2', '--prerelease', 'beta', '--dry-run')).toContain(
-    'vue2-v2.7.0-beta.1',
+  f.commit('chore(release): vue2-v4.0.0')
+  f.git('tag', 'vue2-v4.0.0')
+  expect(() => f.prepare('vue2', '2.7.0')).toThrow()
+  expect(() => f.prepare('vue2', '5.0.0')).toThrow()
+  expect(f.prepare('vue2', '--prerelease', 'beta', '--dry-run')).toContain(
+    'vue2-v4.0.1-beta.0',
   )
 
   f.write('packages/core/new.js', 'feature')
   f.commit('feat: reactive shared options')
   f.write('scratch.txt', 'uncommitted changes')
   const dirty = f.git('status', '--porcelain')
-  expect(f.run('vue3', '--dry-run')).toContain('vue3-v4.1.0')
+  expect(f.prepare('vue3', '--dry-run')).toContain('vue3-v5.1.0')
   expect(f.git('status', '--porcelain')).toBe(dirty)
-  expect(() => f.run('vue3')).toThrow()
+  expect(() => f.prepare('vue3')).toThrow()
   f.commit('chore: scratch file')
-  f.run('vue3')
-  expect(JSON.parse(f.read('packages/vue3/package.json')).version).toBe('4.1.0')
+  f.prepare('vue3')
+  expect(JSON.parse(f.read('packages/vue3/package.json')).version).toBe('5.1.0')
   expect(f.read('pnpm-lock.yaml')).toBe(originalLock)
-  expect(JSON.parse(f.read('packages/vue2/package.json')).version).toBe(
-    '2.7.0-beta.0',
-  )
-  expect(f.read('releases/vue3-v4.1.0.md')).toContain('reactive shared options')
-  expect(f.read('releases/vue3-v4.1.0.md')).not.toContain(
+  expect(JSON.parse(f.read('packages/vue2/package.json')).version).toBe('4.0.0')
+  expect(f.read('releases/vue3-v5.1.0.md')).toContain('reactive shared options')
+  expect(f.read('releases/vue3-v5.1.0.md')).not.toContain(
     'shared fullscreen controls',
   )
   expect(f.read('packages/vue2/CHANGELOG.md')).toBe(vue2Log)
@@ -167,71 +225,70 @@ it('starts fresh independent histories, previews safely, and uses CATV to bump w
 
 it('continues prereleases and includes their changes in stable release notes', () => {
   const f = fixture()
-  f.run('vue3', '--first-release')
+  f.prepare('vue3', '--first-release')
   f.commit('chore(release): initial')
-  f.git('tag', 'vue3-v4.0.0')
+  f.git('tag', 'vue3-v5.0.0')
   f.write('packages/vue3/feature.js', 'beta')
   f.commit('feat: beta fullscreen feature')
-  f.run('vue3', '--prerelease', 'beta')
+  f.prepare('vue3', '--prerelease', 'beta')
   expect(JSON.parse(f.read('packages/vue3/package.json')).version).toBe(
-    '4.1.0-beta.0',
+    '5.1.0-beta.0',
   )
   f.commit('chore(release): beta zero')
-  f.git('tag', 'vue3-v4.1.0-beta.0')
+  f.git('tag', 'vue3-v5.1.0-beta.0')
   f.write('packages/vue3/fix.js', 'fix')
   f.commit('fix: beta cleanup correction')
-  f.run('vue3', '--prerelease', 'beta')
+  f.prepare('vue3', '--prerelease', 'beta')
   expect(JSON.parse(f.read('packages/vue3/package.json')).version).toBe(
-    '4.1.0-beta.1',
+    '5.1.0-beta.1',
   )
-  const beta = f.read('releases/vue3-v4.1.0-beta.1.md')
+  const beta = f.read('releases/vue3-v5.1.0-beta.1.md')
   expect(beta).toContain('beta cleanup correction')
   expect(beta).not.toContain('beta fullscreen feature')
   f.commit('chore(release): beta one')
-  f.git('tag', 'vue3-v4.1.0-beta.1')
-  f.run('vue3', '4.1.0')
-  const stable = f.read('releases/vue3-v4.1.0.md')
+  f.git('tag', 'vue3-v5.1.0-beta.1')
+  f.prepare('vue3', '5.1.0')
+  const stable = f.read('releases/vue3-v5.1.0.md')
   expect(stable).toContain('beta fullscreen feature')
   expect(stable).toContain('beta cleanup correction')
   expect(stable).not.toContain('legacy breaking')
   f.commit('chore(release): stable')
-  f.git('tag', 'vue3-v4.1.0')
+  f.git('tag', 'vue3-v5.1.0')
   f.write('packages/vue3/feature.js', 'breaking')
   f.commit('feat!: redesign fullscreen controls')
-  f.run('vue3')
-  expect(JSON.parse(f.read('packages/vue3/package.json')).version).toBe('5.0.0')
+  f.prepare('vue3')
+  expect(JSON.parse(f.read('packages/vue3/package.json')).version).toBe('6.0.0')
 }, 60000)
 
 it('rejects invalid versions and restores metadata when notes cannot be written', () => {
   const f = fixture()
-  expect(() => f.run('vue3', '4.0.1')).toThrow()
-  f.run('vue3', '--first-release')
+  expect(() => f.prepare('vue3', '5.0.1')).toThrow()
+  f.prepare('vue3', '--first-release')
   f.commit('chore(release): initial')
-  f.git('tag', 'vue3-v4.0.0')
-  expect(() => f.run('vue3', '--first-release')).toThrow()
-  expect(() => f.run('vue3', '3.9.0')).toThrow()
-  expect(() => f.run('vue3', '4.0.0')).toThrow()
-  f.write('releases/vue3-v4.0.1.md', 'reviewed notes')
+  f.git('tag', 'vue3-v5.0.0')
+  expect(() => f.prepare('vue3', '--first-release')).toThrow()
+  expect(() => f.prepare('vue3', '3.9.0')).toThrow()
+  expect(() => f.prepare('vue3', '4.0.0')).toThrow()
+  expect(() => f.prepare('vue3', '5.0.0')).toThrow()
+  f.write('releases/vue3-v5.0.1.md', 'reviewed notes')
   f.commit('chore: preserve reviewed notes')
-  expect(() => f.run('vue3', '4.0.1')).toThrow()
+  expect(() => f.prepare('vue3', '5.0.1')).toThrow()
   expect(f.git('status', '--porcelain')).toBe('')
-  expect(f.read('releases/vue3-v4.0.1.md')).toBe('reviewed notes')
-  expect(JSON.parse(f.read('packages/vue3/package.json')).version).toBe('4.0.0')
+  expect(f.read('releases/vue3-v5.0.1.md')).toBe('reviewed notes')
+  expect(JSON.parse(f.read('packages/vue3/package.json')).version).toBe('5.0.0')
 }, 60000)
 
 it('allows only the bootstrap on v4, then requires master independently of v4', () => {
   const f = fixture()
   f.git('update-ref', 'refs/remotes/origin/master', f.legacy)
   f.git('update-ref', 'refs/remotes/origin/v4', 'HEAD')
-  expect(f.branch('vue3-v4.0.0')).toContain('verified release commit on v4')
-  expect(() => f.branch('vue3-v4.0.1')).toThrow()
-  expect(() => f.branch('vue2-v2.7.0-beta.0')).toThrow()
+  expect(f.branch('vue3-v5.0.0')).toContain('verified release commit on v4')
+  expect(() => f.branch('vue3-v5.0.1')).toThrow()
+  expect(() => f.branch('vue2-v4.0.0')).toThrow()
   f.git('update-ref', 'refs/remotes/origin/master', 'HEAD')
   f.write('packages/core/later.js', 'later')
   f.commit('fix: maintain fullscreen on master')
   f.git('update-ref', 'refs/remotes/origin/master', 'HEAD')
-  expect(f.branch('vue3-v4.0.1')).toContain('verified release commit on master')
-  expect(f.branch('vue2-v2.7.0-beta.0')).toContain(
-    'verified release commit on master',
-  )
+  expect(f.branch('vue3-v5.0.1')).toContain('verified release commit on master')
+  expect(f.branch('vue2-v4.0.0')).toContain('verified release commit on master')
 })
