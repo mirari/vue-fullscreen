@@ -2,7 +2,7 @@
 
 ## 软件包版本
 
-支持 Vue `2.4.0` 及以上的 Vue 2 版本，使用 `vue-fullscreen@legacy`。本文接口参考版本为 `4.0.0`。
+支持 Vue `2.4.0` 及以上的 Vue 2 版本，使用 `vue-fullscreen@legacy`。本文介绍 `4.x` 的接口。
 
 ## Fullscreen API 浏览器支持
 

@@ -8,7 +8,7 @@
 npm install vue-fullscreen
 ```
 
-本文档的接口参考版本为 `5.0.0`。Vue 2 用户请使用 `vue-fullscreen@legacy`，见 [Vue 2 兼容性说明](/vue2/guide/compatibility)。
+本文档介绍 `5.x` 的接口。Vue 2 用户请使用 `vue-fullscreen@legacy`，见 [Vue 2 兼容性说明](/vue2/guide/compatibility)。
 
 ## Fullscreen API 浏览器支持
 
