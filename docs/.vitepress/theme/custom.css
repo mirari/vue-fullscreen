@@ -129,6 +129,9 @@
   position: absolute;
   inset: 0;
 }
+.inline-gallery-sources {
+  display: none;
+}
 .demo-surface .gallery-image-trigger:focus-visible {
   outline-offset: -4px;
 }

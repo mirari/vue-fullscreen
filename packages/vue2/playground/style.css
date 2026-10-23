@@ -71,3 +71,13 @@ output {
   height: calc(100vh - 210px);
   min-height: 120px;
 }
+.inline-gallery-sources {
+  display: none;
+}
+.inline-gallery-stage {
+  height: 280px;
+}
+#target.fullscreen .inline-gallery-stage {
+  height: calc(100vh - 210px);
+  min-height: 160px;
+}

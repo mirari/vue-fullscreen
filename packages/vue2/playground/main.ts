@@ -76,7 +76,8 @@ new Vue({
   },
   watch: {
     active(value: boolean) {
-      if (!value) (this.$refs.preview as InstanceType<typeof Viewer>)?.hide()
+      if (comparison !== 'pageOnly' && !value)
+        (this.$refs.preview as InstanceType<typeof Viewer>)?.hide()
     },
   },
   methods: {
@@ -198,6 +199,10 @@ new Vue({
           attrs: { id: 'target', class: 'demo-target' },
           props: { value: this.active, pageOnly, teleport: this.teleport },
           on: {
+            change: () => {
+              if (comparison === 'pageOnly')
+                this.$nextTick(() => window.dispatchEvent(new Event('resize')))
+            },
             input: (v: boolean) => {
               this.active = v
               if (!v) this.popup = false
@@ -227,7 +232,32 @@ new Vue({
               )
             : null,
           comparison === 'pageOnly'
-            ? picture
+            ? h('div', { class: 'inline-gallery-stage' }, [
+                h(
+                  Viewer,
+                  {
+                    ref: 'preview',
+                    class: 'inline-gallery-sources',
+                    props: {
+                      inline: true,
+                      button: false,
+                      transition: false,
+                      focus: false,
+                      fullscreen: false,
+                      url: 'data-source',
+                    },
+                  },
+                  Array.from({ length: 6 }, (_, index) =>
+                    h('img', {
+                      attrs: {
+                        src: `https://picsum.photos/id/${10 + index}/128/72`,
+                        'data-source': `https://picsum.photos/id/${10 + index}/1280/720`,
+                        alt: `${text.image} ${index + 1}`,
+                      },
+                    }),
+                  ),
+                ),
+              ])
             : h(
                 Viewer,
                 {

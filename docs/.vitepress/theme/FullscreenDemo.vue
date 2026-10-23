@@ -27,24 +27,26 @@ const pageOnly = ref(false)
 const teleport = ref(!props.compareTeleport && !props.comparePageOnly)
 const popup = ref(false)
 const preview = ref<InstanceType<typeof Viewer>>()
-const showDetails = computed(() => !props.simple && !props.comparePageOnly)
+const showDetails = computed(() => props.compareTeleport)
 let readingPosition: { left: number; top: number } | undefined
 function rememberReadingPosition() {
   if (!active.value && !readingPosition)
     readingPosition = { left: window.scrollX, top: window.scrollY }
 }
 watch(active, (value) => {
-  if (!value) preview.value?.hide()
+  if (showDetails.value && !value) preview.value?.hide()
 })
 function previewImage() {
   if (popup.value) preview.value?.hide()
   else preview.value?.show()
 }
 async function fullscreenChanged(value: boolean) {
+  await nextTick()
+  // Page fullscreen changes the inline viewer's container without resizing the window.
+  if (!showDetails.value) window.dispatchEvent(new Event('resize'))
   if (value) return
   // This documentation page scrolls the window. Keep the library independent
   // of the host application's choice of scroll container.
-  await nextTick()
   if (readingPosition) {
     window.scrollTo({ ...readingPosition, behavior: 'instant' })
     readingPosition = undefined
@@ -75,7 +77,13 @@ const photoSizes = { thumb: '128/72', preview: '640/360', full: '1280/720' }
 const photoUrl = (id: number, size: 'thumb' | 'preview' | 'full' = 'thumb') =>
   `https://picsum.photos/id/${id}/${photoSizes[size]}`
 function movePhoto(offset: number) {
-  selected.value = (selected.value + offset + photos.length) % photos.length
+  if (showDetails.value)
+    selected.value = (selected.value + offset + photos.length) % photos.length
+  else if (offset < 0) preview.value?.prev(true)
+  else preview.value?.next(true)
+}
+function photoViewed(event: CustomEvent) {
+  selected.value = event.detail.index
 }
 const { lang } = useData()
 const english = computed(() => lang.value.startsWith('en'))
@@ -188,8 +196,8 @@ onBeforeUnmount(() => {
       class="demo-surface"
       tabindex="0"
       :aria-label="text.gallery"
-      @keydown.left.prevent="movePhoto(-1)"
-      @keydown.right.prevent="movePhoto(1)"
+      @keydown.left.stop.prevent="movePhoto(-1)"
+      @keydown.right.stop.prevent="movePhoto(1)"
       :page-only="pageOnly"
       :teleport="teleport"
       :exit-on-click-wrapper="false"
@@ -255,16 +263,30 @@ onBeforeUnmount(() => {
             />
           </button>
         </Viewer>
-        <img
+        <Viewer
           v-else
-          class="gallery-image"
-          :src="photoUrl(photo.id, active ? 'full' : 'preview')"
-          :alt="english ? photo.en : photo.zh"
-          width="1280"
-          height="720"
-          decoding="async"
-        />
+          ref="preview"
+          class="inline-gallery-sources"
+          inline
+          :button="false"
+          :transition="false"
+          :focus="false"
+          :fullscreen="false"
+          url="data-source"
+          @viewed="photoViewed"
+        >
+          <img
+            v-for="item in photos"
+            :key="item.id"
+            :src="photoUrl(item.id)"
+            :data-source="photoUrl(item.id, 'full')"
+            :alt="english ? item.en : item.zh"
+            width="1280"
+            height="720"
+          />
+        </Viewer>
         <button
+          v-if="showDetails"
           class="gallery-arrow gallery-previous"
           :aria-label="text.previous"
           @click="movePhoto(-1)"
@@ -272,6 +294,7 @@ onBeforeUnmount(() => {
           <span aria-hidden="true">‹</span>
         </button>
         <button
+          v-if="showDetails"
           class="gallery-arrow gallery-next"
           :aria-label="text.next"
           @click="movePhoto(1)"
@@ -280,6 +303,7 @@ onBeforeUnmount(() => {
         </button>
       </div>
       <div
+        v-if="showDetails"
         v-show="active"
         class="gallery-thumbnails"
         :aria-label="text.gallery"

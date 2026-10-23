@@ -28,6 +28,25 @@ async function closeViewer(popup: Locator, image: Locator, visible: boolean) {
   await expect(image).toHaveAttribute('aria-expanded', 'false')
 }
 
+async function expectInlineViewerSize(target: Locator, fullscreen: boolean) {
+  const stage = target.locator('.gallery-stage, .inline-gallery-stage')
+  const viewer = target.locator('.viewer-container')
+  await expect(viewer.locator('.viewer-canvas img')).toBeVisible()
+  await expect
+    .poll(async () => {
+      const container = await stage.boundingBox()
+      const content = await viewer.boundingBox()
+      return Math.max(
+        Math.abs(container!.width - content!.width),
+        Math.abs(container!.height - content!.height),
+      )
+    })
+    .toBeLessThan(2)
+  const box = await viewer.boundingBox()
+  if (fullscreen) expect(box!.height).toBeGreaterThan(300)
+  else expect(box!.height).toBeLessThanOrEqual(280)
+}
+
 for (const teleport of [false, true]) {
   for (const browserExit of [false, true]) {
     test(`native fullscreen preserves reading position: teleport=${teleport}, ${browserExit ? 'browser exit' : 'exit button'}`, async ({
@@ -565,6 +584,7 @@ for (const english of [false, true]) {
       )
       await frame.locator('#enter').click()
       await expect(frame.locator('#state')).toHaveText('true')
+      await expectInlineViewerSize(frame.locator('#target'), true)
       expect(
         await frame
           .locator('#target')
@@ -582,6 +602,7 @@ for (const english of [false, true]) {
       await expect(frame.getByLabel('teleport', { exact: true })).toHaveCount(0)
       await frame.locator('#exit').click()
       await expect(frame.locator('#state')).toHaveText('false')
+      await expectInlineViewerSize(frame.locator('#target'), false)
     })
   }
 }
@@ -606,6 +627,7 @@ for (const english of [false, true]) {
     await page.goto(`${english ? './en/' : './'}guide/getting-started`)
     const demo = page.locator('[data-comparison="pageOnly"]')
     const target = page.locator('#demo-page-only')
+    await expectInlineViewerSize(target, false)
     await expect(demo.getByRole('checkbox')).toHaveCount(1)
     for (const pageOnly of [false, true]) {
       await demo.getByLabel('pageOnly', { exact: true }).setChecked(pageOnly)
@@ -619,6 +641,7 @@ for (const english of [false, true]) {
       expect(
         await target.evaluate((el) => document.fullscreenElement === el),
       ).toBe(!pageOnly)
+      await expectInlineViewerSize(target, true)
       expect(
         await target.evaluate((el) => {
           const rect = el.getBoundingClientRect()
@@ -641,6 +664,7 @@ for (const english of [false, true]) {
         .click()
       await expect(demo.locator('#demo-page-only')).toBeVisible()
       await expect(target).not.toHaveClass(/demo-fullscreen/)
+      await expectInlineViewerSize(target, false)
       expect(await page.evaluate(() => document.fullscreenElement)).toBeNull()
     }
   })
@@ -770,6 +794,55 @@ for (const english of [false, true]) {
             exact: true,
           }),
         ).toHaveCount(0)
+        const target = page.locator('#demo-component')
+        const viewer = target.locator('.viewer-container')
+        const image = viewer.locator('.viewer-canvas img')
+        await expectInlineViewerSize(target, false)
+        await expect(viewer.locator('.viewer-list > li')).toHaveCount(6)
+        await viewer.getByRole('button', { name: 'Next', exact: true }).click()
+        await expect(image).toHaveAttribute(
+          'src',
+          /picsum\.photos\/id\/11\/1280\/720$/,
+        )
+        const width = await image.evaluate(
+          (el) => el.getBoundingClientRect().width,
+        )
+        await viewer
+          .getByRole('button', { name: 'Zoom In', exact: true })
+          .click()
+        await expect
+          .poll(() => image.evaluate((el) => el.getBoundingClientRect().width))
+          .toBeGreaterThan(width)
+        await demo
+          .getByRole('button', {
+            name: english ? 'Enter fullscreen' : '进入全屏',
+            exact: true,
+          })
+          .click()
+        await expectInlineViewerSize(target, true)
+        await viewer.locator('.viewer-list > li').nth(2).click()
+        await expect(image).toHaveAttribute(
+          'src',
+          /picsum\.photos\/id\/12\/1280\/720$/,
+        )
+        await target.focus()
+        await page.keyboard.press('ArrowLeft')
+        await expect(image).toHaveAttribute(
+          'src',
+          /picsum\.photos\/id\/11\/1280\/720$/,
+        )
+        await target
+          .getByRole('button', {
+            name: english ? 'Exit fullscreen' : '退出全屏',
+            exact: true,
+          })
+          .click()
+        await expectInlineViewerSize(target, false)
+        await expect(demo.locator('.gallery-count')).toHaveText('2 / 6')
+        await expect(page.locator('body > .viewer-container')).toHaveCount(0)
+        await page.setViewportSize({ width: 390, height: 844 })
+        await expectInlineViewerSize(target, false)
+        return
       } else {
         await expect(demo.getByRole('checkbox')).toHaveCount(1)
       }
