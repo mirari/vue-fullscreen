@@ -37,7 +37,7 @@ directive vue2 zh
 
 ### 修饰符
 
-`.pageOnly` 和 `.teleport` 对应同名配置。对象中的显式选项优先于修饰符。例如 `.pageOnly="{ pageOnly: false }"` 最终使用原生模式。
+[`.pageOnly`](/vue2/#pageonly) 和 [`.teleport`](/vue2/#teleport) 对应同名配置。对象中的显式选项优先于修饰符。例如 `.pageOnly="{ pageOnly: false }"` 最终使用原生模式。
 
 对象还支持 `fullscreenClass` 与 `callback(isFullscreen)`。指令使用共享 API，所以 `fullscreen.exit()` 可以退出由指令开启的全屏。
 
@@ -65,13 +65,13 @@ interface DirectiveOptions extends ApiOptions {
 }
 ```
 
-| 选项              | 类型                              | 默认值          | 说明                                |
-| ----------------- | --------------------------------- | --------------- | ----------------------------------- |
-| `target`          | `FullscreenTarget`                | `document.body` | 支持类型见[目标](#target)           |
-| `pageOnly`        | `boolean`                         | `false`         | 网页全屏                            |
-| `teleport`        | `boolean`                         | `false`         | 移动到 body；目标是 body 时自动关闭 |
-| `fullscreenClass` | `string`                          | `'fullscreen'`  | 激活时添加，退出时恢复              |
-| `callback`        | `(isFullscreen: boolean) => void` | 无              | 状态变化回调                        |
+| 选项                          | 类型                              | 默认值          | 说明                                |
+| ----------------------------- | --------------------------------- | --------------- | ----------------------------------- |
+| `target`                      | `FullscreenTarget`                | `document.body` | 支持类型见[目标](#target)           |
+| [`pageOnly`](/vue2/#pageonly) | `boolean`                         | `false`         | 网页全屏                            |
+| [`teleport`](/vue2/#teleport) | `boolean`                         | `false`         | 移动到 body；目标是 body 时自动关闭 |
+| `fullscreenClass`             | `string`                          | `'fullscreen'`  | 激活时添加，退出时恢复              |
+| `callback`                    | `(isFullscreen: boolean) => void` | 无              | 状态变化回调                        |
 
 ## 回调 {#callbacks}
 

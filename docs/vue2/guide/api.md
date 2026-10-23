@@ -60,12 +60,12 @@ fullscreen.exit(): Promise<void>
 
 ## 配置项 {#options}
 
-| 选项              | 类型                              | 默认值         | 说明                                |
-| ----------------- | --------------------------------- | -------------- | ----------------------------------- |
-| `pageOnly`        | `boolean`                         | `false`        | 网页全屏                            |
-| `teleport`        | `boolean`                         | `false`        | 移动到 body；目标是 body 时自动关闭 |
-| `fullscreenClass` | `string`                          | `'fullscreen'` | 激活时添加，退出时恢复              |
-| `callback`        | `(isFullscreen: boolean) => void` | 无             | 状态变化回调                        |
+| 选项                          | 类型                              | 默认值         | 说明                                |
+| ----------------------------- | --------------------------------- | -------------- | ----------------------------------- |
+| [`pageOnly`](/vue2/#pageonly) | `boolean`                         | `false`        | 网页全屏                            |
+| [`teleport`](/vue2/#teleport) | `boolean`                         | `false`        | 移动到 body；目标是 body 时自动关闭 |
+| `fullscreenClass`             | `string`                          | `'fullscreen'` | 激活时添加，退出时恢复              |
+| `callback`                    | `(isFullscreen: boolean) => void` | 无             | 状态变化回调                        |
 
 还可以按需导入 `screenfull`，它是底层原生全屏工具；直接使用它不会执行本库的网页全屏、样式和 teleport 管理。
 

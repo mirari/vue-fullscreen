@@ -65,11 +65,11 @@ useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): Use
 
 ## 配置项 {#options}
 
-| 选项              | 类型                     | 默认值         |
-| ----------------- | ------------------------ | -------------- |
-| `pageOnly`        | `boolean`、ref 或 getter | `false`        |
-| `teleport`        | `boolean`、ref 或 getter | `false`        |
-| `fullscreenClass` | `string`、ref 或 getter  | `'fullscreen'` |
+| 选项                                          | 类型                     | 默认值         |
+| --------------------------------------------- | ------------------------ | -------------- |
+| [`pageOnly`](/guide/getting-started#pageonly) | `boolean`、ref 或 getter | `false`        |
+| [`teleport`](/guide/getting-started#teleport) | `boolean`、ref 或 getter | `false`        |
+| `fullscreenClass`                             | `string`、ref 或 getter  | `'fullscreen'` |
 
 选项在每次进入时读取。原生能力不支持时自动使用网页全屏，请求失败时恢复 DOM 并拒绝 Promise。
 

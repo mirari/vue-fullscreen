@@ -39,7 +39,7 @@ With a regular `setup()` function or the Options API, register the directive loc
 
 ### Modifiers
 
-`.pageOnly` and `.teleport` set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
+[`.pageOnly`](/en/guide/getting-started#pageonly) and [`.teleport`](/en/guide/getting-started#teleport) set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
 
 The binding object also accepts `fullscreenClass` and `callback(isFullscreen)`. Bind the same directive inside the target to provide an exit button. Unmounting the directive that started the session cleans it up automatically.
 
@@ -67,13 +67,13 @@ interface DirectiveOptions extends ApiOptions {
 }
 ```
 
-| Option            | Type                              | Default         | Purpose                                      |
-| ----------------- | --------------------------------- | --------------- | -------------------------------------------- |
-| `target`          | `FullscreenTarget`                | `document.body` | Accepted types: see [Targets](#target)       |
-| `pageOnly`        | `boolean`                         | `false`         | Use page-only mode                           |
-| `teleport`        | `boolean`                         | `false`         | Move to the body; disabled for a body target |
-| `fullscreenClass` | `string`                          | `'fullscreen'`  | Class to add while active                    |
-| `callback`        | `(isFullscreen: boolean) => void` | None            | Report changes in state                      |
+| Option                                           | Type                              | Default         | Purpose                                      |
+| ------------------------------------------------ | --------------------------------- | --------------- | -------------------------------------------- |
+| `target`                                         | `FullscreenTarget`                | `document.body` | Accepted types: see [Targets](#target)       |
+| [`pageOnly`](/en/guide/getting-started#pageonly) | `boolean`                         | `false`         | Use page-only mode                           |
+| [`teleport`](/en/guide/getting-started#teleport) | `boolean`                         | `false`         | Move to the body; disabled for a body target |
+| `fullscreenClass`                                | `string`                          | `'fullscreen'`  | Class to add while active                    |
+| `callback`                                       | `(isFullscreen: boolean) => void` | None            | Report changes in state                      |
 
 ## Callbacks {#callbacks}
 

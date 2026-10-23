@@ -1,6 +1,6 @@
 # Component
 
-Wrap content in the component and use `v-model` to control fullscreen. When the user exits with Esc, the bound value returns to `false`.
+Wrap content in the component and use `v-model` to control fullscreen. Exiting fullscreen automatically sets the bound value to `false`.
 
 ## Playground {#playground}
 
@@ -14,14 +14,14 @@ component vue3 en
 
 ## Component props {#props}
 
-| Prop                 | Type      | Default        | Purpose                                                               |
-| -------------------- | --------- | -------------- | --------------------------------------------------------------------- |
-| `modelValue`         | `boolean` | `false`        | `v-model` value                                                       |
-| `pageOnly`           | `boolean` | `false`        | Fill the page; automatic fallback if native fullscreen is unavailable |
-| `teleport`           | `boolean` | `false`        | Move the element to the body while active                             |
-| `fullscreenClass`    | `string`  | `'fullscreen'` | Class applied while active                                            |
-| `exitOnClickWrapper` | `boolean` | `true`         | Exit on wrapper background clicks, not child clicks                   |
-| `fullscreen`         | `boolean` | `false`        | Deprecated model prop                                                 |
+| Prop                                             | Type      | Default        | Purpose                                                               |
+| ------------------------------------------------ | --------- | -------------- | --------------------------------------------------------------------- |
+| `modelValue`                                     | `boolean` | `false`        | `v-model` value                                                       |
+| [`pageOnly`](/en/guide/getting-started#pageonly) | `boolean` | `false`        | Fill the page; automatic fallback if native fullscreen is unavailable |
+| [`teleport`](/en/guide/getting-started#teleport) | `boolean` | `false`        | Move the element to the body while active                             |
+| `fullscreenClass`                                | `string`  | `'fullscreen'` | Class applied while active                                            |
+| `exitOnClickWrapper`                             | `boolean` | `true`         | Exit on wrapper background clicks, not child clicks                   |
+| `fullscreen`                                     | `boolean` | `false`        | Deprecated model prop                                                 |
 
 ## Instance properties {#instance-properties}
 

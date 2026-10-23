@@ -37,7 +37,7 @@ directive vue2 en
 
 ### Modifiers
 
-`.pageOnly` and `.teleport` set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
+[`.pageOnly`](/en/vue2/#pageonly) and [`.teleport`](/en/vue2/#teleport) set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
 
 The binding object also accepts `fullscreenClass` and `callback(isFullscreen)`. The directive uses the shared API, so `fullscreen.exit()` can exit a session started by a directive.
 
@@ -65,13 +65,13 @@ interface DirectiveOptions extends ApiOptions {
 }
 ```
 
-| Option            | Type                              | Default         | Purpose                                      |
-| ----------------- | --------------------------------- | --------------- | -------------------------------------------- |
-| `target`          | `FullscreenTarget`                | `document.body` | Accepted types: see [Targets](#target)       |
-| `pageOnly`        | `boolean`                         | `false`         | Use page-only mode                           |
-| `teleport`        | `boolean`                         | `false`         | Move to the body; disabled for a body target |
-| `fullscreenClass` | `string`                          | `'fullscreen'`  | Class to add while active                    |
-| `callback`        | `(isFullscreen: boolean) => void` | None            | Report changes in state                      |
+| Option                           | Type                              | Default         | Purpose                                      |
+| -------------------------------- | --------------------------------- | --------------- | -------------------------------------------- |
+| `target`                         | `FullscreenTarget`                | `document.body` | Accepted types: see [Targets](#target)       |
+| [`pageOnly`](/en/vue2/#pageonly) | `boolean`                         | `false`         | Use page-only mode                           |
+| [`teleport`](/en/vue2/#teleport) | `boolean`                         | `false`         | Move to the body; disabled for a body target |
+| `fullscreenClass`                | `string`                          | `'fullscreen'`  | Class to add while active                    |
+| `callback`                       | `(isFullscreen: boolean) => void` | None            | Report changes in state                      |
 
 ## Callbacks {#callbacks}
 

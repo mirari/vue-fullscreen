@@ -1,6 +1,6 @@
 # Vue 2 组件
 
-使用 `v-model` 控制全屏状态。它对应 `value` 属性和 `input` 事件；按 Esc 退出时，绑定值会同步更新。
+使用 `v-model` 控制全屏状态。它对应 `value` 属性和 `input` 事件；退出全屏时，绑定的状态会自动变回 `false`。
 
 ## 演练场 {#playground}
 
@@ -14,14 +14,14 @@ component vue2 zh
 
 ## 组件属性（Props） {#props}
 
-| 属性                 | 类型      | 默认值         | 说明                                  |
-| -------------------- | --------- | -------------- | ------------------------------------- |
-| `value`              | `boolean` | `false`        | `v-model` 绑定值                      |
-| `pageOnly`           | `boolean` | `false`        | 仅填满网页；不支持原生 API 时自动启用 |
-| `teleport`           | `boolean` | `false`        | 全屏期间将元素移动到 body             |
-| `fullscreenClass`    | `string`  | `'fullscreen'` | 激活期间的 class                      |
-| `exitOnClickWrapper` | `boolean` | `true`         | 点击容器背景退出；点击子元素不会触发  |
-| `fullscreen`         | `boolean` | `false`        | 已废弃的模型属性，保留兼容            |
+| 属性                          | 类型      | 默认值         | 说明                                  |
+| ----------------------------- | --------- | -------------- | ------------------------------------- |
+| `value`                       | `boolean` | `false`        | `v-model` 绑定值                      |
+| [`pageOnly`](/vue2/#pageonly) | `boolean` | `false`        | 仅填满网页；不支持原生 API 时自动启用 |
+| [`teleport`](/vue2/#teleport) | `boolean` | `false`        | 全屏期间将元素移动到 body             |
+| `fullscreenClass`             | `string`  | `'fullscreen'` | 激活期间的 class                      |
+| `exitOnClickWrapper`          | `boolean` | `true`         | 点击容器背景退出；点击子元素不会触发  |
+| `fullscreen`                  | `boolean` | `false`        | 已废弃的模型属性，保留兼容            |
 
 ## 实例属性 {#instance-properties}
 

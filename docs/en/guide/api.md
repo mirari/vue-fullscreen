@@ -65,11 +65,11 @@ useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): Use
 
 ## Options {#options}
 
-| Option            | Type                     | Default        |
-| ----------------- | ------------------------ | -------------- |
-| `pageOnly`        | `boolean`, ref or getter | `false`        |
-| `teleport`        | `boolean`, ref or getter | `false`        |
-| `fullscreenClass` | `string`, ref or getter  | `'fullscreen'` |
+| Option                                           | Type                     | Default        |
+| ------------------------------------------------ | ------------------------ | -------------- |
+| [`pageOnly`](/en/guide/getting-started#pageonly) | `boolean`, ref or getter | `false`        |
+| [`teleport`](/en/guide/getting-started#teleport) | `boolean`, ref or getter | `false`        |
+| `fullscreenClass`                                | `string`, ref or getter  | `'fullscreen'` |
 
 Options are read on each entry. Unsupported browsers fall back to page-only mode; failed native requests restore the DOM and reject.
 

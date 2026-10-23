@@ -58,12 +58,12 @@ These are ordinary properties, not Vue reactive refs. Use `callback` to update V
 
 ## Options {#options}
 
-| Option            | Type                              | Default        | Purpose                                      |
-| ----------------- | --------------------------------- | -------------- | -------------------------------------------- |
-| `pageOnly`        | `boolean`                         | `false`        | Use page-only mode                           |
-| `teleport`        | `boolean`                         | `false`        | Move to the body; disabled for a body target |
-| `fullscreenClass` | `string`                          | `'fullscreen'` | Class to add while active                    |
-| `callback`        | `(isFullscreen: boolean) => void` | None           | Report changes in state                      |
+| Option                           | Type                              | Default        | Purpose                                      |
+| -------------------------------- | --------------------------------- | -------------- | -------------------------------------------- |
+| [`pageOnly`](/en/vue2/#pageonly) | `boolean`                         | `false`        | Use page-only mode                           |
+| [`teleport`](/en/vue2/#teleport) | `boolean`                         | `false`        | Move to the body; disabled for a body target |
+| `fullscreenClass`                | `string`                          | `'fullscreen'` | Class to add while active                    |
+| `callback`                       | `(isFullscreen: boolean) => void` | None           | Report changes in state                      |
 
 `screenfull` is also available as a named export. It is the underlying native fullscreen utility; calling it directly does not manage page-only mode, styles or teleport.
 
