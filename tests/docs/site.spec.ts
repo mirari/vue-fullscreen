@@ -46,6 +46,24 @@ async function expectInlineViewerSize(target: Locator, fullscreen: boolean) {
   if (fullscreen) expect(box!.height).toBeGreaterThan(300)
 }
 
+async function expectSurfaceTheme(target: Locator) {
+  const dark = await target.evaluate((el) =>
+    el.ownerDocument.documentElement.classList.contains('dark'),
+  )
+  await expect(target).toHaveCSS(
+    'background-color',
+    dark ? 'rgb(32, 33, 39)' : 'rgb(255, 255, 255)',
+  )
+  await expect(target).toHaveCSS(
+    'color',
+    dark ? 'rgb(223, 223, 229)' : 'rgb(60, 60, 67)',
+  )
+  await expect(target.locator('#exit')).toHaveCSS(
+    'background-color',
+    dark ? 'rgb(170, 162, 255)' : 'rgb(91, 81, 216)',
+  )
+}
+
 for (const teleport of [false, true]) {
   for (const browserExit of [false, true]) {
     test(`native fullscreen preserves reading position: teleport=${teleport}, ${browserExit ? 'browser exit' : 'exit button'}`, async ({
@@ -123,6 +141,7 @@ for (const english of [false, true]) {
           const target = frame.locator('#target')
           await expect(frame.locator('#enter')).toBeDisabled()
           await expect(target).toHaveClass(/fullscreen/)
+          await expectSurfaceTheme(target)
           expect(
             await target.evaluate((el) => el.parentElement === document.body),
           ).toBe(teleport)
@@ -312,6 +331,7 @@ for (const english of [false, true]) {
         await expect(frame.locator('#demo-component, #target')).toHaveClass(
           /demo-fullscreen/,
         )
+        await expectSurfaceTheme(frame.locator('#demo-component, #target'))
         await image.click({ position: { x: 8, y: 8 } })
         await expectBodyViewer(popup, teleport)
         await closeViewer(popup, image, teleport)
@@ -359,6 +379,11 @@ for (const english of [false, true]) {
       )
       await expect(editor).toContainText('theme draft')
       await expect(frameElement).toHaveAttribute('srcdoc', source!)
+      await frame.locator('#enter').click()
+      const target = frame.locator('#demo-directive, #target')
+      await expect(target).toHaveClass(/demo-fullscreen/)
+      await expectSurfaceTheme(target)
+      await target.locator('#exit').click()
       await page.getByRole('switch').click()
       await expect(frame.locator('html')).not.toHaveClass('dark')
       await expect(editor).toContainText('theme draft')
@@ -484,6 +509,7 @@ for (const english of [false, true]) {
             .click()
           const target = page.locator(`#demo-${kind}`)
           await expect(target).toHaveClass(/demo-fullscreen/)
+          await expectSurfaceTheme(target)
           const fullImage = target.locator('.gallery-image').first()
           await expect(fullImage).toHaveCSS('object-fit', 'cover')
           await expect
