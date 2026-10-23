@@ -37,15 +37,27 @@ With a regular `setup()` function or the Options API, register the directive loc
 </button>
 ```
 
-`target` also accepts HTML elements, Vue refs, component instances (using `$el`) and getters. The current target is resolved on entry. Strings passed directly are CSS selectors; use `'#report'` for an id.
-
-An unresolved target dispatches `fullscreen-error`. Passing `null` directly is equivalent to omitting `target`.
-
 ### Modifiers
 
 `.pageOnly` and `.teleport` set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
 
 The binding object also accepts `fullscreenClass` and `callback(isFullscreen)`. Bind the same directive inside the target to provide an exit button. Unmounting the directive that started the session cleans it up automatically.
+
+## Targets {#target}
+
+Set `target` in the binding object to select the fullscreen element:
+
+| Target type        | Example                                              |
+| ------------------ | ---------------------------------------------------- |
+| HTML element       | `{ target: document.getElementById('panel') }`       |
+| Vue ref object     | `{ target: panelRef }`                               |
+| Component instance | `{ target: panelComponent }`; uses its `$el`         |
+| CSS selector       | `{ target: '#panel' }` or `{ target: '.panel' }`     |
+| Getter             | `{ target: () => document.getElementById('panel') }` |
+
+The current target is resolved on each entry. Omitting `target` or passing `null` directly uses `document.body`. Missing selectors, unmounted refs and other unresolved targets dispatch `fullscreen-error`.
+
+String targets are CSS selectors, including the shorthand `v-fullscreen="'#panel'"`. An id needs the `#` prefix.
 
 ## Options {#options}
 
@@ -57,7 +69,7 @@ interface DirectiveOptions extends ApiOptions {
 
 | Option            | Type                              | Default         | Purpose                                      |
 | ----------------- | --------------------------------- | --------------- | -------------------------------------------- |
-| `target`          | `FullscreenTarget`                | `document.body` | Target; direct strings are CSS selectors     |
+| `target`          | `FullscreenTarget`                | `document.body` | Accepted types: see [Targets](#target)       |
 | `pageOnly`        | `boolean`                         | `false`         | Use page-only mode                           |
 | `teleport`        | `boolean`                         | `false`         | Move to the body; disabled for a body target |
 | `fullscreenClass` | `string`                          | `'fullscreen'`  | Class to add while active                    |

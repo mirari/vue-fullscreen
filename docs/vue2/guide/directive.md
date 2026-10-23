@@ -35,15 +35,27 @@ directive vue2 zh
 </button>
 ```
 
-`target` 还支持 HTML 元素、Vue ref、组件实例（使用 `$el`）和 getter，进入全屏时解析当前目标。直接传入的字符串按 CSS 选择器处理，id 应写成 `'#report'`。
-
-无法解析目标时触发 `fullscreen-error`。直接传入 `null` 与省略 `target` 相同。
-
 ### 修饰符
 
 `.pageOnly` 和 `.teleport` 对应同名配置。对象中的显式选项优先于修饰符。例如 `.pageOnly="{ pageOnly: false }"` 最终使用原生模式。
 
 对象还支持 `fullscreenClass` 与 `callback(isFullscreen)`。指令使用共享 API，所以 `fullscreen.exit()` 可以退出由指令开启的全屏。
+
+## 目标 {#target}
+
+通过绑定对象的 `target` 指定全屏目标，支持以下类型：
+
+| 目标类型     | 示例                                             |
+| ------------ | ------------------------------------------------ |
+| HTML 元素    | `{ target: document.getElementById('panel') }`   |
+| Vue ref 对象 | `{ target: panelRef }`                           |
+| 组件实例     | `{ target: this.$refs.panel }`，使用其 `$el`     |
+| CSS 选择器   | `{ target: '#panel' }` 或 `{ target: '.panel' }` |
+| getter       | `{ target: () => this.$refs.panel }`             |
+
+每次进入全屏时解析当前目标。省略 `target` 或直接传入 `null` 时使用 `document.body`；选择器未匹配、ref 尚未挂载等无法解析目标的情况会触发 `fullscreen-error`。
+
+字符串目标按 CSS 选择器解析，简写 `v-fullscreen="'#panel'"` 也遵循此规则，id 需要带 `#` 前缀。
 
 ## 配置项 {#options}
 
@@ -53,13 +65,13 @@ interface DirectiveOptions extends ApiOptions {
 }
 ```
 
-| 选项              | 类型                              | 默认值          | 说明                                    |
-| ----------------- | --------------------------------- | --------------- | --------------------------------------- |
-| `target`          | `FullscreenTarget`                | `document.body` | 目标；直接传入的字符串按 CSS 选择器解析 |
-| `pageOnly`        | `boolean`                         | `false`         | 网页全屏                                |
-| `teleport`        | `boolean`                         | `false`         | 移动到 body；目标是 body 时自动关闭     |
-| `fullscreenClass` | `string`                          | `'fullscreen'`  | 激活时添加，退出时恢复                  |
-| `callback`        | `(isFullscreen: boolean) => void` | 无              | 状态变化回调                            |
+| 选项              | 类型                              | 默认值          | 说明                                |
+| ----------------- | --------------------------------- | --------------- | ----------------------------------- |
+| `target`          | `FullscreenTarget`                | `document.body` | 支持类型见[目标](#target)           |
+| `pageOnly`        | `boolean`                         | `false`         | 网页全屏                            |
+| `teleport`        | `boolean`                         | `false`         | 移动到 body；目标是 body 时自动关闭 |
+| `fullscreenClass` | `string`                          | `'fullscreen'`  | 激活时添加，退出时恢复              |
+| `callback`        | `(isFullscreen: boolean) => void` | 无              | 状态变化回调                        |
 
 ## 回调 {#callbacks}
 
