@@ -12,8 +12,6 @@ Use `v-model` to control fullscreen. It binds the `value` prop and `input` event
 
 <Vue2Demo kind="component" />
 
-Only fullscreen-related code is shown below. See the Playground for the complete example.
-
 ```fullscreen-example
 component vue2 en
 ```

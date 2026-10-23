@@ -8,8 +8,6 @@
 
 <Vue2Demo kind="api" />
 
-以下仅展示全屏相关代码，完整示例见演练场。
-
 ```fullscreen-example
 api vue2 zh
 ```

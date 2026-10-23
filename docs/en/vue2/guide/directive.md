@@ -12,8 +12,6 @@ The directive provides a click trigger without requiring a model value.
 
 <Vue2Demo kind="directive" />
 
-Only fullscreen-related code is shown below. See the Playground for the complete example.
-
 ```fullscreen-example
 directive vue2 en
 ```

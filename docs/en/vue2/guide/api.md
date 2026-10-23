@@ -8,8 +8,6 @@ Import the API to control an existing element. Every operation returns a Promise
 
 <Vue2Demo kind="api" />
 
-Only fullscreen-related code is shown below. See the Playground for the complete example.
-
 ```fullscreen-example
 api vue2 en
 ```

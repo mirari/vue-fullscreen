@@ -8,8 +8,6 @@ Control an existing element from buttons or application logic, with reactive ful
 
 <UsageDemo kind="api" />
 
-Only fullscreen-related code is shown below. See the Playground for the complete example.
-
 ```fullscreen-example
 api vue3 en
 ```
