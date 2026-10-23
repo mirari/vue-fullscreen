@@ -2,36 +2,17 @@
 
 Register the directive locally, then click the button to toggle a target element.
 
-::: tip On this page
-See the [**directive reference**](#reference) for all binding values, modifiers and options.
-:::
+## Playground {#playground}
 
-<ClientOnly><Vue2Demo kind="directive" /></ClientOnly>
+[Playground](/en/vue2/playground?example=directive)
 
-```vue
-<template>
-  <div>
-    <button
-      v-fullscreen.pageOnly.teleport="{ target: '#report' }"
-      @fullscreen-error="error = $event.detail.message"
-    >
-      Toggle fullscreen
-    </button>
-    <section id="report">Content</section>
-    <p v-if="error" role="alert">{{ error }}</p>
-  </div>
-</template>
+<Vue2Demo kind="directive" />
 
-<script>
-import { vFullscreen } from 'vue-fullscreen'
-export default {
-  directives: { fullscreen: vFullscreen },
-  data: () => ({ error: '' }),
-}
-</script>
+```fullscreen-example
+directive vue2 en
 ```
 
-## Binding values
+## Binding values and modifiers {#reference}
 
 ```vue
 <!-- No binding: target document.body -->
@@ -50,25 +31,13 @@ export default {
 
 An unresolved target dispatches `fullscreen-error`. Omitting `target` or passing `null` directly uses `document.body`.
 
-## Modifiers and options
+### Modifiers
 
 `.pageOnly` and `.teleport` set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
 
 The binding object also accepts `fullscreenClass` and `callback(isFullscreen)`. The directive uses the shared API, so `fullscreen.exit()` can exit a session started by a directive.
 
-## Errors
-
-Failures dispatch a bubbling native `fullscreen-error` event. The error is in `event.detail`; this is separate from the component's `error` event.
-
-```js
-button.addEventListener('fullscreen-error', (event) => {
-  console.error(event.detail)
-})
-```
-
-A button outside the fullscreen target may not be visible in native mode. Put an exit button inside the target, or use Esc.
-
-## Reference
+## Options {#options}
 
 ```ts
 interface DirectiveOptions extends ApiOptions {
@@ -83,3 +52,27 @@ interface DirectiveOptions extends ApiOptions {
 | `teleport`        | `boolean`                         | `false`         | Move to the body; disabled for a body target |
 | `fullscreenClass` | `string`                          | `'fullscreen'`  | Class to add while active                    |
 | `callback`        | `(isFullscreen: boolean) => void` | None            | Report changes in state                      |
+
+## Callbacks {#callbacks}
+
+Use `callback` to keep application state synchronized when fullscreen changes.
+
+```js
+const options = {
+  callback(isFullscreen) {
+    console.log(isFullscreen)
+  },
+}
+```
+
+## Error events {#events}
+
+Failures dispatch a bubbling native `fullscreen-error` event. The error is in `event.detail`.
+
+```js
+button.addEventListener('fullscreen-error', (event) => {
+  console.error(event.detail)
+})
+```
+
+A button outside the fullscreen target may not be visible in native mode. Put an exit button inside the target, or use Esc.

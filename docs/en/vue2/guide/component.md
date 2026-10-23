@@ -2,42 +2,41 @@
 
 Use `v-model` to control fullscreen. It binds the `value` prop and `input` event. Exiting with Esc updates the bound value.
 
-::: tip On this page
-See the [**component reference**](#reference) for all props, events and methods.
+::: warning Upgrading existing projects
+4.x is a new major release and retains the Vue plugin. Use `v-model` for component state; see the [migration example](#migration).
 :::
 
-<ClientOnly><Vue2Demo kind="component" /></ClientOnly>
+## Playground {#playground}
 
-## Local registration
+[Playground](/en/vue2/playground?example=component)
 
-```vue
-<template>
-  <div>
-    <button @click="active = true">Enter fullscreen</button>
-    <Fullscreen v-model="active" page-only teleport @error="handleError">
-      <h2>Content</h2>
-      <button @click="active = false">Exit fullscreen</button>
-    </Fullscreen>
-    <p v-if="error" role="alert">{{ error }}</p>
-  </div>
-</template>
+<Vue2Demo kind="component" />
 
-<script>
-import { Fullscreen } from 'vue-fullscreen'
-export default {
-  components: { Fullscreen },
-  data: () => ({ active: false, error: '' }),
-  methods: {
-    handleError(error) {
-      this.active = false
-      this.error = error.message
-    },
-  },
-}
-</script>
+```fullscreen-example
+component vue2 en
 ```
 
-## Component methods
+## Props {#props}
+
+| Prop                 | Type      | Default        | Purpose                                                               |
+| -------------------- | --------- | -------------- | --------------------------------------------------------------------- |
+| `value`              | `boolean` | `false`        | `v-model` value                                                       |
+| `pageOnly`           | `boolean` | `false`        | Fill the page; automatic fallback if native fullscreen is unavailable |
+| `teleport`           | `boolean` | `false`        | Move the element to the body while active                             |
+| `fullscreenClass`    | `string`  | `'fullscreen'` | Class applied while active                                            |
+| `exitOnClickWrapper` | `boolean` | `true`         | Exit on wrapper background clicks, not child clicks                   |
+| `fullscreen`         | `boolean` | `false`        | Deprecated model prop                                                 |
+
+## Events {#events}
+
+| Event               | Argument     | Purpose                                                      |
+| ------------------- | ------------ | ------------------------------------------------------------ |
+| `change`            | `boolean`    | Fullscreen state changed                                     |
+| `input`             | `boolean`    | Synchronize `v-model`                                        |
+| `update:fullscreen` | `boolean`    | Synchronize the deprecated model                             |
+| `error`             | Error object | A model change or wrapper click triggered a failed operation |
+
+## Methods and state {#methods}
 
 Set `ref="panel"` on the component to call its methods:
 
@@ -49,32 +48,6 @@ async enterPanel() {
 ```
 
 The instance provides `request()`, `exit()` and `toggle(force?)`, as well as the compatibility members `enter()`, `getState()` and `support`.
-
-## Reference
-
-### Props
-
-| Prop                 | Type      | Default        | Purpose                                                               |
-| -------------------- | --------- | -------------- | --------------------------------------------------------------------- |
-| `value`              | `boolean` | `false`        | `v-model` value                                                       |
-| `pageOnly`           | `boolean` | `false`        | Fill the page; automatic fallback if native fullscreen is unavailable |
-| `teleport`           | `boolean` | `false`        | Move the element to the body while active                             |
-| `fullscreenClass`    | `string`  | `'fullscreen'` | Class applied while active                                            |
-| `exitOnClickWrapper` | `boolean` | `true`         | Exit on wrapper background clicks, not child clicks                   |
-| `fullscreen`         | `boolean` | `false`        | Deprecated model prop                                                 |
-
-Do not supply conflicting model values.
-
-### Events
-
-| Event               | Argument     | Purpose                                                      |
-| ------------------- | ------------ | ------------------------------------------------------------ |
-| `change`            | `boolean`    | Fullscreen state changed                                     |
-| `input`             | `boolean`    | Synchronize `v-model`                                        |
-| `update:fullscreen` | `boolean`    | Synchronize the deprecated model                             |
-| `error`             | Error object | A model change or wrapper click triggered a failed operation |
-
-### Instance members
 
 | Member         | Type / signature                   | Purpose                  |
 | -------------- | ---------------------------------- | ------------------------ |
@@ -88,3 +61,25 @@ Do not supply conflicting model values.
 | `support`      | `boolean`                          | Alias for `isEnabled`    |
 
 Handle rejected Promises when calling methods directly. The component cleans up listeners and moved DOM nodes on unmount.
+
+## Migrating older versions {#migration}
+
+```vue
+<!-- Before -->
+<fullscreen :fullscreen="active" @update:fullscreen="active = $event" />
+
+<!-- Now -->
+<fullscreen v-model="active" />
+```
+
+```js
+// Before
+this.$refs.panel.enter()
+this.$refs.panel.getState()
+this.$refs.panel.support
+
+// Now
+this.$refs.panel.request()
+this.$refs.panel.isFullscreen
+this.$refs.panel.isEnabled
+```

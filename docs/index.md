@@ -9,7 +9,7 @@ hero:
       text: 快速上手
       link: /guide/getting-started
     - theme: alt
-      text: Playground
+      text: 演练场
       link: /playground
 features:
   - title: 组件

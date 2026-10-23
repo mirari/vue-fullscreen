@@ -2,63 +2,21 @@
 
 导入 API 可以控制已有元素。每个操作都返回 Promise。
 
-::: tip 本页参考
-完整的参数、返回值和方法列表见[**API 参考**](#参考)。
-:::
+## 演练场 {#playground}
 
-<ClientOnly><Vue2Demo kind="api" /></ClientOnly>
+[演练场](/vue2/playground?example=api)
 
-```vue
-<template>
-  <div>
-    <button @click="enter">进入全屏</button>
-    <section ref="target">
-      <h2>内容区域</h2>
-      <button v-if="active" @click="exit">退出全屏</button>
-    </section>
-    <p v-if="error" role="alert">{{ error }}</p>
-  </div>
-</template>
+<Vue2Demo kind="api" />
 
-<script>
-import { fullscreen } from 'vue-fullscreen'
-export default {
-  data: () => ({ active: false, error: '' }),
-  methods: {
-    async enter() {
-      try {
-        await fullscreen.request(this.$refs.target, {
-          pageOnly: true,
-          teleport: true,
-          callback: (isFullscreen) => {
-            this.active = isFullscreen
-          },
-        })
-      } catch (error) {
-        this.error = error.message
-      }
-    },
-    async exit() {
-      try {
-        await fullscreen.exit()
-      } catch (error) {
-        this.error = error.message
-      }
-    },
-  },
-  beforeDestroy() {
-    if (fullscreen.element === this.$refs.target)
-      void fullscreen.exit().catch(() => {})
-  },
-}
-</script>
+```fullscreen-example
+api vue2 zh
 ```
 
 示例使用网页全屏。原生模式下，应在路由离开守卫中等待 `fullscreen.exit()`，再移除目标。
 
 ## 目标类型
 
-目标支持 HTML 元素、Vue 模板 ref、组件实例（使用 `$el`）、id 字符串（`'panel'` 或 `'#panel'`）以及 getter。每次进入时解析当前目标；id 不存在或 ref 尚未挂载会拒绝 Promise，不会让 body 意外全屏。省略目标或直接传入 `null` 时控制 `document.body`。
+目标支持 HTML 元素、Vue 模板 ref、组件实例（使用 `$el`）、id 字符串（`'panel'` 或 `'#panel'`）以及 getter。每次进入时解析当前目标；id 不存在或 ref 尚未挂载会拒绝 Promise。省略目标或直接传入 `null` 时控制 `document.body`。
 
 ```js
 await fullscreen.request('panel') // id
@@ -81,9 +39,7 @@ await fullscreen.exit() // 已退出时不执行操作
 原生全屏请求要直接由点击、按键等操作触发。不要先等待网络请求再调用 `request()`，否则浏览器可能拒绝。
 :::
 
-## 参考
-
-### 方法
+## 方法 {#methods}
 
 ```ts
 fullscreen.request(target?: FullscreenTarget, options?: ApiOptions): Promise<void>
@@ -91,7 +47,7 @@ fullscreen.toggle(target?: FullscreenTarget, options?: ApiOptions, force?: boole
 fullscreen.exit(): Promise<void>
 ```
 
-### 状态
+## 状态 {#state}
 
 | 属性           | 类型              | 说明                         |
 | -------------- | ----------------- | ---------------------------- |
@@ -102,7 +58,7 @@ fullscreen.exit(): Promise<void>
 
 这些是普通属性，不是 Vue 的响应式引用。想让页面随 Esc 等操作更新，请使用 `callback` 同步 Vue 状态，或使用组件的 `v-model`。
 
-### ApiOptions
+## 配置项 {#options}
 
 | 选项              | 类型                              | 默认值         | 说明                                |
 | ----------------- | --------------------------------- | -------------- | ----------------------------------- |
@@ -112,3 +68,14 @@ fullscreen.exit(): Promise<void>
 | `callback`        | `(isFullscreen: boolean) => void` | 无             | 状态变化回调                        |
 
 还可以按需导入 `screenfull`，它是底层原生全屏工具；直接使用它不会执行本库的网页全屏、样式和 teleport 管理。
+
+## 回调 {#callbacks}
+
+```js
+fullscreen.request(target, {
+  callback(isFullscreen) {
+    // 同步页面状态
+    active = isFullscreen
+  },
+})
+```

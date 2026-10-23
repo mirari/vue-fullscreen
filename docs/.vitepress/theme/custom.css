@@ -2,10 +2,19 @@
   --vp-c-brand-1: #5b51d8;
   --vp-c-brand-2: #7367ee;
   --vp-c-brand-3: #8278f5;
+  --vp-button-brand-bg: #5b51d8;
+  --vp-button-brand-text: #fff;
+  --vp-button-brand-hover-bg: #493dbc;
+  --vp-button-brand-hover-text: #fff;
+  accent-color: var(--vp-c-brand-1);
 }
 .dark {
   --vp-c-brand-1: #aaa2ff;
   --vp-c-brand-2: #9187ff;
+  --vp-button-brand-bg: #aaa2ff;
+  --vp-button-brand-text: #202127;
+  --vp-button-brand-hover-bg: #bcb5ff;
+  --vp-button-brand-hover-text: #202127;
 }
 .fullscreen-demo {
   margin: 24px 0;
@@ -37,8 +46,8 @@
 .demo-button {
   border: 0;
   border-radius: 8px;
-  background: #5b51d8;
-  color: #fff;
+  background: var(--vp-button-brand-bg);
+  color: var(--vp-button-brand-text);
   padding: 9px 16px;
   font-size: 13px;
   font-weight: 600;
@@ -46,7 +55,7 @@
   line-height: 1.6;
 }
 .demo-button:hover {
-  background: #493dbc;
+  background: var(--vp-button-brand-hover-bg);
 }
 .demo-button:focus-visible {
   outline: 3px solid #afa7ff;
@@ -60,8 +69,8 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: #101820;
-  color: #edf2f7;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
   overflow: hidden;
 }
 .demo-surface:not(.demo-fullscreen) {
@@ -81,15 +90,15 @@
 }
 .gallery-count {
   margin-left: auto;
-  color: #a8b5c3;
+  color: var(--vp-c-text-2);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 .gallery-exit {
   padding: 4px 12px;
-  border: 1px solid #637182;
+  border: 1px solid var(--vp-c-divider);
   border-radius: 6px;
-  color: #fff;
+  color: var(--vp-c-text-1);
   font-size: 13px;
 }
 .gallery-stage {
@@ -164,7 +173,7 @@
   cursor: pointer;
 }
 .gallery-thumbnails button[aria-pressed='true'] {
-  border-color: #d8e3f0;
+  border-color: var(--vp-c-brand-1);
   opacity: 1;
 }
 .gallery-thumbnails img {
@@ -177,7 +186,7 @@
   opacity: 1;
 }
 .demo-surface button:focus-visible {
-  outline: 2px solid #fff;
+  outline: 2px solid var(--vp-c-brand-1);
   outline-offset: 3px;
 }
 .demo-caption a {
@@ -198,8 +207,8 @@
 .demo-comparison-status {
   flex-shrink: 0;
   padding: 10px 20px;
-  border-top: 1px solid #ffffff20;
-  background: #182b37;
+  border-top: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-alt);
   font-size: 12px;
   line-height: 1.7;
 }
@@ -222,7 +231,7 @@
   overflow: auto;
   box-sizing: border-box;
   padding: 24px;
-  border: 1px solid #b88a47;
+  border: 1px solid var(--vp-c-brand-1);
   border-radius: 12px;
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
@@ -234,7 +243,7 @@
   display: inline-block;
   padding: 0 8px;
   border-radius: 4px;
-  background: #b88a4726;
+  background: var(--vp-c-brand-soft);
   color: var(--vp-c-text-1);
   font-family: var(--vp-font-family-mono);
   font-size: 12px;

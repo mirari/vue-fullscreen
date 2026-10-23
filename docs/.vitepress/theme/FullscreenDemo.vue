@@ -91,23 +91,8 @@ const text = computed(() =>
         popupContent:
           'This popup is mounted under body, like a dialog from a UI library.',
         closePopup: 'Close popup',
-        moved: 'Native fullscreen element: body',
-        stayed: 'Native fullscreen element: image panel',
-        pageStatus: 'Page-only fullscreen · body popups remain visible',
         hiddenPopup:
           'The popup is open under body, but is outside the native fullscreen element. Exit and enable “teleport” to see it.',
-        pageComparison:
-          'Page-only mode displays the body popup with either setting. Turn it off to compare popup visibility in native fullscreen.',
-        nativeWithout:
-          'The image panel fills the screen, but the body popup is outside this fullscreen element and cannot appear.',
-        nativeWith:
-          'The image panel fills the screen. Body is the fullscreen element, so its popup can appear too.',
-        pageCaption:
-          'Page-only mode keeps the browser toolbar visible. Press Esc or use the exit button to leave.',
-        nativeCaption:
-          'Native mode requests browser fullscreen. Availability depends on the browser and its permissions.',
-        pageOnlyStatus: 'pageOnly: true · the browser toolbar stays visible',
-        nativeStatus: 'pageOnly: false · the browser hides its toolbar',
         error: 'Fullscreen request failed:',
       }
     : {
@@ -126,30 +111,10 @@ const text = computed(() =>
         popupTitle: '图片详情',
         popupContent: '这个弹窗挂载在 body 下，模拟 UI 组件库的对话框。',
         closePopup: '关闭弹窗',
-        moved: '原生全屏元素：body',
-        stayed: '原生全屏元素：图片区域',
-        pageStatus: '网页全屏 · body 弹窗均可见',
         hiddenPopup:
           '弹窗已在 body 下打开，但不属于当前原生全屏元素。退出并勾选「teleport」后再试。',
-        pageComparison:
-          '网页全屏下，body 弹窗都能显示。请关闭 pageOnly，对比原生全屏下的弹窗可见性。',
-        nativeWithout:
-          '图片区域会铺满屏幕，但 body 弹窗位于全屏元素之外，无法显示。',
-        nativeWith:
-          '图片区域同样铺满屏幕；此时 body 是全屏元素，其下的弹窗也能显示。',
-        pageCaption: '网页全屏保留浏览器工具栏，按 Esc 或点击退出按钮退出。',
-        nativeCaption: '原生全屏由浏览器提供，是否可用取决于浏览器支持与权限。',
-        pageOnlyStatus: 'pageOnly: true · 保留浏览器工具栏',
-        nativeStatus: 'pageOnly: false · 浏览器隐藏工具栏',
         error: '无法进入全屏：',
       },
-)
-const comparisonCaption = computed(() =>
-  pageOnly.value
-    ? text.value.pageComparison
-    : teleport.value
-      ? text.value.nativeWith
-      : text.value.nativeWithout,
 )
 const options = computed(() => ({
   target: `#${demoId.value}`,
@@ -183,7 +148,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section
-    class="fullscreen-demo"
+    class="fullscreen-demo vp-raw"
     :data-demo="comparePageOnly ? 'page-only' : kind"
     :data-comparison="
       comparePageOnly ? 'pageOnly' : compareTeleport ? 'teleport' : undefined
@@ -214,13 +179,6 @@ onBeforeUnmount(() => {
       <button v-else class="demo-button" :disabled="active" @click="enter">
         {{ text.enter }}
       </button>
-      <code class="demo-config">{{
-        comparePageOnly
-          ? `{ pageOnly: ${pageOnly} }`
-          : compareTeleport
-            ? `{ teleport: ${teleport} }`
-            : `{ pageOnly: ${pageOnly}, teleport: ${teleport} }`
-      }}</code>
     </div>
     <component
       :is="kind === 'component' ? Fullscreen : 'div'"
@@ -260,23 +218,11 @@ onBeforeUnmount(() => {
         </button>
       </div>
       <div
-        v-if="comparePageOnly && active"
+        v-if="showDetails && active && popup && !pageOnly && !teleport"
         class="demo-comparison-status"
         aria-live="polite"
       >
-        <span>{{ pageOnly ? text.pageOnlyStatus : text.nativeStatus }}</span>
-        <p>{{ pageOnly ? text.pageCaption : text.nativeCaption }}</p>
-      </div>
-      <div
-        v-if="showDetails && active"
-        class="demo-comparison-status"
-        aria-live="polite"
-      >
-        <span>{{
-          pageOnly ? text.pageStatus : teleport ? text.moved : text.stayed
-        }}</span>
-        <p>{{ comparisonCaption }}</p>
-        <p v-if="popup && !pageOnly && !teleport" role="status">
+        <p role="status">
           {{ text.hiddenPopup }}
         </p>
       </div>
@@ -365,12 +311,6 @@ onBeforeUnmount(() => {
         </button>
       </aside>
     </Teleport>
-    <p
-      v-if="!simple && !compareTeleport && !comparePageOnly"
-      class="demo-caption"
-    >
-      {{ pageOnly ? text.pageCaption : text.nativeCaption }}
-    </p>
     <p v-if="error" role="alert" class="demo-error">
       {{ text.error }} {{ error }}
     </p>

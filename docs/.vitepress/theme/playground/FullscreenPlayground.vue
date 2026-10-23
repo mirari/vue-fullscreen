@@ -108,6 +108,7 @@ async function run() {
       imports,
       !!props.vue2,
       english.value,
+      isDark.value,
     )
     revision.value++
     status.value = 'running'
@@ -168,6 +169,7 @@ function receive(event: MessageEvent) {
   if (level === 'ready') {
     clearTimeout(timeout)
     if (status.value !== 'error') status.value = 'ready'
+    syncTheme()
     return
   }
   if (level === 'error') {
@@ -188,6 +190,10 @@ function shortcut(event: KeyboardEvent) {
 }
 
 onMounted(() => {
+  const requestedExample = new URLSearchParams(window.location.search).get(
+    'example',
+  ) as Example
+  if (examples.includes(requestedExample)) kind.value = requestedExample
   window.addEventListener('message', receive)
   editor = new EditorView({
     parent: editorElement.value,
@@ -234,7 +240,15 @@ onMounted(() => {
 
 watch(isDark, (dark) => {
   editor?.dispatch({ effects: editorTheme.reconfigure(dark ? oneDark : []) })
+  syncTheme()
 })
+
+function syncTheme() {
+  frame.value?.contentWindow?.postMessage(
+    { source: 'fullscreen-preview-theme', dark: isDark.value },
+    '*',
+  )
+}
 
 onBeforeUnmount(() => {
   generation++
@@ -246,7 +260,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section
-    class="fullscreen-playground"
+    class="fullscreen-playground vp-raw"
     :class="{ 'playground-dark': isDark }"
     @keydown="shortcut"
   >
@@ -324,7 +338,7 @@ onBeforeUnmount(() => {
     </div>
     <div class="playground-footer">
       <span>{{ text.shortcut }}</span
-      ><span>vue-fullscreen · {{ props.vue2 ? 'Vue 2' : 'Vue 3' }}</span>
+      ><span>vue-fullscreen</span>
     </div>
   </section>
 </template>
@@ -371,8 +385,8 @@ onBeforeUnmount(() => {
   color: var(--vp-c-text-2);
 }
 .playground-toolbar .playground-run {
-  background: var(--vp-c-brand-3);
-  color: white;
+  background: var(--vp-button-brand-bg);
+  color: var(--vp-button-brand-text);
   min-width: 80px;
 }
 .playground-run span {
@@ -431,8 +445,8 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 400px;
   border: 0;
-  background: #101820;
-  color: #a4b5c8;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-2);
 }
 .playground-placeholder {
   display: grid;

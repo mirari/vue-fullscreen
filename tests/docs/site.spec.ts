@@ -75,7 +75,7 @@ for (const english of [false, true]) {
             .setChecked(teleport)
           await frame.locator('#enter').click()
           const target = frame.locator('#target')
-          await expect(frame.locator('#state')).toHaveText('true')
+          await expect(frame.locator('#enter')).toBeDisabled()
           await expect(target).toHaveClass(/fullscreen/)
           expect(
             await target.evaluate((el) => el.parentElement === document.body),
@@ -112,7 +112,7 @@ for (const english of [false, true]) {
           await expect(details).toHaveAttribute('aria-expanded', 'false')
           await expect(popup).toHaveAttribute('hidden')
           await frame.locator('#exit').click()
-          await expect(frame.locator('#state')).toHaveText('false')
+          await expect(frame.locator('#enter')).toBeEnabled()
           await expect(target).not.toHaveClass(/fullscreen/)
           expect(
             await target.evaluate(() => document.fullscreenElement),
@@ -151,7 +151,7 @@ async function expectSidebar(page: Page, english: boolean, vue2 = false) {
           '组件',
           '指令',
           'API',
-          'Playground',
+          '演练场',
           '更多示例',
           '常见问题',
           '问题反馈',
@@ -183,6 +183,109 @@ test.beforeEach(async ({ page }) => {
     }),
   )
 })
+
+for (const english of [false, true]) {
+  for (const vue2 of [false, true]) {
+    const prefix = (english ? './en/' : './') + (vue2 ? 'vue2/' : '')
+    const playground = english ? 'Playground' : '演练场'
+    test(`${prefix} usage links select the matching playground example`, async ({
+      page,
+    }) => {
+      for (const kind of ['component', 'directive', 'api']) {
+        await page.goto(`${prefix}guide/${kind}`)
+        await expect(page.locator('h2#playground')).toContainText(playground)
+        await expect(page.locator('.vp-doc')).not.toContainText(
+          english ? 'On this page' : '本页参考',
+        )
+        const code = page.locator('.vp-doc div.language-vue').first()
+        await expect(code).toContainText('showDetails')
+        await expect(code).not.toContainText('<style')
+        await page
+          .locator('.vp-doc')
+          .getByRole('link', { name: playground, exact: true })
+          .click()
+        await expect(page).toHaveURL(
+          new RegExp(`/playground\\?example=${kind}$`),
+        )
+        const name =
+          kind === 'component'
+            ? english
+              ? 'Component'
+              : '组件'
+            : kind === 'directive'
+              ? english
+                ? 'Directive'
+                : '指令'
+              : 'API'
+        await expect(
+          page
+            .locator('.playground-examples')
+            .getByRole('button', { name, exact: true }),
+        ).toHaveAttribute('aria-pressed', 'true')
+        await expect(page.locator('.playground-status')).toHaveText(
+          english ? 'Ready' : '已就绪',
+        )
+      }
+      await page.goto(`${prefix}playground?example=unknown`)
+      await expect(
+        page.locator('.playground-examples button').first(),
+      ).toHaveAttribute('aria-pressed', 'true')
+    })
+
+    test(`${prefix} playground theme follows the document without losing edits`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme: 'light' })
+      await page.goto(`${prefix}playground?example=directive`)
+      await expect(page.locator('.playground-status')).toHaveText(
+        english ? 'Ready' : '已就绪',
+      )
+      const frameElement = page.locator('.playground-output iframe')
+      const frame = page.frameLocator('.playground-output iframe')
+      await expect(frame.locator('.lab')).toHaveCSS(
+        'background-color',
+        'rgb(246, 246, 247)',
+      )
+      const source = await frameElement.getAttribute('srcdoc')
+      const editor = page.locator('.cm-content')
+      await editor.click()
+      await editor.press('ControlOrMeta+End')
+      await page.keyboard.type('\n<!-- theme draft -->')
+      await page.getByRole('switch').click()
+      await expect(frame.locator('html')).toHaveClass('dark')
+      await expect(frame.locator('.lab')).toHaveCSS(
+        'background-color',
+        'rgb(27, 27, 31)',
+      )
+      await expect(editor).toContainText('theme draft')
+      await expect(frameElement).toHaveAttribute('srcdoc', source!)
+      await page.getByRole('switch').click()
+      await expect(frame.locator('html')).not.toHaveClass('dark')
+      await expect(editor).toContainText('theme draft')
+    })
+
+    test(`${prefix} component methods anchor survives example loading`, async ({
+      page,
+    }) => {
+      await page.route('**/demos.js', async (route) => {
+        await new Promise((resolve) => setTimeout(resolve, 400))
+        await route.continue()
+      })
+      await page.goto(`${prefix}guide/component#methods`)
+      await expect(page.locator('h2#methods')).toBeInViewport()
+      if (vue2)
+        await expect(
+          page.frameLocator('[data-demo="component"] iframe').locator('#enter'),
+        ).toBeAttached()
+      else
+        await expect(
+          page.locator('[data-demo="component"] #enter'),
+        ).toBeAttached()
+      await expect(page.locator('h2#methods')).toBeInViewport()
+      await expect(page).toHaveURL(/#methods$/)
+    })
+  }
+}
 
 for (const english of [false, true]) {
   const prefix = english ? './en/' : './'
@@ -471,9 +574,6 @@ for (const english of [false, true]) {
     await expect(demo.getByRole('checkbox')).toHaveCount(1)
     for (const pageOnly of [false, true]) {
       await demo.getByLabel('pageOnly', { exact: true }).setChecked(pageOnly)
-      await expect(demo.locator('.demo-config')).toHaveText(
-        `{ pageOnly: ${pageOnly} }`,
-      )
       await demo
         .getByRole('button', {
           name: english ? 'Enter fullscreen' : '进入全屏',

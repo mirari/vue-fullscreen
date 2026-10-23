@@ -123,6 +123,8 @@ If npm publishing succeeds but GitHub Release creation fails, use GitHub Actions
 
 User-facing documentation lives in `docs/`, with Chinese and English navigation, separate Vue 2 and Vue 3 guides, local search and interactive component/directive/API examples. `README.md` is copied into both published packages and is also the repository entry point. Keep its links usable on npm: use absolute repository URLs for files that are not included in the package.
 
+Usage-page demos, their displayed code and the Playground share `docs/.vitepress/theme/playground/samples.ts`. The `fullscreen-example` Markdown fence selects a usage mode, Vue version and language; the documentation renderer formats the same SFC without presentation styles. `docs:prepare` builds the runnable demos from these sources. Keep interactive changes in the shared sample and rerun the documentation browser tests.
+
 - `pnpm run docs:dev`: develop at `/`.
 - `pnpm run docs:build`: SSR/static build, including dead-link checks.
 - `pnpm run docs:preview`: serve the production build.

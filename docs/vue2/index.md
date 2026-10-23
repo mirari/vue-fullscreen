@@ -1,7 +1,5 @@
 # Vue 2 快速上手
 
-这里介绍 Vue 2 对应的安装和用法。
-
 ## 1. 安装
 
 ```sh
@@ -26,7 +24,7 @@ new Vue({ render: (h) => h(App) }).$mount('#app')
 ### 自定义名称
 
 ```ts
-Vue.use(VueFullscreen, { name: 'fs' }) // Vue 2
+Vue.use(VueFullscreen, { name: 'fs' })
 ```
 
 | 选项   | 类型     | 默认值         | 作用                               |

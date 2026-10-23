@@ -1,5 +1,25 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig, postcssIsolateStyles } from 'vitepress'
 import { fileURLToPath } from 'node:url'
+import { format } from 'prettier'
+import { sample } from './theme/playground/samples'
+
+const exampleSources = new Map<string, string>()
+for (const vue2 of [false, true]) {
+  for (const english of [false, true]) {
+    for (const kind of ['component', 'directive', 'api'] as const) {
+      exampleSources.set(
+        `${kind} ${vue2 ? 'vue2' : 'vue3'} ${english ? 'en' : 'zh'}`,
+        await format(
+          sample(kind, vue2, english).replace(
+            /\n<style scoped>[\s\S]*<\/style>\s*$/,
+            '',
+          ),
+          { parser: 'vue', semi: false, singleQuote: true },
+        ),
+      )
+    }
+  }
+}
 
 function navigation(english: boolean, vue2 = false) {
   const prefix = (english ? '/en' : '') + (vue2 ? '/vue2' : '')
@@ -46,7 +66,10 @@ function navigation(english: boolean, vue2 = false) {
             link: link('/guide/directive'),
           },
           { text: 'API', link: link('/guide/api') },
-          { text: 'Playground', link: link('/playground') },
+          {
+            text: english ? 'Playground' : '演练场',
+            link: link('/playground'),
+          },
           {
             text: english ? 'More examples' : '更多示例',
             link: link('/guide/examples'),
@@ -71,6 +94,21 @@ export default defineConfig({
   title: 'vue-fullscreen',
   base: process.env.DOCS_BASE || '/',
   cleanUrls: true,
+  markdown: {
+    config(md) {
+      md.core.ruler.after('block', 'fullscreen-examples', (state) => {
+        for (const token of state.tokens) {
+          if (token.type !== 'fence' || token.info !== 'fullscreen-example')
+            continue
+          const source = exampleSources.get(token.content.trim())
+          if (!source)
+            throw new Error(`Unknown fullscreen example: ${token.content}`)
+          token.info = 'vue'
+          token.content = source
+        }
+      })
+    },
+  },
   lastUpdated: true,
   head: [['meta', { name: 'theme-color', content: '#646cff' }]],
   locales: {
@@ -155,6 +193,11 @@ export default defineConfig({
     },
   },
   vite: {
+    css: {
+      postcss: {
+        plugins: [postcssIsolateStyles({ includeFiles: [/vp-doc\.css$/] })],
+      },
+    },
     resolve: {
       alias: {
         'vue-fullscreen': fileURLToPath(

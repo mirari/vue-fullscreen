@@ -2,6 +2,24 @@ import Vue from 'vue'
 
 import { fullscreen, Fullscreen, vFullscreen } from '../src/index'
 import './style.css'
+const syncTheme = (dark: boolean) => {
+  document.documentElement.classList.toggle('dark', dark)
+  document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+}
+try {
+  syncTheme(parent.document.documentElement.classList.contains('dark'))
+} catch {
+  syncTheme(matchMedia('(prefers-color-scheme: dark)').matches)
+}
+addEventListener('message', (event) => {
+  if (
+    event.source === parent &&
+    event.origin === location.origin &&
+    event.data?.source === 'fullscreen-docs-theme' &&
+    typeof event.data.dark === 'boolean'
+  )
+    syncTheme(event.data.dark)
+})
 const options = new URLSearchParams(location.search)
 const pageOnly = options.has('pageOnly')
 const comparison = options.get('compare')

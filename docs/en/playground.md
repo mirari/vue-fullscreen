@@ -9,4 +9,4 @@ Edit the code and click **Run** to test `pageOnly`, `teleport` and popups in the
 
 <ClientOnly><FullscreenPlayground /></ClientOnly>
 
-`pageOnly` fills the preview area. Supports JavaScript and CSS in a single `App.vue`, with `vue` and the workspace version of `vue-fullscreen` included.
+`pageOnly` fills the preview area. Supports JavaScript and CSS in a single `App.vue`, with `vue` and `vue-fullscreen` included.

@@ -1,42 +1,20 @@
 # API
 
-`useFullscreen()` provides VueUse-style reactive state and controls, without a state callback.
+Control an existing element from buttons or application logic, with reactive fullscreen state.
 
-::: tip On this page
-See the [**API reference**](#reference) for all parameters, return values and methods.
-:::
+## Playground {#playground}
 
-<ClientOnly><FullscreenDemo kind="api" /></ClientOnly>
+[Playground](/en/playground?example=api)
 
-## Specify a target
+<UsageDemo kind="api" />
 
-```vue
-<script setup>
-import { ref } from 'vue'
-import { useFullscreen } from 'vue-fullscreen'
-
-const target = ref()
-const error = ref('')
-const { isFullscreen, enter, exit, toggle } = useFullscreen(target, {
-  pageOnly: true,
-  teleport: true,
-})
-</script>
-
-<template>
-  <button @click="enter().catch((e) => (error = e.message))">
-    Enter fullscreen
-  </button>
-  <section ref="target">
-    <h2>Panel</h2>
-    <button v-if="isFullscreen" @click="exit">Exit fullscreen</button>
-    <button @click="toggle">Toggle fullscreen</button>
-  </section>
-  <p v-if="error" role="alert">{{ error }}</p>
-</template>
+```fullscreen-example
+api vue3 en
 ```
 
-Targets accept an HTML element, Vue template ref, component instance (using its `$el`), id string (`'panel'` or `'#panel'`) or getter. The target is resolved on each entry. Missing ids and unmounted refs reject the Promise instead of fullscreening body. Omitting the target or passing `null` directly uses `document.body`.
+## Targets {#target}
+
+Targets accept an HTML element, Vue template ref, component instance (using its `$el`), id string (`'panel'` or `'#panel'`) or getter. The target is resolved on each entry. Missing ids and unmounted refs reject the Promise. Omitting the target or passing `null` directly uses `document.body`.
 
 ```js
 useFullscreen(document.getElementById('panel')) // HTML element
@@ -45,7 +23,7 @@ useFullscreen('panel') // id
 useFullscreen('#panel') // id with #
 ```
 
-Each call owns an independent controller. Component unmount restores moved nodes and removes listeners, exiting fullscreen. Native requests must run directly from a click or key handler, before awaiting network requests.
+Each call maintains its own fullscreen state. Component unmount restores moved nodes and removes listeners, exiting fullscreen. Native requests must run directly from a click or key handler, before awaiting network requests.
 
 ## Use outside components
 
@@ -62,15 +40,13 @@ await enter()
 await exit()
 ```
 
-## Reference
-
-### Signature
+## Parameters {#parameters}
 
 ```ts
 useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): UseFullscreenReturn
 ```
 
-### Return values
+## Return values {#returns}
 
 | Return value                | Type                     | Meaning                                                  |
 | --------------------------- | ------------------------ | -------------------------------------------------------- |
@@ -78,7 +54,7 @@ useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): Use
 | `isSupported`               | `ComputedRef<boolean>`   | Native API availability; page-only mode works regardless |
 | `enter` / `exit` / `toggle` | `(): Promise<void>`      | Enter, exit or toggle                                    |
 
-### UseFullscreenOptions
+## Options {#options}
 
 | Option            | Type                     | Default        |
 | ----------------- | ------------------------ | -------------- |
@@ -89,3 +65,15 @@ useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): Use
 Options are read on each entry. Unsupported browsers fall back to page-only mode; failed native requests restore the DOM and reject.
 
 `screenfull` is also available as a named export. It is the underlying native fullscreen utility; calling it directly does not manage page-only mode, styles or teleport.
+
+## Migrating older versions {#migration}
+
+```js
+// Before
+import { api } from 'vue-fullscreen'
+api.request(target, { callback: onChange })
+
+// Now
+import { useFullscreen } from 'vue-fullscreen'
+const { isFullscreen, enter, exit } = useFullscreen(target)
+```

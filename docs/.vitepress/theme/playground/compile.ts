@@ -81,6 +81,7 @@ export function previewDocument(
   imports: Record<string, string>,
   vue2: boolean,
   english: boolean,
+  dark = false,
 ) {
   // All scripts are data modules so the sandbox can keep its opaque origin,
   // without relying on CDNs or allowing access to the documentation's DOM.
@@ -88,6 +89,11 @@ export function previewDocument(
 const style = document.createElement('style')
 style.textContent = ${JSON.stringify(compiled.styles)}
 document.head.appendChild(style)
+addEventListener('message', event => {
+  if (event.source !== parent || event.data?.source !== 'fullscreen-preview-theme' || typeof event.data.dark !== 'boolean') return
+  document.documentElement.classList.toggle('dark', event.data.dark)
+  document.documentElement.style.colorScheme = event.data.dark ? 'dark' : 'light'
+})
 const report = (level, args) => parent.postMessage({
   source: 'vue-fullscreen-playground', level,
   text: args.map(value => {
@@ -120,9 +126,10 @@ try {
   report('ready', [])
 } catch (error) { console.error(error) }
 `
-  return `<!doctype html><html lang="${english ? 'en' : 'zh-CN'}"><head>
+  return `<!doctype html><html lang="${english ? 'en' : 'zh-CN'}" class="${dark ? 'dark' : ''}" style="color-scheme: ${dark ? 'dark' : 'light'}"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>vue-fullscreen preview</title>
+<style>:where(body) { margin: 0; background: #f6f6f7; color: #3c3c43; } :where(.dark body) { background: #1b1b1f; color: #dfdfe5; }</style>
 <script type="importmap">${JSON.stringify({ imports }).replace(/</g, '\\u003c')}</script>
 </head><body><div id="app"></div>
 <script type="module" src="${moduleUrl(bootstrap)}"></script>

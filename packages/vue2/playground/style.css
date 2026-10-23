@@ -1,6 +1,23 @@
+:root {
+  color-scheme: light;
+  --demo-background: #fff;
+  --demo-surface: #f6f6f7;
+  --demo-text: #3c3c43;
+  --demo-accent: #5b51d8;
+}
+:root.dark {
+  color-scheme: dark;
+  --demo-background: #1b1b1f;
+  --demo-surface: #202127;
+  --demo-text: #dfdfe5;
+  --demo-accent: #aaa2ff;
+}
 body {
   font-family: system-ui, sans-serif;
   margin: 2rem;
+  color: var(--demo-text);
+  background: var(--demo-background);
+  accent-color: var(--demo-accent);
 }
 button {
   padding: 0.75rem;
@@ -11,10 +28,10 @@ button {
 #api-target {
   padding: 2rem;
   box-sizing: border-box;
-  background: #eff6ff;
+  background: var(--demo-surface);
 }
 .fullscreen {
-  background: white !important;
+  background: var(--demo-background) !important;
   overflow: auto;
 }
 output {
@@ -41,7 +58,7 @@ output {
   gap: 16px;
 }
 .image-trigger:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid var(--demo-accent);
   outline-offset: 3px;
 }
 .demo-picture {
@@ -65,8 +82,8 @@ output {
   overflow: auto;
   box-sizing: border-box;
   padding: 16px;
-  background: white;
-  color: #172554;
-  border: 2px solid #2563eb;
+  background: var(--demo-background);
+  color: var(--demo-text);
+  border: 2px solid var(--demo-accent);
   z-index: 1001;
 }
