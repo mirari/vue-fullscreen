@@ -1,6 +1,10 @@
 # Directive
 
-The directive toggles fullscreen when its element is clicked. It does not require a model value.
+The directive provides a click trigger without requiring a model value.
+
+::: tip Trigger and fullscreen target
+**The element with `v-fullscreen` is the click trigger; `target` selects the fullscreen element.** The bound element does not automatically become the target. If no target is specified, the directive controls `document.body`.
+:::
 
 ## Playground {#playground}
 
@@ -22,8 +26,12 @@ With a regular `setup()` function or the Options API, register the directive loc
 <!-- No binding: target document.body -->
 <button v-fullscreen>Fullscreen page</button>
 
-<!-- CSS selector -->
+<!-- The button triggers fullscreen for #report, rather than for itself. -->
 <button v-fullscreen="'#report'">Fullscreen report</button>
+<section id="report">
+  Report content
+  <button v-fullscreen="'#report'">Exit fullscreen</button>
+</section>
 
 <!-- Target and options -->
 <button v-fullscreen="{ target: '#report', pageOnly: true, teleport: true }">
@@ -33,7 +41,7 @@ With a regular `setup()` function or the Options API, register the directive loc
 
 `target` also accepts HTML elements, Vue refs, component instances (using `$el`) and getters. The current target is resolved on entry. Strings passed directly are CSS selectors; use `'#report'` for an id.
 
-An unresolved target dispatches `fullscreen-error`. Omitting `target` or passing `null` directly uses `document.body`.
+An unresolved target dispatches `fullscreen-error`. Passing `null` directly is equivalent to omitting `target`.
 
 ### Modifiers
 

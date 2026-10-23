@@ -59,7 +59,7 @@ export default {
 
 ### Directive
 
-Toggle fullscreen for the entire page with a click. See [directive usage](/en/vue2/guide/directive).
+The button is the trigger. This example omits the target and toggles fullscreen for `document.body`. See [directive usage](/en/vue2/guide/directive).
 
 ```vue
 <template>

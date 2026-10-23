@@ -57,7 +57,7 @@ export default {
 
 ### 指令
 
-点击按钮切换整个页面的全屏状态。详细用法见[指令](/vue2/guide/directive)。
+按钮作为触发器；此例省略目标，默认切换 `document.body` 的全屏状态。详细用法见[指令](/vue2/guide/directive)。
 
 ```vue
 <template>

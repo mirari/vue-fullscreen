@@ -1,6 +1,10 @@
 # Vue 2 指令
 
-在 `directives` 中局部注册指令，点击按钮即可切换目标元素的全屏状态。
+点击绑定的元素即可切换目标区域的全屏状态，无需维护模型状态。
+
+::: tip 触发器与全屏目标
+**指令绑定的元素是点击触发器，`target` 指定的才是全屏目标。** 绑定元素不会自动成为全屏目标；不指定目标时，默认控制 `document.body`。
+:::
 
 ## 演练场 {#playground}
 
@@ -20,8 +24,12 @@ directive vue2 zh
 <!-- 不传参数：控制 document.body -->
 <button v-fullscreen>整个页面全屏</button>
 
-<!-- 字符串：CSS 选择器 -->
+<!-- 按钮是触发器，#report 区域才是全屏目标 -->
 <button v-fullscreen="'#report'">报表全屏</button>
+<section id="report">
+  报表内容
+  <button v-fullscreen="'#report'">退出全屏</button>
+</section>
 
 <!-- 对象：目标与配置 -->
 <button v-fullscreen="{ target: '#report', pageOnly: true, teleport: true }">
@@ -31,7 +39,7 @@ directive vue2 zh
 
 `target` 还支持 HTML 元素、Vue ref、组件实例（使用 `$el`）和 getter，进入全屏时解析当前目标。直接传入的字符串按 CSS 选择器处理，id 应写成 `'#report'`。
 
-无法解析目标时触发 `fullscreen-error`。省略 `target` 或直接传入 `null` 时使用 `document.body`。
+无法解析目标时触发 `fullscreen-error`。直接传入 `null` 与省略 `target` 相同。
 
 ### 修饰符
 
