@@ -16,7 +16,7 @@ npm install vue-fullscreen
 
 ## 2. 基本使用方式
 
-以下三种方式任选其一。示例使用 `<script setup>`，要求 Vue 3.2+。
+按照使用场景从三种使用方式中选择适合的接入。
 
 ### 组件
 

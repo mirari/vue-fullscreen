@@ -16,7 +16,7 @@ See [compatibility](/en/guide/compatibility) for API versions and package channe
 
 ## 2. Basic usage
 
-Choose one of the following interfaces. These examples use `<script setup>` (Vue 3.2+).
+Choose the most suitable of the three integration methods for your use case.
 
 ### Component
 

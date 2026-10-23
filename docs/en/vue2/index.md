@@ -41,7 +41,7 @@ Vue.use(VueFullscreen, { name: 'fs' })
 
 ## 3. Basic usage
 
-After registering the plugin, choose one of these three interfaces.
+After registering the plugin, choose the most suitable of the three integration methods for your use case.
 
 ### Component
 
