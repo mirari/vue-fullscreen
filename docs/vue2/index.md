@@ -47,15 +47,15 @@ Vue.use(VueFullscreen, { name: 'fs' })
 
 ```vue
 <template>
-  <fullscreen v-model="active">
-    <button v-if="active" @click="active = false">退出全屏</button>
-    <button v-else @click="active = true">进入全屏</button>
+  <fullscreen v-model="isFullscreen">
+    <button v-if="isFullscreen" @click="isFullscreen = false">退出全屏</button>
+    <button v-else @click="isFullscreen = true">进入全屏</button>
   </fullscreen>
 </template>
 
 <script>
 export default {
-  data: () => ({ active: false }),
+  data: () => ({ isFullscreen: false }),
 }
 </script>
 ```
@@ -97,9 +97,9 @@ Vue.use(VueFullscreen)
 
 ```html
 <div id="app">
-  <fullscreen v-model="active">
-    <button @click="active = !active">
-      {{ active ? '退出全屏' : '进入全屏' }}
+  <fullscreen v-model="isFullscreen">
+    <button @click="isFullscreen = !isFullscreen">
+      {{ isFullscreen ? '退出全屏' : '进入全屏' }}
     </button>
   </fullscreen>
 </div>
@@ -109,7 +109,7 @@ Vue.use(VueFullscreen)
 <script>
   Vue.use(VueFullscreen.default)
   new Vue({
-    data: () => ({ active: false }),
+    data: () => ({ isFullscreen: false }),
   }).$mount('#app')
 </script>
 ```

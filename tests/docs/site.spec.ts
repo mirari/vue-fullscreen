@@ -278,7 +278,7 @@ for (const english of [false, true]) {
         )
         const code = page.locator('.vp-doc div.language-vue').first()
         await expect(code).toContainText('teleport')
-        await expect(code).toContainText('v-if="active"')
+        await expect(code).toContainText('v-if="isFullscreen"')
         await expect(code).toContainText(
           kind === 'component' ? 'page-only' : 'pageOnly',
         )

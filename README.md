@@ -33,12 +33,12 @@ Import only what you need. This example uses `<script setup>` (Vue 3.2+):
 import { ref } from 'vue'
 import { Fullscreen } from 'vue-fullscreen'
 
-const active = ref(false)
+const isFullscreen = ref(false)
 </script>
 
 <template>
-  <Fullscreen v-model="active">
-    <button @click="active = !active">Toggle fullscreen</button>
+  <Fullscreen v-model="isFullscreen">
+    <button @click="isFullscreen = !isFullscreen">Toggle fullscreen</button>
   </Fullscreen>
 </template>
 ```
@@ -62,14 +62,14 @@ new Vue({ render: (h) => h(App) }).$mount('#app')
 ```vue
 <!-- App.vue -->
 <template>
-  <fullscreen v-model="active">
-    <button @click="active = !active">Toggle fullscreen</button>
+  <fullscreen v-model="isFullscreen">
+    <button @click="isFullscreen = !isFullscreen">Toggle fullscreen</button>
   </fullscreen>
 </template>
 
 <script>
 export default {
-  data: () => ({ active: false }),
+  data: () => ({ isFullscreen: false }),
 }
 </script>
 ```

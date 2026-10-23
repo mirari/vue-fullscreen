@@ -21,7 +21,6 @@ component vue2 zh
 | [`teleport`](/vue2/#teleport) | `boolean` | `false`        | 全屏期间将元素移动到 body             |
 | `fullscreenClass`             | `string`  | `'fullscreen'` | 激活期间的 class                      |
 | `exitOnClickWrapper`          | `boolean` | `true`         | 点击容器背景退出；点击子元素不会触发  |
-| `fullscreen`                  | `boolean` | `false`        | 已废弃的模型属性，保留兼容            |
 
 ## 实例属性 {#instance-properties}
 
@@ -35,12 +34,11 @@ component vue2 zh
 
 ## 事件 {#events}
 
-| 事件                | 参数      | 时机                             |
-| ------------------- | --------- | -------------------------------- |
-| `change`            | `boolean` | 全屏状态改变                     |
-| `input`             | `boolean` | 同步 `v-model`                   |
-| `update:fullscreen` | `boolean` | 同步旧模型属性                   |
-| `error`             | 错误对象  | 模型变化或容器点击触发的操作失败 |
+| 事件     | 参数      | 时机                             |
+| -------- | --------- | -------------------------------- |
+| `change` | `boolean` | 全屏状态改变                     |
+| `input`  | `boolean` | 同步 `v-model`                   |
+| `error`  | 错误对象  | 模型变化或容器点击触发的操作失败 |
 
 ## 方法 {#methods}
 
@@ -65,12 +63,17 @@ async enterPanel() {
 
 ## 旧版本迁移 {#migration}
 
+旧版的 `fullscreen` 属性和 `update:fullscreen` 事件仅作为兼容接口保留，新代码使用 `v-model`。
+
 ```vue
 <!-- 旧写法 -->
-<fullscreen :fullscreen="active" @update:fullscreen="active = $event" />
+<fullscreen
+  :fullscreen="isFullscreen"
+  @update:fullscreen="isFullscreen = $event"
+/>
 
 <!-- 新写法 -->
-<fullscreen v-model="active" />
+<fullscreen v-model="isFullscreen" />
 ```
 
 ```js

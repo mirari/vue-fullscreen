@@ -73,9 +73,9 @@ fullscreen.exit(): Promise<void>
 
 ```js
 fullscreen.request(target, {
-  callback(isFullscreen) {
+  callback(value) {
     // 同步页面状态
-    active = isFullscreen
+    isFullscreen = value
   },
 })
 ```

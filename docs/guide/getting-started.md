@@ -27,13 +27,13 @@ npm install vue-fullscreen
 import { ref } from 'vue'
 import { Fullscreen } from 'vue-fullscreen'
 
-const active = ref(false)
+const isFullscreen = ref(false)
 </script>
 
 <template>
-  <Fullscreen v-model="active">
-    <button v-if="active" @click="active = false">退出全屏</button>
-    <button v-else @click="active = true">进入全屏</button>
+  <Fullscreen v-model="isFullscreen">
+    <button v-if="isFullscreen" @click="isFullscreen = false">退出全屏</button>
+    <button v-else @click="isFullscreen = true">进入全屏</button>
   </Fullscreen>
 </template>
 ```
@@ -82,9 +82,9 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
 
 ```html
 <div id="app">
-  <fullscreen v-model="active">
-    <button @click="active = !active">
-      {{ active ? '退出全屏' : '进入全屏' }}
+  <fullscreen v-model="isFullscreen">
+    <button @click="isFullscreen = !isFullscreen">
+      {{ isFullscreen ? '退出全屏' : '进入全屏' }}
     </button>
   </fullscreen>
 </div>
@@ -94,7 +94,7 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
 <script>
   Vue.createApp({
     components: { fullscreen: VueFullscreen.Fullscreen },
-    data: () => ({ active: false }),
+    data: () => ({ isFullscreen: false }),
   }).mount('#app')
 </script>
 ```

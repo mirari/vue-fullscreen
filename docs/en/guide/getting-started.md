@@ -27,13 +27,15 @@ Bind a state value with `v-model`. See [component usage](/en/guide/component).
 import { ref } from 'vue'
 import { Fullscreen } from 'vue-fullscreen'
 
-const active = ref(false)
+const isFullscreen = ref(false)
 </script>
 
 <template>
-  <Fullscreen v-model="active">
-    <button v-if="active" @click="active = false">Exit fullscreen</button>
-    <button v-else @click="active = true">Enter fullscreen</button>
+  <Fullscreen v-model="isFullscreen">
+    <button v-if="isFullscreen" @click="isFullscreen = false">
+      Exit fullscreen
+    </button>
+    <button v-else @click="isFullscreen = true">Enter fullscreen</button>
   </Fullscreen>
 </template>
 ```
@@ -82,9 +84,9 @@ Load the latest Vue 3 build and the package's `latest` channel from UNPKG. Load 
 
 ```html
 <div id="app">
-  <fullscreen v-model="active">
-    <button @click="active = !active">
-      {{ active ? 'Exit fullscreen' : 'Enter fullscreen' }}
+  <fullscreen v-model="isFullscreen">
+    <button @click="isFullscreen = !isFullscreen">
+      {{ isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen' }}
     </button>
   </fullscreen>
 </div>
@@ -94,7 +96,7 @@ Load the latest Vue 3 build and the package's `latest` channel from UNPKG. Load 
 <script>
   Vue.createApp({
     components: { fullscreen: VueFullscreen.Fullscreen },
-    data: () => ({ active: false }),
+    data: () => ({ isFullscreen: false }),
   }).mount('#app')
 </script>
 ```

@@ -21,7 +21,6 @@ component vue3 zh
 | [`teleport`](/guide/getting-started#teleport) | `boolean` | `false`        | 全屏期间将元素移动到 body             |
 | `fullscreenClass`                             | `string`  | `'fullscreen'` | 激活期间的 class                      |
 | `exitOnClickWrapper`                          | `boolean` | `true`         | 点击容器背景退出；点击子元素不会触发  |
-| `fullscreen`                                  | `boolean` | `false`        | 已废弃的模型属性，保留兼容            |
 
 ## 实例属性 {#instance-properties}
 
@@ -38,7 +37,6 @@ component vue3 zh
 | ------------------- | --------- | -------------------------------- |
 | `change`            | `boolean` | 全屏状态改变                     |
 | `update:modelValue` | `boolean` | 同步 `v-model`                   |
-| `update:fullscreen` | `boolean` | 同步旧模型属性                   |
 | `error`             | 错误对象  | 模型变化或容器点击触发的操作失败 |
 
 ## 方法 {#methods}
@@ -74,6 +72,8 @@ async function enter() {
 
 ## 旧版本迁移 {#migration}
 
+旧版的 `fullscreen` 属性和 `update:fullscreen` 事件仅作为兼容接口保留，新代码使用 `v-model`。
+
 ```js
 // 旧写法
 import VueFullscreen from 'vue-fullscreen'
@@ -85,8 +85,11 @@ import { Fullscreen } from 'vue-fullscreen'
 
 ```vue
 <!-- 旧写法 -->
-<fullscreen :fullscreen="active" @update:fullscreen="active = $event" />
+<fullscreen
+  :fullscreen="isFullscreen"
+  @update:fullscreen="isFullscreen = $event"
+/>
 
 <!-- 新写法 -->
-<Fullscreen v-model="active" />
+<Fullscreen v-model="isFullscreen" />
 ```

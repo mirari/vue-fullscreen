@@ -31,7 +31,7 @@ Vue.use(VueViewer)
 const images = [10, 11, 12, 13, 14, 15]
 
 export default {
-  data: () => ({ images, selected: 0, active: false, pageOnly: false, teleport: true, showDetails: false, error: '' }),
+  data: () => ({ images, selected: 0, isFullscreen: false, pageOnly: false, teleport: true, showDetails: false, error: '' }),
   computed: {
     options() {
       return {
@@ -42,10 +42,10 @@ export default {
   },
   methods: {
     changed(isFullscreen) {
-      this.active = isFullscreen
+      this.isFullscreen = isFullscreen
       if (!isFullscreen) this.$refs.preview.hide()
     },
-    report(error) { this.active = false; this.showDetails = false; this.error = error.message },
+    report(error) { this.isFullscreen = false; this.showDetails = false; this.error = error.message },
     ${
       kind === 'api'
         ? `enter() { return this.$fullscreen.request('${id}', this.options).catch(this.report) },
@@ -83,10 +83,10 @@ const error = ref('')
 ${
   kind === 'api'
     ? `const target = ref()
-const { isFullscreen: active, enter, exit } = useFullscreen(target, {
+const { isFullscreen, enter, exit } = useFullscreen(target, {
   pageOnly, teleport, fullscreenClass: 'demo-fullscreen',
 })`
-    : 'const active = ref(false)'
+    : 'const isFullscreen = ref(false)'
 }
 ${
   kind === 'directive'
@@ -96,21 +96,21 @@ ${
 }))
 `
     : ''
-}function changed(isFullscreen) {
-  ${kind !== 'api' ? 'active.value = isFullscreen\n  ' : ''}if (!isFullscreen) preview.value?.hide()
+}function changed(value) {
+  ${kind !== 'api' ? 'isFullscreen.value = value\n  ' : ''}if (!value) preview.value?.hide()
 }
-function report(reason) { ${kind === 'api' ? '' : 'active.value = false; '}showDetails.value = false; error.value = reason.message }
-${kind === 'api' ? 'watch(active, changed)\n' : ''}
+function report(reason) { ${kind === 'api' ? '' : 'isFullscreen.value = false; '}showDetails.value = false; error.value = reason.message }
+${kind === 'api' ? 'watch(isFullscreen, changed)\n' : ''}
 </script>`
   const enter =
     kind === 'component'
-      ? '@click="active = true"'
+      ? '@click="isFullscreen = true"'
       : kind === 'directive'
         ? 'v-fullscreen="options"'
         : `@click="${vue2 ? 'enter' : 'enter().catch(report)'}"`
   const exit =
     kind === 'component'
-      ? '@click="active = false"'
+      ? '@click="isFullscreen = false"'
       : kind === 'directive'
         ? 'v-fullscreen="options"'
         : `@click="${vue2 ? 'exit' : 'exit().catch(report)'}"`
@@ -118,26 +118,26 @@ ${kind === 'api' ? 'watch(active, changed)\n' : ''}
     kind === 'component' ? (vue2 ? 'fullscreen' : 'Fullscreen') : 'section'
   const props =
     kind === 'component'
-      ? 'v-model="active" :page-only="pageOnly" :teleport="teleport" :exit-on-click-wrapper="false" fullscreen-class="demo-fullscreen" @change="changed" @error="report"'
+      ? 'v-model="isFullscreen" :page-only="pageOnly" :teleport="teleport" :exit-on-click-wrapper="false" fullscreen-class="demo-fullscreen" @change="changed" @error="report"'
       : ''
   return `${script}
 
 <template>
   <div class="lab">
     <header class="options">
-      <label class="page-only-control"><input v-model="pageOnly" type="checkbox" :disabled="active"> pageOnly</label>
-      <label><input v-model="teleport" type="checkbox" :disabled="active"> teleport</label>
-      <button id="enter" :disabled="active" ${enter} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.enter}</button>
+      <label class="page-only-control"><input v-model="pageOnly" type="checkbox" :disabled="isFullscreen"> pageOnly</label>
+      <label><input v-model="teleport" type="checkbox" :disabled="isFullscreen"> teleport</label>
+      <button id="enter" :disabled="isFullscreen" ${enter} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.enter}</button>
     </header>
     <div class="surface-placeholder">
       <${tag} id="${id}" ref="target" class="surface" ${props}>
-        <button v-if="active" id="exit" class="exit" ${exit} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.exit}</button>
+        <button v-if="isFullscreen" id="exit" class="exit" ${exit} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.exit}</button>
         <${vue2 ? 'viewer' : 'Viewer'} ref="preview" class="image-preview" url="data-source" :z-index="10001" :toolbar="false" :title="false" :transition="false" :focus="false" :fullscreen="false" @show="showDetails = true" @hidden="showDetails = false">
           <button v-for="(id, index) in images" :key="id" class="image-trigger" :aria-label="'${text.details} ' + (index + 1)" :aria-expanded="showDetails && selected === index ? 'true' : 'false'" @click.stop="previewImage(index)">
             <img class="gallery-image demo-picture" :src="'https://picsum.photos/id/' + id + '/640/360'" :data-source="'https://picsum.photos/id/' + id + '/1280/720'" :alt="'${text.image} ' + (index + 1)" width="1280" height="720">
           </button>
         </${vue2 ? 'viewer' : 'Viewer'}>
-        <p v-if="active && showDetails && !pageOnly && !teleport" role="status">${text.hidden}</p>
+        <p v-if="isFullscreen && showDetails && !pageOnly && !teleport" role="status">${text.hidden}</p>
       </${tag}>
     </div>
     <p v-if="error" role="alert">{{ error }}</p>

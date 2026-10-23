@@ -71,9 +71,9 @@ These are ordinary properties, not Vue reactive refs. Use `callback` to update V
 
 ```js
 fullscreen.request(target, {
-  callback(isFullscreen) {
+  callback(value) {
     // Synchronize application state
-    active = isFullscreen
+    isFullscreen = value
   },
 })
 ```

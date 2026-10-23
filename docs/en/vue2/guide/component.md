@@ -21,7 +21,6 @@ component vue2 en
 | [`teleport`](/en/vue2/#teleport) | `boolean` | `false`        | Move the element to the body while active                             |
 | `fullscreenClass`                | `string`  | `'fullscreen'` | Class applied while active                                            |
 | `exitOnClickWrapper`             | `boolean` | `true`         | Exit on wrapper background clicks, not child clicks                   |
-| `fullscreen`                     | `boolean` | `false`        | Deprecated model prop                                                 |
 
 ## Instance properties {#instance-properties}
 
@@ -35,12 +34,11 @@ Read these through the component ref.
 
 ## Events {#events}
 
-| Event               | Argument     | Purpose                                                      |
-| ------------------- | ------------ | ------------------------------------------------------------ |
-| `change`            | `boolean`    | Fullscreen state changed                                     |
-| `input`             | `boolean`    | Synchronize `v-model`                                        |
-| `update:fullscreen` | `boolean`    | Synchronize the deprecated model                             |
-| `error`             | Error object | A model change or wrapper click triggered a failed operation |
+| Event    | Argument     | Purpose                                                      |
+| -------- | ------------ | ------------------------------------------------------------ |
+| `change` | `boolean`    | Fullscreen state changed                                     |
+| `input`  | `boolean`    | Synchronize `v-model`                                        |
+| `error`  | Error object | A model change or wrapper click triggered a failed operation |
 
 ## Methods {#methods}
 
@@ -63,12 +61,17 @@ async enterPanel() {
 
 ## Migrating older versions {#migration}
 
+The legacy `fullscreen` prop and `update:fullscreen` event remain available for compatibility. Use `v-model` in new code.
+
 ```vue
 <!-- Before -->
-<fullscreen :fullscreen="active" @update:fullscreen="active = $event" />
+<fullscreen
+  :fullscreen="isFullscreen"
+  @update:fullscreen="isFullscreen = $event"
+/>
 
 <!-- Now -->
-<fullscreen v-model="active" />
+<fullscreen v-model="isFullscreen" />
 ```
 
 ```js

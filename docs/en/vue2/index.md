@@ -49,15 +49,17 @@ Bind a state value with `v-model`. See [component usage](/en/vue2/guide/componen
 
 ```vue
 <template>
-  <fullscreen v-model="active">
-    <button v-if="active" @click="active = false">Exit fullscreen</button>
-    <button v-else @click="active = true">Enter fullscreen</button>
+  <fullscreen v-model="isFullscreen">
+    <button v-if="isFullscreen" @click="isFullscreen = false">
+      Exit fullscreen
+    </button>
+    <button v-else @click="isFullscreen = true">Enter fullscreen</button>
   </fullscreen>
 </template>
 
 <script>
 export default {
-  data: () => ({ active: false }),
+  data: () => ({ isFullscreen: false }),
 }
 </script>
 ```
@@ -99,9 +101,9 @@ Load the latest Vue 2 build and the package's `legacy` channel from UNPKG. Load 
 
 ```html
 <div id="app">
-  <fullscreen v-model="active">
-    <button @click="active = !active">
-      {{ active ? 'Exit fullscreen' : 'Enter fullscreen' }}
+  <fullscreen v-model="isFullscreen">
+    <button @click="isFullscreen = !isFullscreen">
+      {{ isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen' }}
     </button>
   </fullscreen>
 </div>
@@ -111,7 +113,7 @@ Load the latest Vue 2 build and the package's `legacy` channel from UNPKG. Load 
 <script>
   Vue.use(VueFullscreen.default)
   new Vue({
-    data: () => ({ active: false }),
+    data: () => ({ isFullscreen: false }),
   }).$mount('#app')
 </script>
 ```

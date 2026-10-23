@@ -7,16 +7,16 @@ export function usageSnippet(kind: Example, vue2: boolean, english: boolean) {
   const options = `target: '#panel',
     pageOnly: false,
     teleport: true,
-    callback: (isFullscreen) => { ${vue2 ? 'this.active' : 'active.value'} = isFullscreen },`
+    callback: (value) => { ${vue2 ? 'this.isFullscreen' : 'isFullscreen.value'} = value },`
   const vue3Scripts = {
     component: `import { ref } from 'vue'
 import { Fullscreen } from 'vue-fullscreen'
 
-const active = ref(false)`,
+const isFullscreen = ref(false)`,
     directive: `import { ref } from 'vue'
 import { vFullscreen } from 'vue-fullscreen'
 
-const active = ref(false)
+const isFullscreen = ref(false)
 const options = {
     ${options}
 }`,
@@ -24,7 +24,7 @@ const options = {
 import { useFullscreen } from 'vue-fullscreen'
 
 const target = ref()
-const { isFullscreen: active, enter, exit } = useFullscreen(target, {
+const { isFullscreen, enter, exit } = useFullscreen(target, {
   pageOnly: false,
   teleport: true,
 })`,
@@ -36,9 +36,9 @@ import VueFullscreen from 'vue-fullscreen'
 Vue.use(VueFullscreen)
 
 export default {
-  data: () => ({ active: false }),
+  data: () => ({ isFullscreen: false }),
   methods: {
-    report(error) { this.active = false; console.error(error) },
+    report(error) { this.isFullscreen = false; console.error(error) },
   },
 }`,
     directive: `import Vue from 'vue'
@@ -49,26 +49,26 @@ Vue.use(VueFullscreen)
 export default {
   data() {
     return {
-      active: false,
+      isFullscreen: false,
       options: {
         ${options}
       },
     }
   },
   methods: {
-    report(error) { this.active = false; console.error(error) },
+    report(error) { this.isFullscreen = false; console.error(error) },
   },
 }`,
     api: `import { fullscreen } from 'vue-fullscreen'
 
 export default {
-  data: () => ({ active: false }),
+  data: () => ({ isFullscreen: false }),
   methods: {
     enter() {
       fullscreen.request(this.$refs.target, {
         pageOnly: false,
         teleport: true,
-        callback: (isFullscreen) => { this.active = isFullscreen },
+        callback: (isFullscreen) => { this.isFullscreen = isFullscreen },
       }).catch(console.error)
     },
     exit() {
@@ -83,13 +83,13 @@ export default {
   }
   const enterAction =
     kind === 'component'
-      ? '@click="active = true"'
+      ? '@click="isFullscreen = true"'
       : kind === 'directive'
         ? 'v-fullscreen="options" @fullscreen-error="report($event.detail)"'
         : `@click="${vue2 ? 'enter' : 'enter().catch(report)'}"`
   const exitAction =
     kind === 'component'
-      ? '@click="active = false"'
+      ? '@click="isFullscreen = false"'
       : kind === 'directive'
         ? 'v-fullscreen="options" @fullscreen-error="report($event.detail)"'
         : `@click="${vue2 ? 'exit' : 'exit().catch(report)'}"`
@@ -97,7 +97,7 @@ export default {
     kind === 'component' ? (vue2 ? 'fullscreen' : 'Fullscreen') : 'section'
   const attributes =
     kind === 'component'
-      ? 'v-model="active" :page-only="false" :teleport="true" @error="report"'
+      ? 'v-model="isFullscreen" :page-only="false" :teleport="true" @error="report"'
       : kind === 'directive'
         ? 'id="panel"'
         : 'ref="target"'
@@ -108,15 +108,15 @@ ${
     ? vue2Scripts[kind]
     : `${vue3Scripts[kind]}
 
-function report(error) { ${kind === 'api' ? '' : 'active.value = false; '}console.error(error) }`
+function report(error) { ${kind === 'api' ? '' : 'isFullscreen.value = false; '}console.error(error) }`
 }
 </script>
 
 <template>
   <div>
-    <button :disabled="active" ${enterAction}>${enter}</button>
+    <button :disabled="isFullscreen" ${enterAction}>${enter}</button>
     <${tag} ${attributes}>
-      <button v-if="active" ${exitAction}>${exit}</button>
+      <button v-if="isFullscreen" ${exitAction}>${exit}</button>
       <!-- ${content} -->
     </${tag}>
   </div>

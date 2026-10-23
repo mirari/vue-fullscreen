@@ -7,7 +7,7 @@ const pageOnly = options.has('pageOnly')
 
 createApp({
   setup() {
-    const active = ref(false)
+    const isFullscreen = ref(false)
     const error = ref('')
     const apiTarget = ref<HTMLElement>()
     const controls = useFullscreen(apiTarget, { pageOnly, teleport: true })
@@ -20,7 +20,7 @@ createApp({
           {
             id: 'enter',
             onClick: () => {
-              active.value = true
+              isFullscreen.value = true
             },
           },
           'Enter component fullscreen',
@@ -29,9 +29,9 @@ createApp({
           Fullscreen,
           {
             id: 'target',
-            modelValue: active.value,
+            modelValue: isFullscreen.value,
             'onUpdate:modelValue': (v: boolean) => {
-              active.value = v
+              isFullscreen.value = v
             },
             pageOnly,
             teleport: true,
@@ -46,7 +46,7 @@ createApp({
               {
                 id: 'exit',
                 onClick: () => {
-                  active.value = false
+                  isFullscreen.value = false
                 },
               },
               'Exit',
@@ -68,7 +68,7 @@ createApp({
           h('p', 'API content'),
           h('button', { onClick: controls.exit }, 'Exit API'),
         ]),
-        h('output', { id: 'state' }, String(active.value)),
+        h('output', { id: 'state' }, String(isFullscreen.value)),
         h('p', { role: 'alert' }, error.value),
       ])
   },

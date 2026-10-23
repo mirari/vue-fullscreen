@@ -21,7 +21,6 @@ component vue3 en
 | [`teleport`](/en/guide/getting-started#teleport) | `boolean` | `false`        | Move the element to the body while active                             |
 | `fullscreenClass`                                | `string`  | `'fullscreen'` | Class applied while active                                            |
 | `exitOnClickWrapper`                             | `boolean` | `true`         | Exit on wrapper background clicks, not child clicks                   |
-| `fullscreen`                                     | `boolean` | `false`        | Deprecated model prop                                                 |
 
 ## Instance properties {#instance-properties}
 
@@ -38,7 +37,6 @@ Read these through the component ref.
 | ------------------- | ------------ | ------------------------------------------------------------ |
 | `change`            | `boolean`    | Fullscreen state changed                                     |
 | `update:modelValue` | `boolean`    | Synchronize `v-model`                                        |
-| `update:fullscreen` | `boolean`    | Synchronize the deprecated model                             |
 | `error`             | Error object | A model change or wrapper click triggered a failed operation |
 
 ## Methods {#methods}
@@ -74,6 +72,8 @@ async function enter() {
 
 ## Migrating older versions {#migration}
 
+The legacy `fullscreen` prop and `update:fullscreen` event remain available for compatibility. Use `v-model` in new code.
+
 ```js
 // Before
 import VueFullscreen from 'vue-fullscreen'
@@ -85,8 +85,11 @@ import { Fullscreen } from 'vue-fullscreen'
 
 ```vue
 <!-- Before -->
-<fullscreen :fullscreen="active" @update:fullscreen="active = $event" />
+<fullscreen
+  :fullscreen="isFullscreen"
+  @update:fullscreen="isFullscreen = $event"
+/>
 
 <!-- Now -->
-<Fullscreen v-model="active" />
+<Fullscreen v-model="isFullscreen" />
 ```

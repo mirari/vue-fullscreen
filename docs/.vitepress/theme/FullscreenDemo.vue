@@ -22,7 +22,7 @@ const props = withDefaults(
 const demoId = computed(() =>
   props.comparePageOnly ? 'demo-page-only' : `demo-${props.kind}`,
 )
-const active = ref(false)
+const isFullscreen = ref(false)
 const pageOnly = ref(false)
 const teleport = ref(!props.compareTeleport && !props.comparePageOnly)
 const popup = ref(false)
@@ -30,10 +30,10 @@ const preview = ref<InstanceType<typeof Viewer>>()
 const showDetails = computed(() => props.compareTeleport)
 let readingPosition: { left: number; top: number } | undefined
 function rememberReadingPosition() {
-  if (!active.value && !readingPosition)
+  if (!isFullscreen.value && !readingPosition)
     readingPosition = { left: window.scrollX, top: window.scrollY }
 }
-watch(active, (value) => {
+watch(isFullscreen, (value) => {
   if (showDetails.value && !value) preview.value?.hide()
 })
 function previewImage(index: number) {
@@ -64,7 +64,7 @@ const controls = useFullscreen(target, {
 })
 watch(controls.isFullscreen, (value) => {
   if (props.kind === 'api') {
-    active.value = value
+    isFullscreen.value = value
     void fullscreenChanged(value)
   }
 })
@@ -125,24 +125,24 @@ const options = computed(() => ({
   pageOnly: pageOnly.value,
   teleport: teleport.value,
   fullscreenClass: 'demo-fullscreen',
-  callback: (isFullscreen: boolean) => {
-    active.value = isFullscreen
-    void fullscreenChanged(isFullscreen)
+  callback: (value: boolean) => {
+    isFullscreen.value = value
+    void fullscreenChanged(value)
   },
 }))
 function report(value: unknown) {
-  active.value = false
+  isFullscreen.value = false
   void fullscreenChanged(false)
   error.value = value instanceof Error ? value.message : String(value)
 }
 function enter() {
   rememberReadingPosition()
   error.value = ''
-  if (props.kind === 'component') active.value = true
+  if (props.kind === 'component') isFullscreen.value = true
   else void controls.enter().catch(report)
 }
 function exit() {
-  if (props.kind === 'component') active.value = false
+  if (props.kind === 'component') isFullscreen.value = false
   else if (props.kind === 'api') void controls.exit().catch(report)
 }
 onBeforeUnmount(() => {
@@ -164,24 +164,29 @@ onBeforeUnmount(() => {
   >
     <div v-if="!simple" class="demo-controls">
       <label v-if="!compareTeleport"
-        ><input v-model="pageOnly" type="checkbox" :disabled="active" />
+        ><input v-model="pageOnly" type="checkbox" :disabled="isFullscreen" />
         {{ comparePageOnly ? 'pageOnly' : text.pageOnly }}</label
       >
       <label v-if="!comparePageOnly"
-        ><input v-model="teleport" type="checkbox" :disabled="active" />
+        ><input v-model="teleport" type="checkbox" :disabled="isFullscreen" />
         {{ text.teleport }}</label
       >
       <button
         v-if="kind === 'directive'"
         v-fullscreen="options"
         class="demo-button"
-        :disabled="active"
+        :disabled="isFullscreen"
         @click.capture="rememberReadingPosition"
         @fullscreen-error="report($event.detail)"
       >
         {{ text.directiveButton }}
       </button>
-      <button v-else class="demo-button" :disabled="active" @click="enter">
+      <button
+        v-else
+        class="demo-button"
+        :disabled="isFullscreen"
+        @click="enter"
+      >
         {{ text.enter }}
       </button>
     </div>
@@ -189,7 +194,7 @@ onBeforeUnmount(() => {
       :is="kind === 'component' ? Fullscreen : 'div'"
       :id="demoId"
       ref="target"
-      v-model="active"
+      v-model="isFullscreen"
       class="demo-surface"
       tabindex="0"
       :aria-label="text.gallery"
@@ -202,16 +207,16 @@ onBeforeUnmount(() => {
       @error="report"
       @change="fullscreenChanged"
     >
-      <div v-if="simple || active" class="gallery-topbar">
+      <div v-if="simple || isFullscreen" class="gallery-topbar">
         <button
-          v-if="simple && !active"
+          v-if="simple && !isFullscreen"
           class="demo-button gallery-fullscreen-action"
           @click="enter"
         >
           {{ text.enter }}
         </button>
         <button
-          v-if="active && kind === 'directive'"
+          v-if="isFullscreen && kind === 'directive'"
           v-fullscreen="options"
           class="demo-button gallery-fullscreen-action"
           @fullscreen-error="report($event.detail)"
@@ -219,7 +224,7 @@ onBeforeUnmount(() => {
           {{ text.exit }}
         </button>
         <button
-          v-else-if="active"
+          v-else-if="isFullscreen"
           class="demo-button gallery-fullscreen-action"
           @click="exit"
         >
@@ -227,7 +232,7 @@ onBeforeUnmount(() => {
         </button>
       </div>
       <div
-        v-if="showDetails && active && popup && !pageOnly && !teleport"
+        v-if="showDetails && isFullscreen && popup && !pageOnly && !teleport"
         class="demo-comparison-status"
         aria-live="polite"
       >

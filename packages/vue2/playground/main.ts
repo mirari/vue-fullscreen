@@ -67,21 +67,21 @@ document.documentElement.lang = zh ? 'zh-CN' : 'en'
 new Vue({
   directives: { fullscreen: vFullscreen },
   data: {
-    active: false,
+    isFullscreen: false,
     error: '',
     teleport: !comparison,
     popup: false,
     selected: 0,
   },
   watch: {
-    active(value: boolean) {
+    isFullscreen(value: boolean) {
       if (comparison !== 'pageOnly' && !value)
         (this.$refs.preview as InstanceType<typeof Viewer>)?.hide()
     },
   },
   methods: {
     changed(isFullscreen: boolean) {
-      this.active = isFullscreen
+      this.isFullscreen = isFullscreen
     },
     report(error: Error) {
       this.error = error.message
@@ -103,12 +103,12 @@ new Vue({
             callback: this.changed,
           })
           .catch(this.report)
-      else this.active = true
+      else this.isFullscreen = true
     },
     exit() {
       if (kind === 'api' || kind === 'directive')
         void fullscreen.exit().catch(this.report)
-      else this.active = false
+      else this.isFullscreen = false
     },
   },
   render(h) {
@@ -129,7 +129,7 @@ new Vue({
               attrs: {
                 type: 'checkbox',
                 id: 'teleport',
-                disabled: this.active,
+                disabled: this.isFullscreen,
               },
               domProps: { checked: this.teleport },
               on: {
@@ -190,14 +190,18 @@ new Vue({
         kind === 'directive' || kind === 'api' ? 'section' : Fullscreen,
         {
           attrs: { id: 'target', class: 'demo-target' },
-          props: { value: this.active, pageOnly, teleport: this.teleport },
+          props: {
+            value: this.isFullscreen,
+            pageOnly,
+            teleport: this.teleport,
+          },
           on: {
             change: () => {
               if (comparison === 'pageOnly')
                 this.$nextTick(() => window.dispatchEvent(new Event('resize')))
             },
             input: (v: boolean) => {
-              this.active = v
+              this.isFullscreen = v
               if (!v) this.popup = false
             },
             error: (e: Error) => {
@@ -206,7 +210,7 @@ new Vue({
           },
         },
         [
-          this.active
+          this.isFullscreen
             ? h(
                 'button',
                 {
@@ -216,7 +220,7 @@ new Vue({
                 text.exit,
               )
             : null,
-          comparison === 'pageOnly' && this.active
+          comparison === 'pageOnly' && this.isFullscreen
             ? h(
                 'p',
                 { attrs: { role: 'status' } },
@@ -309,7 +313,7 @@ new Vue({
                   ),
                 ),
               ),
-          this.active && this.popup && !this.teleport && !pageOnly
+          this.isFullscreen && this.popup && !this.teleport && !pageOnly
             ? h('p', { attrs: { role: 'status' } }, text.hiddenPopup)
             : null,
         ],
@@ -337,7 +341,7 @@ new Vue({
       comparison || kind
         ? null
         : h('section', { attrs: { id: 'api-target' } }, text.api),
-      h('output', { attrs: { id: 'state' } }, String(this.active)),
+      h('output', { attrs: { id: 'state' } }, String(this.isFullscreen)),
       h('p', { attrs: { role: 'alert' } }, this.error),
     ])
   },
