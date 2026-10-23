@@ -52,12 +52,13 @@ directive vue3 zh
 | HTML 元素    | `{ target: document.getElementById('panel') }`       |
 | Vue ref 对象 | `{ target: panelRef }`                               |
 | 组件实例     | `{ target: panelComponent }`，使用其 `$el`           |
+| id 字符串    | `{ target: 'panel' }` 或 `{ target: '#panel' }`      |
 | CSS 选择器   | `{ target: '#panel' }` 或 `{ target: '.panel' }`     |
 | getter       | `{ target: () => document.getElementById('panel') }` |
 
 每次进入全屏时解析当前目标。省略 `target` 或直接传入 `null` 时使用 `document.body`；选择器未匹配、ref 尚未挂载等无法解析目标的情况会触发 `fullscreen-error`。
 
-字符串目标按 CSS 选择器解析，简写 `v-fullscreen="'#panel'"` 也遵循此规则，id 需要带 `#` 前缀。
+目标解析与 API 共用同一规则：字符串先按 id 查找（允许带 `#`），未找到时再按 CSS 选择器解析；两者都能匹配时，id 优先。简写 `v-fullscreen="'panel'"`、`v-fullscreen="'#panel'"` 和 `v-fullscreen="'.panel'"` 也遵循此规则。
 
 ## 配置项 {#options}
 

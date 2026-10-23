@@ -8,7 +8,7 @@
 
 先检查错误事件或 Promise 拒绝。嵌入 iframe 时还需要宿主允许 fullscreen 权限。
 
-`isEnabled` 只表示 API 可用，不保证每次请求都被批准。可先启用 `pageOnly`，排除原生权限问题。
+`isSupported` 只表示 API 可用，不保证每次请求都被批准。可先启用 `pageOnly`，排除原生权限问题。
 
 ## 手机上的表现为什么不同？
 

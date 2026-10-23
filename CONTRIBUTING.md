@@ -108,6 +108,8 @@ If npm publishing succeeds but GitHub Release creation fails, use GitHub Actions
 
 ## Migration notes
 
+- Prefer VueUse conventions for new public names. All adapters use `isSupported` for native fullscreen availability and `isFullscreen` for current state. Component and API operations use `enter`, `exit` and `toggle`; `request` and `isEnabled` remain deprecated aliases. Keep legacy names in migration guidance rather than current reference tables.
+- API and directive targets share one resolver: strings first match an id (with an optional `#`), then a CSS selector. Ids take priority when both match, including ids with CSS special characters. Ref and getter values use the same rules on each entry. Unresolved targets never fall back to body.
 - Vue 3 exposes `Fullscreen`, `vFullscreen` and `useFullscreen(target, options)`. The default plugin export, `$fullscreen` instance property and API singleton have been removed; migrate old API calls to `useFullscreen()`. Each composable call owns its reactive state and session, with component unmount cleanup; calls outside components must exit explicitly. The deprecated `component` and `directive` aliases remain.
 - Vue 2 retains its default plugin export, `$fullscreen` instance property and `fullscreen` / `api` singleton. Use `v-model` for component state; the legacy `fullscreen` / `update:fullscreen` model remains supported in both adapters.
 - Vue 2 minimum is 2.4.0, when `inheritAttrs`, `$attrs` and `$listeners` became available. Public declarations use types shared by Vue 2.4 through 2.7 rather than the later `VueConstructor` export.

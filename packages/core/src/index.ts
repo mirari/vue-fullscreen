@@ -31,7 +31,14 @@ function resolveTarget(target: FullscreenTarget): HTMLElement {
   else node = target
   if (typeof node === 'string') {
     const id = node.charAt(0) === '#' ? node.slice(1) : node
-    const found = document.getElementById(id)
+    let found: Element | null = document.getElementById(id)
+    if (!found) {
+      try {
+        found = document.querySelector(node)
+      } catch {
+        // Invalid selectors still report the same unresolved-target error.
+      }
+    }
     if (!found) throw new Error(`Fullscreen target not found: ${node}`)
     node = found
   }
@@ -46,12 +53,16 @@ export interface VueFullscreenApi {
     Pick<ApiOptions, 'callback'>
   readonly element: Element | null
   readonly isFullscreen: boolean
+  readonly isSupported: boolean
+  /** @deprecated Use isSupported. */
   readonly isEnabled: boolean
   toggle(
     target?: FullscreenTarget,
     options?: ApiOptions,
     force?: boolean,
   ): Promise<void>
+  enter(target?: FullscreenTarget, options?: ApiOptions): Promise<void>
+  /** @deprecated Use enter. */
   request(target?: FullscreenTarget, options?: ApiOptions): Promise<void>
   exit(): Promise<void>
 }
@@ -62,7 +73,7 @@ export interface FullscreenController extends VueFullscreenApi {
 /** Each component owns its controller; the public API uses a shared singleton. */
 export function createFullscreen(): FullscreenController {
   let element: HTMLElement | null = null
-  let active = false
+  let isFullscreen = false
   let pending: Promise<void> | null = null
   let disposed = false
   let restore: (() => void) | undefined
@@ -73,8 +84,8 @@ export function createFullscreen(): FullscreenController {
   }
   let nativeTarget: Element | null = null
   const notify = (value: boolean) => {
-    if (active === value) return
-    active = value
+    if (isFullscreen === value) return
+    isFullscreen = value
     options.callback?.(value)
   }
   const cleanup = () => {
@@ -106,21 +117,27 @@ export function createFullscreen(): FullscreenController {
       return element
     },
     get isFullscreen() {
-      return active
+      return isFullscreen
     },
-    get isEnabled() {
+    get isSupported() {
       return screenfull.isEnabled
     },
+    get isEnabled() {
+      return this.isSupported
+    },
     toggle(target, config, force) {
-      return (force ?? !active) ? this.request(target, config) : this.exit()
+      return (force ?? !isFullscreen) ? this.enter(target, config) : this.exit()
     },
     request(target, config = {}) {
+      return controller.enter(target, config)
+    },
+    enter(target, config = {}) {
       if (disposed)
         return Promise.reject(
           new Error('Fullscreen controller has been disposed'),
         )
       if (pending) return pending
-      if (active) return Promise.resolve()
+      if (isFullscreen) return Promise.resolve()
       if (typeof document === 'undefined')
         return Promise.reject(new Error('Fullscreen requires a browser'))
       let node: HTMLElement
@@ -212,13 +229,13 @@ export function createFullscreen(): FullscreenController {
     },
     async exit() {
       if (pending) await pending
-      if (!active) return
+      if (!isFullscreen) return
       if (options.pageOnly) {
         cleanup()
         notify(false)
       } else {
         await screenfull.exit()
-        if (active) {
+        if (isFullscreen) {
           cleanup()
           notify(false)
         }
@@ -230,7 +247,7 @@ export function createFullscreen(): FullscreenController {
       const request = pending
       // Restore DOM synchronously before Vue removes its nodes.
       cleanup()
-      active = false
+      isFullscreen = false
       if (screenfull.isEnabled) {
         const exitOwned = () => {
           if (owned && screenfull.element === owned) return screenfull.exit()
@@ -282,14 +299,10 @@ export function bindDirective(el: HTMLElement, binding: FullscreenBinding) {
           ? { target: binding.value }
           : (binding.value ?? {})
       const { target, ...options } = config
-      const node =
-        typeof target === 'string' ? document.querySelector(target) : target
-      if (typeof target === 'string' && !node)
-        throw new Error(`Fullscreen target not found: ${target}`)
       const controller = api
       if (!controller.element) directiveOwner = el
       void controller
-        .toggle(node, {
+        .toggle(target, {
           teleport: !!binding.modifiers.teleport,
           pageOnly: !!binding.modifiers.pageOnly,
           ...options,
@@ -325,8 +338,12 @@ export interface FullscreenProps {
 }
 export interface FullscreenInstance {
   readonly isFullscreen: boolean
+  readonly isSupported: boolean
+  /** @deprecated Use isSupported. */
   readonly isEnabled: boolean
+  enter(): Promise<void>
+  /** @deprecated Use enter. */
   request(): Promise<void>
   exit(): Promise<void>
-  toggle(value?: boolean): Promise<void>
+  toggle(force?: boolean): Promise<void>
 }

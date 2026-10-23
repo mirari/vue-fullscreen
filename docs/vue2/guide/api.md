@@ -16,12 +16,13 @@ api vue2 zh
 
 ## 目标类型
 
-目标支持 HTML 元素、Vue 模板 ref、组件实例（使用 `$el`）、id 字符串（`'panel'` 或 `'#panel'`）以及 getter。每次进入时解析当前目标；id 不存在或 ref 尚未挂载会拒绝 Promise。省略目标或直接传入 `null` 时控制 `document.body`。
+目标支持 HTML 元素、Vue 模板 ref、组件实例（使用 `$el`）、id 字符串、CSS 选择器以及 getter。字符串先按 id 查找（允许带 `#`），未找到时再按 CSS 选择器解析；两者都能匹配时，id 优先。每次进入时解析当前目标，无法解析或 ref 尚未挂载会拒绝 Promise。省略目标或直接传入 `null` 时控制 `document.body`。
 
 ```js
-await fullscreen.request('panel') // id
-await fullscreen.request('#panel') // 带 # 的 id
-await fullscreen.request(this.$refs.target) // DOM 元素或 Vue 组件
+await fullscreen.enter('panel') // id
+await fullscreen.enter('#panel') // 带 # 的 id
+await fullscreen.enter('.panel') // CSS 选择器
+await fullscreen.enter(this.$refs.target) // DOM 元素或 Vue 组件
 ```
 
 ## 切换与强制状态
@@ -33,16 +34,16 @@ await fullscreen.toggle(element, undefined, false) // 强制退出
 await fullscreen.exit() // 已退出时不执行操作
 ```
 
-`request()` 默认控制 `document.body`。已处于全屏时再次 `request()` 不会切换目标；先退出，再请求新目标。
+`enter()` 默认控制 `document.body`。已处于全屏时再次 `enter()` 不会切换目标；先退出，再请求新目标。
 
 ::: tip 保留用户手势
-原生全屏请求要直接由点击、按键等操作触发。不要先等待网络请求再调用 `request()`，否则浏览器可能拒绝。
+原生全屏请求要直接由点击、按键等操作触发。不要先等待网络请求再调用 `enter()`，否则浏览器可能拒绝。
 :::
 
 ## 方法 {#methods}
 
 ```ts
-fullscreen.request(target?: FullscreenTarget, options?: ApiOptions): Promise<void>
+fullscreen.enter(target?: FullscreenTarget, options?: ApiOptions): Promise<void>
 fullscreen.toggle(target?: FullscreenTarget, options?: ApiOptions, force?: boolean): Promise<void>
 fullscreen.exit(): Promise<void>
 ```
@@ -52,7 +53,7 @@ fullscreen.exit(): Promise<void>
 | 属性           | 类型              | 说明                         |
 | -------------- | ----------------- | ---------------------------- |
 | `isFullscreen` | `boolean`         | 当前控制器状态               |
-| `isEnabled`    | `boolean`         | 原生全屏支持情况             |
+| `isSupported`  | `boolean`         | 原生全屏支持情况             |
 | `element`      | `Element \| null` | 目标元素，退出后为 null      |
 | `options`      | 会话配置          | 当前配置；不要在会话期间修改 |
 
@@ -67,15 +68,17 @@ fullscreen.exit(): Promise<void>
 | `fullscreenClass`             | `string`                          | `'fullscreen'` | 激活时添加，退出时恢复              |
 | `callback`                    | `(isFullscreen: boolean) => void` | 无             | 状态变化回调                        |
 
-还可以按需导入 `screenfull`，它是底层原生全屏工具；直接使用它不会执行本库的网页全屏、样式和 teleport 管理。
-
 ## 回调 {#callbacks}
 
 ```js
-fullscreen.request(target, {
+fullscreen.enter(target, {
   callback(value) {
     // 同步页面状态
     isFullscreen = value
   },
 })
 ```
+
+## 旧版本迁移 {#migration}
+
+使用 `enter()` 替代 `request()`，使用 `isSupported` 替代 `isEnabled`。旧名称作为兼容入口保留。

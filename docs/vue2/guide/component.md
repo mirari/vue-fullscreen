@@ -26,11 +26,10 @@ component vue2 zh
 
 通过组件 ref 读取。
 
-| 属性           | 类型      | 作用                   |
-| -------------- | --------- | ---------------------- |
-| `isFullscreen` | `boolean` | 当前全屏状态           |
-| `isEnabled`    | `boolean` | 原生全屏是否可用       |
-| `support`      | `boolean` | `isEnabled` 的兼容属性 |
+| 属性           | 类型      | 作用             |
+| -------------- | --------- | ---------------- |
+| `isFullscreen` | `boolean` | 当前全屏状态     |
+| `isSupported`  | `boolean` | 原生全屏是否可用 |
 
 ## 事件 {#events}
 
@@ -46,22 +45,22 @@ component vue2 zh
 
 ```js
 async enterPanel() {
-  try { await this.$refs.panel.request() }
+  try { await this.$refs.panel.enter() }
   catch (error) { this.error = error.message }
 }
 ```
 
 模板中的组件需要设置 `ref="panel"`。
 
-| 方法       | 签名                               | 作用                 |
-| ---------- | ---------------------------------- | -------------------- |
-| `request`  | `(): Promise<void>`                | 请求全屏             |
-| `exit`     | `(): Promise<void>`                | 退出全屏             |
-| `toggle`   | `(force?: boolean): Promise<void>` | 切换或指定状态       |
-| `enter`    | `(): Promise<void>`                | `request` 的兼容入口 |
-| `getState` | `(): boolean`                      | 读取全屏状态         |
+| 方法     | 签名                               | 作用           |
+| -------- | ---------------------------------- | -------------- |
+| `enter`  | `(): Promise<void>`                | 请求全屏       |
+| `exit`   | `(): Promise<void>`                | 退出全屏       |
+| `toggle` | `(force?: boolean): Promise<void>` | 切换或指定状态 |
 
 ## 旧版本迁移 {#migration}
+
+使用 `enter()` 替代 `request()`，使用 `isSupported` 替代 `isEnabled`。旧名称作为兼容入口保留。
 
 旧版的 `fullscreen` 属性和 `update:fullscreen` 事件仅作为兼容接口保留，新代码使用 `v-model`。
 
@@ -78,12 +77,12 @@ async enterPanel() {
 
 ```js
 // 旧写法
-this.$refs.panel.enter()
+this.$refs.panel.request()
 this.$refs.panel.getState()
 this.$refs.panel.support
 
 // 新写法
-this.$refs.panel.request()
+this.$refs.panel.enter()
 this.$refs.panel.isFullscreen
-this.$refs.panel.isEnabled
+this.$refs.panel.isSupported
 ```

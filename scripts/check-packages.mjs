@@ -173,13 +173,15 @@ for (const [line, versions] of [
           const root = app.mount('#mount'); instance = root.$refs.fs;
           close = () => app.unmount();
         }
-        await instance.request();
+        if (typeof instance.isSupported !== 'boolean') throw Error('Missing component support flag');
+        await instance.enter();
         if (!instance.isFullscreen || !document.querySelector('body > .fullscreen')) throw Error('Component enter failed');
         await instance.exit();
         if (instance.isFullscreen || document.querySelector('.fullscreen')) throw Error('Component exit failed');
         if (${JSON.stringify(line)} === 'vue2') {
           if (changes.join(',') !== 'true,false') throw Error('Model events failed');
-          await fullscreen.request(instance, { pageOnly: true });
+          if (typeof fullscreen.isSupported !== 'boolean') throw Error('Missing API support flag');
+          await fullscreen.enter(instance, { pageOnly: true });
           if (fullscreen.element !== instance.$el) throw Error('Component target resolution failed');
           await fullscreen.exit();
         } else {
@@ -212,9 +214,14 @@ type RemovedApi = import('vue-fullscreen').VueFullscreenApi;`
           : ''
       const targetTypes = `
 const element = document.createElement('section');
+declare const typedComponent: InstanceType<typeof Fullscreen>;
+const supported: boolean = typedComponent.isSupported;
+const enteredComponent: Promise<void> = typedComponent.enter();
+const legacySupported: boolean = typedComponent.isEnabled;
+const legacyEntered: Promise<void> = typedComponent.request();
 const targetRef: FullscreenTarget = { value: element };
 const componentRoot: FullscreenTarget = { $el: element };
-${['element', 'targetRef', 'componentRoot', "'panel'", "'#panel'", '() => element'].map((target) => (line === 'vue2' ? `fullscreen.request(${target}, options);` : `useFullscreen(${target}, options);`)).join('\n')}
+${['element', 'targetRef', 'componentRoot', "'panel'", "'#panel'", "'.panel'", '() => element'].map((target) => (line === 'vue2' ? `fullscreen.enter(${target}, options);` : `useFullscreen(${target}, options);`)).join('\n')}
 ${
   line === 'vue3'
     ? `import { ref } from 'vue';

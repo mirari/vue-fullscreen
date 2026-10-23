@@ -46,16 +46,16 @@ const implementation = defineComponent({
       emit('update:modelValue', value)
       emit('update:fullscreen', value)
     }
-    const request = () =>
-      controller.request(wrapper.value, {
+    const enter = () =>
+      controller.enter(wrapper.value, {
         pageOnly: props.pageOnly,
         teleport: props.teleport,
         fullscreenClass: props.fullscreenClass,
         callback: changed,
       })
     const exit = () => controller.exit()
-    const toggle = (value?: boolean) =>
-      (value ?? !controller.isFullscreen) ? request() : exit()
+    const toggle = (force?: boolean) =>
+      (force ?? !controller.isFullscreen) ? enter() : exit()
     const update = (value: boolean) => {
       void toggle(value).catch((error) => emit('error', error))
     }
@@ -67,11 +67,13 @@ const implementation = defineComponent({
     onBeforeUnmount(() => controller.dispose())
     return {
       wrapper,
-      request,
+      enter,
+      request: enter,
       exit,
       toggle,
       isFullscreen,
-      isEnabled: controller.isEnabled,
+      isSupported: controller.isSupported,
+      isEnabled: controller.isSupported,
       shadeClick: (event: MouseEvent) => {
         if (props.exitOnClickWrapper && event.target === wrapper.value)
           update(false)
@@ -139,25 +141,25 @@ export function useFullscreen(
   options: UseFullscreenOptions = {},
 ): UseFullscreenReturn {
   const controller = createFullscreen()
-  const active = ref(false)
+  const isFullscreen = ref(false)
   const enter = () =>
-    controller.request(target, {
+    controller.enter(target, {
       pageOnly: resolveValue(options.pageOnly ?? false),
       teleport: resolveValue(options.teleport ?? false),
       fullscreenClass: resolveValue(options.fullscreenClass ?? 'fullscreen'),
-      callback: (isFullscreen) => {
-        active.value = isFullscreen
+      callback: (value) => {
+        isFullscreen.value = value
       },
     })
   if (getCurrentInstance()) {
     onBeforeUnmount(() => {
       controller.dispose()
-      active.value = false
+      isFullscreen.value = false
     })
   }
   return {
-    isFullscreen: readonly(active),
-    isSupported: computed(() => controller.isEnabled),
+    isFullscreen: readonly(isFullscreen),
+    isSupported: computed(() => controller.isSupported),
     enter,
     exit: () => controller.exit(),
     toggle: () => (controller.isFullscreen ? controller.exit() : enter()),

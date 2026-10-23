@@ -8,7 +8,7 @@
 
 先检查错误事件或 Promise 拒绝。嵌入 iframe 时还需要宿主允许 fullscreen 权限。
 
-`isEnabled` 只表示 API 可用，不保证每次请求都被批准。可先启用 `pageOnly`，排除原生权限问题。
+`isSupported` 只表示 API 可用，不保证每次请求都被批准。可先启用 `pageOnly`，排除原生权限问题。
 
 ## 手机上的表现为什么不同？
 
@@ -34,4 +34,4 @@
 
 ## SSR 或 Nuxt 可以用吗？
 
-可以在服务端导入包。只在浏览器挂载后读取 DOM，并在用户操作中请求原生全屏。不要在服务端调用 `fullscreen.request()`。
+可以在服务端导入包。只在浏览器挂载后读取 DOM，并在用户操作中请求原生全屏。不要在服务端调用 `fullscreen.enter()`。

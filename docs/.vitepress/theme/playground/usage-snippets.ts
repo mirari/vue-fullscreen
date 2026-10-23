@@ -65,7 +65,7 @@ export default {
   data: () => ({ isFullscreen: false }),
   methods: {
     enter() {
-      fullscreen.request(this.$refs.target, {
+      fullscreen.enter(this.$refs.target, {
         pageOnly: false,
         teleport: true,
         callback: (isFullscreen) => { this.isFullscreen = isFullscreen },

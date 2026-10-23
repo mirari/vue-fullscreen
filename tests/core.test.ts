@@ -5,6 +5,7 @@ import {
   createFullscreen,
   disposeDirective,
   unbindDirective,
+  type FullscreenTarget,
 } from '../packages/core/src/index'
 import screenfull from 'screenfull'
 
@@ -52,6 +53,13 @@ function target() {
   return document.querySelector<HTMLElement>('#target')!
 }
 describe('fullscreen lifecycle', () => {
+  it('reports native availability as isSupported', () => {
+    const controller = createFullscreen()
+    expect(controller.isSupported).toBe(false)
+    native.enabled = true
+    expect(controller.isSupported).toBe(true)
+    expect(controller.isFullscreen).toBe(false)
+  })
   it.each(['target', '#target', 'panel:1', '#panel:1'])(
     'resolves the id %s on each request without CSS selector parsing',
     async (id) => {
@@ -223,6 +231,84 @@ describe('fullscreen lifecycle', () => {
     expect(native.listeners.size).toBe(0)
   })
 })
+describe.each(['API', 'directive'] as const)(
+  '%s target resolution',
+  (entry) => {
+    it.each([
+      'panel',
+      '#panel',
+      '.probe',
+      'main > [data-panel]',
+      'panel:1',
+      '#panel:1',
+    ])(
+      'resolves %s identically for strings, refs and getters, preferring ids',
+      async (selector) => {
+        document.body.innerHTML =
+          '<main><panel></panel><div id="panel" class="probe" data-panel></div><div id="panel:1"></div></main>'
+        const expected = document.getElementById(
+          selector.includes(':1') ? 'panel:1' : 'panel',
+        )
+        const controller = entry === 'API' ? createFullscreen() : api
+        const button = document.createElement('button')
+        const errors = vi.fn()
+        button.addEventListener('fullscreen-error', errors)
+        for (const input of [selector, { value: selector }, () => selector]) {
+          if (entry === 'API')
+            await controller.request(input, { pageOnly: true })
+          else {
+            bindDirective(button, {
+              value: { target: input },
+              modifiers: { pageOnly: true },
+            })
+            button.click()
+            await Promise.resolve()
+            expect(errors).not.toHaveBeenCalled()
+          }
+          expect(controller.element).toBe(expected)
+          await controller.exit()
+        }
+        if (entry === 'directive') {
+          bindDirective(button, {
+            value: selector,
+            modifiers: { pageOnly: true },
+          })
+          button.click()
+          await Promise.resolve()
+          expect(errors).not.toHaveBeenCalled()
+          expect(controller.element).toBe(expected)
+          await controller.exit()
+          unbindDirective(button)
+        }
+      },
+    )
+    it.each(['#missing', '[invalid', { value: null }, () => undefined])(
+      'reports an unresolved target without fullscreening body: %s',
+      async (input) => {
+        const controller = entry === 'API' ? createFullscreen() : api
+        if (entry === 'API')
+          await expect(
+            controller.request(input as FullscreenTarget),
+          ).rejects.toThrow()
+        else {
+          const button = document.createElement('button')
+          const errors = vi.fn()
+          button.addEventListener('fullscreen-error', errors)
+          bindDirective(button, {
+            value: { target: input as FullscreenTarget },
+            modifiers: {},
+          })
+          button.click()
+          await Promise.resolve()
+          expect(errors).toHaveBeenCalledOnce()
+          unbindDirective(button)
+        }
+        expect(controller.element).toBeNull()
+        expect(document.body.classList.contains('fullscreen')).toBe(false)
+      },
+    )
+  },
+)
 describe('directive lifecycle', () => {
   it('cleans up the owning directive while allowing other bound buttons to enter again', async () => {
     const node = target()
@@ -267,12 +353,13 @@ describe('directive lifecycle', () => {
     button.click()
     expect(api.isFullscreen).toBe(false)
   })
-  it('reports missing selectors instead of fullscreening the body', () => {
+  it('reports missing selectors instead of fullscreening the body', async () => {
     const button = document.createElement('button'),
       error = vi.fn()
     button.addEventListener('fullscreen-error', error)
     bindDirective(button, { value: '#missing', modifiers: {} })
     button.click()
+    await Promise.resolve()
     expect(error).toHaveBeenCalledOnce()
     expect(api.isFullscreen).toBe(false)
     unbindDirective(button)

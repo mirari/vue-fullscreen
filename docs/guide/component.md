@@ -29,7 +29,7 @@ component vue3 zh
 | 属性           | 类型      | 作用             |
 | -------------- | --------- | ---------------- |
 | `isFullscreen` | `boolean` | 当前全屏状态     |
-| `isEnabled`    | `boolean` | 原生全屏是否可用 |
+| `isSupported`  | `boolean` | 原生全屏是否可用 |
 
 ## 事件 {#events}
 
@@ -50,7 +50,7 @@ const panel = ref()
 const error = ref('')
 async function enter() {
   try {
-    await panel.value.request()
+    await panel.value.enter()
   } catch (reason) {
     error.value = reason.message
   }
@@ -64,13 +64,15 @@ async function enter() {
 </template>
 ```
 
-| 方法      | 签名                               | 作用           |
-| --------- | ---------------------------------- | -------------- |
-| `request` | `(): Promise<void>`                | 请求全屏       |
-| `exit`    | `(): Promise<void>`                | 退出全屏       |
-| `toggle`  | `(force?: boolean): Promise<void>` | 切换或指定状态 |
+| 方法     | 签名                               | 作用           |
+| -------- | ---------------------------------- | -------------- |
+| `enter`  | `(): Promise<void>`                | 请求全屏       |
+| `exit`   | `(): Promise<void>`                | 退出全屏       |
+| `toggle` | `(force?: boolean): Promise<void>` | 切换或指定状态 |
 
 ## 旧版本迁移 {#migration}
+
+使用 `enter()` 替代 `request()`，使用 `isSupported` 替代 `isEnabled`。旧名称作为兼容入口保留。
 
 旧版的 `fullscreen` 属性和 `update:fullscreen` 事件仅作为兼容接口保留，新代码使用 `v-model`。
 

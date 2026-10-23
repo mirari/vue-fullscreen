@@ -29,8 +29,7 @@ Read these through the component ref.
 | Property       | Type      | Purpose                  |
 | -------------- | --------- | ------------------------ |
 | `isFullscreen` | `boolean` | Current fullscreen state |
-| `isEnabled`    | `boolean` | Native API support       |
-| `support`      | `boolean` | Alias for `isEnabled`    |
+| `isSupported`  | `boolean` | Native API support       |
 
 ## Events {#events}
 
@@ -46,20 +45,20 @@ Set `ref="panel"` on the component to call its methods:
 
 ```js
 async enterPanel() {
-  try { await this.$refs.panel.request() }
+  try { await this.$refs.panel.enter() }
   catch (error) { this.error = error.message }
 }
 ```
 
-| Method     | Signature                          | Purpose                 |
-| ---------- | ---------------------------------- | ----------------------- |
-| `request`  | `(): Promise<void>`                | Enter fullscreen        |
-| `exit`     | `(): Promise<void>`                | Exit fullscreen         |
-| `toggle`   | `(force?: boolean): Promise<void>` | Toggle or force a state |
-| `enter`    | `(): Promise<void>`                | Alias for `request`     |
-| `getState` | `(): boolean`                      | Read fullscreen state   |
+| Method   | Signature                          | Purpose                 |
+| -------- | ---------------------------------- | ----------------------- |
+| `enter`  | `(): Promise<void>`                | Enter fullscreen        |
+| `exit`   | `(): Promise<void>`                | Exit fullscreen         |
+| `toggle` | `(force?: boolean): Promise<void>` | Toggle or force a state |
 
 ## Migrating older versions {#migration}
+
+Use `enter()` instead of `request()`, and `isSupported` instead of `isEnabled`. The old names remain compatibility aliases.
 
 The legacy `fullscreen` prop and `update:fullscreen` event remain available for compatibility. Use `v-model` in new code.
 
@@ -76,12 +75,12 @@ The legacy `fullscreen` prop and `update:fullscreen` event remain available for 
 
 ```js
 // Before
-this.$refs.panel.enter()
+this.$refs.panel.request()
 this.$refs.panel.getState()
 this.$refs.panel.support
 
 // Now
-this.$refs.panel.request()
+this.$refs.panel.enter()
 this.$refs.panel.isFullscreen
-this.$refs.panel.isEnabled
+this.$refs.panel.isSupported
 ```

@@ -1,6 +1,6 @@
 # 快速上手
 
-在使用的位置按需导入组件、指令或 API。
+在使用的位置按需导入组件、指令或 API。基于 [screenfull](https://github.com/sindresorhus/screenfull)。
 
 ::: warning 旧版本升级提醒
 5.x 改用按需导入，不再提供全局插件注册。旧项目请参阅[迁移示例](/guide/component#migration)。

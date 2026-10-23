@@ -1,6 +1,37 @@
 import Vue from 'vue'
 import { expect, it } from 'vitest'
-import plugin, { Fullscreen } from '../src/index'
+import plugin, { Fullscreen, fullscreen, vFullscreen } from '../src/index'
+it('cleans up the owning directive and keeps the plugin API usable', async () => {
+  Vue.use(plugin)
+  const parent = document.createElement('section')
+  const target = document.createElement('div')
+  parent.append(target)
+  document.body.append(parent)
+  const vm = new Vue({
+    directives: { fullscreen: vFullscreen },
+    render(h) {
+      return h('button', {
+        directives: [
+          {
+            name: 'fullscreen',
+            value: { target, pageOnly: true, teleport: true },
+          },
+        ],
+      })
+    },
+  }).$mount()
+  vm.$el.dispatchEvent(new MouseEvent('click'))
+  expect(target.parentNode).toBe(document.body)
+  vm.$destroy()
+  expect(target.parentNode).toBe(parent)
+  expect(fullscreen.isFullscreen).toBe(false)
+  expect(vm.$fullscreen).toBe(fullscreen)
+  expect(vm.$fullscreen.isSupported).toBe(false)
+  await vm.$fullscreen.enter(target, { pageOnly: true })
+  expect(vm.$fullscreen.element).toBe(target)
+  await vm.$fullscreen.exit()
+  parent.remove()
+})
 it('preserves Vue 2 v-model, deprecated methods and destroys teleported nodes', async () => {
   Vue.use(plugin, { name: 'fs' })
   const host = document.createElement('main')
@@ -36,6 +67,7 @@ it('preserves Vue 2 v-model, deprecated methods and destroys teleported nodes', 
   vm.active = true
   await Vue.nextTick()
   const child = vm.$refs.fullscreen as InstanceType<typeof Fullscreen>
+  expect(child.isSupported).toBe(false)
   expect(child.getState()).toBe(true)
   expect(document.querySelector('#vue2-target')!.parentNode).toBe(document.body)
   document.dispatchEvent(new KeyboardEvent('keyup', { key: 'Escape' }))

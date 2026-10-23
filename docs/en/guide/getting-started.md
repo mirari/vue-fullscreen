@@ -1,6 +1,6 @@
 # Getting started
 
-Import the component, directive or API where you need it.
+Import the component, directive or API where you need it. Built on [screenfull](https://github.com/sindresorhus/screenfull).
 
 ::: warning Upgrading existing projects
 5.x uses named imports and no longer provides a global plugin. See the [migration example](/en/guide/component#migration).

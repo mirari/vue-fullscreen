@@ -82,13 +82,13 @@ CommonJS 项目可先执行 `require('vue-fullscreen/polyfills')`，再执行 `r
 
 ## 能力检测与网页全屏降级
 
-在浏览器中读取 `fullscreen.isEnabled` 可判断当前文档是否允许使用原生全屏。它不表示是否已经进入全屏，也不保证下一次请求一定成功。
+在浏览器中读取 `fullscreen.isSupported` 可判断当前文档是否允许使用原生全屏。它不表示是否已经进入全屏，也不保证下一次请求一定成功。
 
 ```js
 import { fullscreen } from 'vue-fullscreen'
 
 // 在组件挂载后或用户点击时读取
-const nativeAvailable = fullscreen.isEnabled
+const nativeAvailable = fullscreen.isSupported
 ```
 
 - 原生全屏不可用时，组件、指令和 API 自动使用网页全屏。

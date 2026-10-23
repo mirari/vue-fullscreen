@@ -50,12 +50,13 @@ Set `target` in the binding object to select the fullscreen element:
 | HTML element       | `{ target: document.getElementById('panel') }`   |
 | Vue ref object     | `{ target: panelRef }`                           |
 | Component instance | `{ target: this.$refs.panel }`; uses its `$el`   |
+| id string          | `{ target: 'panel' }` or `{ target: '#panel' }`  |
 | CSS selector       | `{ target: '#panel' }` or `{ target: '.panel' }` |
 | Getter             | `{ target: () => this.$refs.panel }`             |
 
 The current target is resolved on each entry. Omitting `target` or passing `null` directly uses `document.body`. Missing selectors, unmounted refs and other unresolved targets dispatch `fullscreen-error`.
 
-String targets are CSS selectors, including the shorthand `v-fullscreen="'#panel'"`. An id needs the `#` prefix.
+Target resolution is shared with the API: strings are resolved by id first (with an optional `#` prefix), then as CSS selectors. An id takes priority when both match. The shorthands `v-fullscreen="'panel'"`, `v-fullscreen="'#panel'"` and `v-fullscreen="'.panel'"` follow the same rule.
 
 ## Options {#options}
 

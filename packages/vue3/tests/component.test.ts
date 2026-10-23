@@ -1,6 +1,22 @@
 import { createApp, h, nextTick, ref } from 'vue'
 import { expect, it } from 'vitest'
-import { Fullscreen } from '../src/index'
+import { Fullscreen, useFullscreen } from '../src/index'
+it('uses the same support flag and enter method as the composable', async () => {
+  const host = document.createElement('main')
+  document.body.append(host)
+  const app = createApp({
+    render: () => h(Fullscreen, { ref: 'panel', pageOnly: true }),
+  })
+  const root = app.mount(host)
+  const panel = root.$refs.panel as InstanceType<typeof Fullscreen>
+  const controls = useFullscreen()
+  expect(panel.isSupported).toBe(controls.isSupported.value)
+  await panel.enter()
+  expect(panel.isFullscreen).toBe(true)
+  await panel.exit()
+  app.unmount()
+  host.remove()
+})
 it('syncs v-model, forwards attributes and cleans up teleport on unmount', async () => {
   const model = ref(false),
     visible = ref(true),

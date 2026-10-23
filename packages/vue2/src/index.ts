@@ -9,7 +9,7 @@ import {
   createFullscreen,
   componentProps,
   bindDirective,
-  unbindDirective,
+  disposeDirective,
 } from '../../core/src/index'
 import type {
   FullscreenController,
@@ -33,17 +33,20 @@ const implementation = Vue.extend({
   inheritAttrs: false,
   props: { ...componentProps, value: { type: Boolean, default: false } },
   data() {
-    return { isFullscreen: false, isEnabled: false }
+    return { isFullscreen: false, isSupported: false }
   },
   computed: {
+    isEnabled(): boolean {
+      return this.isSupported
+    },
     support(): boolean {
-      return this.isEnabled
+      return this.isSupported
     },
   },
   created() {
     const controller = createFullscreen()
     controllers.set(this, controller)
-    this.isEnabled = controller.isEnabled
+    this.isSupported = controller.isSupported
   },
   mounted() {
     if (this.value || this.fullscreen) this.update(true)
@@ -61,8 +64,8 @@ const implementation = Vue.extend({
     },
   },
   methods: {
-    request(): Promise<void> {
-      return controllers.get(this)!.request(this.$el, {
+    enter(): Promise<void> {
+      return controllers.get(this)!.enter(this.$el, {
         pageOnly: this.pageOnly,
         teleport: this.teleport,
         fullscreenClass: this.fullscreenClass,
@@ -77,14 +80,14 @@ const implementation = Vue.extend({
     exit(): Promise<void> {
       return controllers.get(this)!.exit()
     },
-    toggle(value?: boolean): Promise<void> {
-      return (value ?? !this.isFullscreen) ? this.request() : this.exit()
+    toggle(force?: boolean): Promise<void> {
+      return (force ?? !this.isFullscreen) ? this.enter() : this.exit()
     },
     update(value: boolean) {
       void this.toggle(value).catch((error) => this.$emit('error', error))
     },
-    enter(): Promise<void> {
-      return this.request()
+    request(): Promise<void> {
+      return this.enter()
     },
     getState(): boolean {
       return this.isFullscreen
@@ -111,8 +114,9 @@ const implementation = Vue.extend({
 })
 export type Vue2FullscreenInstance = VueInstance &
   FullscreenInstance & {
+    /** @deprecated Read isSupported. */
     readonly support: boolean
-    enter(): Promise<void>
+    /** @deprecated Read isFullscreen. */
     getState(): boolean
   }
 // Vue 2.4 predates VueConstructor; retain its static API and type our instance.
@@ -127,7 +131,7 @@ export const Fullscreen = implementation as Pick<
 export const vFullscreen: VueDirectiveOptions = {
   inserted: bindDirective,
   update: bindDirective,
-  unbind: unbindDirective,
+  unbind: disposeDirective,
 }
 /** @deprecated Import Fullscreen instead. */
 export const component: typeof Fullscreen = Fullscreen
@@ -138,7 +142,10 @@ export default {
     ctor: typeof VueInstance,
     { name = 'fullscreen' }: InstallationOptions = {},
   ) {
-    ctor.prototype[`$${name}`] = api
+    Object.defineProperty(ctor.prototype, `$${name}`, {
+      configurable: true,
+      get: () => api,
+    })
     ctor.component(name, Fullscreen)
     ctor.directive(name, vFullscreen)
   },

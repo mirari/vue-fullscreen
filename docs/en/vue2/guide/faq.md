@@ -8,7 +8,7 @@ Native fullscreen **can only be triggered by** a user interaction such as a clic
 
 Check the error event or rejected Promise. An iframe also needs permission from its host to use fullscreen.
 
-`isEnabled` only indicates API support. Try `pageOnly` to distinguish native permission issues from other problems.
+`isSupported` only indicates API support. Try `pageOnly` to distinguish native permission issues from other problems.
 
 ## Why does fullscreen behave differently on mobile?
 
@@ -34,4 +34,4 @@ Apply background, scrolling and stacking styles through `fullscreenClass`. The l
 
 ## Can I use SSR or Nuxt?
 
-The package can be imported on the server. Read DOM elements after mount and request native fullscreen from a browser user action. Do not call `fullscreen.request()` on the server.
+The package can be imported on the server. Read DOM elements after mount and request native fullscreen from a browser user action. Do not call `fullscreen.enter()` on the server.

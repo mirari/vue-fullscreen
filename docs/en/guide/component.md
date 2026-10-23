@@ -29,7 +29,7 @@ Read these through the component ref.
 | Property       | Type      | Purpose                  |
 | -------------- | --------- | ------------------------ |
 | `isFullscreen` | `boolean` | Current fullscreen state |
-| `isEnabled`    | `boolean` | Native API support       |
+| `isSupported`  | `boolean` | Native API support       |
 
 ## Events {#events}
 
@@ -50,7 +50,7 @@ const panel = ref()
 const error = ref('')
 async function enter() {
   try {
-    await panel.value.request()
+    await panel.value.enter()
   } catch (reason) {
     error.value = reason.message
   }
@@ -64,13 +64,15 @@ async function enter() {
 </template>
 ```
 
-| Method    | Signature                          | Purpose                 |
-| --------- | ---------------------------------- | ----------------------- |
-| `request` | `(): Promise<void>`                | Enter fullscreen        |
-| `exit`    | `(): Promise<void>`                | Exit fullscreen         |
-| `toggle`  | `(force?: boolean): Promise<void>` | Toggle or force a state |
+| Method   | Signature                          | Purpose                 |
+| -------- | ---------------------------------- | ----------------------- |
+| `enter`  | `(): Promise<void>`                | Enter fullscreen        |
+| `exit`   | `(): Promise<void>`                | Exit fullscreen         |
+| `toggle` | `(force?: boolean): Promise<void>` | Toggle or force a state |
 
 ## Migrating older versions {#migration}
+
+Use `enter()` instead of `request()`, and `isSupported` instead of `isEnabled`. The old names remain compatibility aliases.
 
 The legacy `fullscreen` prop and `update:fullscreen` event remain available for compatibility. Use `v-model` in new code.
 

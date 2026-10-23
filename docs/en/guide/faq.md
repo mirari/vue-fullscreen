@@ -8,7 +8,7 @@ Native fullscreen **can only be triggered by** a user interaction such as a clic
 
 Check the error event or rejected Promise. An iframe also needs permission from its host to use fullscreen.
 
-`isEnabled` only indicates API support. Try `pageOnly` to distinguish native permission issues from other problems.
+`isSupported` only indicates API support. Try `pageOnly` to distinguish native permission issues from other problems.
 
 ## Why does fullscreen behave differently on mobile?
 

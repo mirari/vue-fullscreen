@@ -82,13 +82,13 @@ The parent document's `Permissions-Policy` can still restrict fullscreen. An ifr
 
 ## Capability detection and page-only fallback
 
-Read `fullscreen.isEnabled` in the browser to check whether the current document allows native fullscreen. It does not indicate whether fullscreen is active or guarantee that the next request will succeed.
+Read `fullscreen.isSupported` in the browser to check whether the current document allows native fullscreen. It does not indicate whether fullscreen is active or guarantee that the next request will succeed.
 
 ```js
 import { fullscreen } from 'vue-fullscreen'
 
 // Read after mount or during a user interaction
-const nativeAvailable = fullscreen.isEnabled
+const nativeAvailable = fullscreen.isSupported
 ```
 
 - When native fullscreen is unavailable, the component, directive and API fall back to page-only mode.

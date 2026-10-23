@@ -1,5 +1,7 @@
 # Vue 2 快速上手
 
+基于 [screenfull](https://github.com/sindresorhus/screenfull)。
+
 ::: warning 旧版本升级提醒
 4.x 是重构后的新主版本，保留全局插件注册。组件状态使用 `v-model`，见[迁移示例](/vue2/guide/component#migration)。
 :::

@@ -48,7 +48,7 @@ export default {
     report(error) { this.isFullscreen = false; this.showDetails = false; this.error = error.message },
     ${
       kind === 'api'
-        ? `enter() { return this.$fullscreen.request('${id}', this.options).catch(this.report) },
+        ? `enter() { return this.$fullscreen.enter('${id}', this.options).catch(this.report) },
     exit() { return this.$fullscreen.exit().catch(this.report) },
     `
         : ''

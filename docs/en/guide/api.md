@@ -21,6 +21,7 @@ useFullscreen(document.getElementById('panel')) // HTML element
 useFullscreen(target) // Vue template ref
 useFullscreen('panel') // id
 useFullscreen('#panel') // id with #
+useFullscreen('.panel') // CSS selector
 ```
 
 Each call maintains its own fullscreen state. To control the same target from multiple places, share the state and methods returned by a single `useFullscreen()` call. Component unmount restores moved nodes and removes listeners, exiting fullscreen. Native requests must run directly from a click or key handler, before awaiting network requests.
@@ -72,8 +73,6 @@ useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): Use
 | `fullscreenClass`                                | `string`, ref or getter  | `'fullscreen'` |
 
 Options are read on each entry. Unsupported browsers fall back to page-only mode; failed native requests restore the DOM and reject.
-
-`screenfull` is also available as a named export. It is the underlying native fullscreen utility; calling it directly does not manage page-only mode, styles or teleport.
 
 ## Migrating older versions {#migration}
 

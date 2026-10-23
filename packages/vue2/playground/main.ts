@@ -97,7 +97,7 @@ new Vue({
     enter() {
       if (kind === 'api')
         void fullscreen
-          .request('target', {
+          .enter('target', {
             pageOnly,
             teleport: this.teleport,
             callback: this.changed,

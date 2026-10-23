@@ -99,7 +99,7 @@ for (const provider of ['optional entry', 'app-owned core-js']) {
       assert.equal(typeof w.Promise.prototype.finally, 'function')
       assert.equal(typeof w.WeakMap, 'function')
       const { fullscreen: api, vFullscreen: directive } = w.VueFullscreen
-      assert.equal(api.isEnabled, native)
+      assert.equal(api.isSupported, native)
       const target = w.document.querySelector('#target')
       await api.request(target, { teleport: true, fullscreenClass: 'full one' })
       assert.equal(target.parentNode, w.document.body)
@@ -130,13 +130,14 @@ for (const provider of ['optional entry', 'app-owned core-js']) {
         await api.exit()
       }
       const button = w.document.querySelector('#directive')
-      let reported
-      button.addEventListener('fullscreen-error', (e) => {
-        reported = e.detail
+      const reported = new Promise((resolve) => {
+        button.addEventListener('fullscreen-error', (e) => resolve(e.detail), {
+          once: true,
+        })
       })
       directive.inserted(button, { value: '#missing', modifiers: {} })
       button.click()
-      assert.match(reported.message, /not found/)
+      assert.match((await reported).message, /not found/)
       directive.unbind(button)
       // Vue itself is external: verify a real Vue 2 component with the selected global polyfills.
       w.eval(`
