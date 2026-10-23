@@ -70,7 +70,7 @@ Automated checks parse the emitted code as ES5 and exercise missing capabilities
 
 ## User activation and iframe permissions
 
-Native fullscreen **can only be triggered by** a user interaction such as a click, touch or key press. Avoid waiting for a network request before calling the API, as user activation may expire.
+Native fullscreen **can only be triggered by** a user interaction such as a click, touch or key press. This restriction applies to components, directives and the API alike. Trigger fullscreen directly in the event handler. Waiting for a network response, timer or other asynchronous task may let user activation expire, causing the browser to reject the request and preventing entry into native fullscreen.
 
 An embedded document needs fullscreen permission, for example:
 

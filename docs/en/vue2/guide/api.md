@@ -42,8 +42,6 @@ await fullscreen.exit() // No-op when inactive
 
 `enter()` defaults to `document.body`. Calling it while active does not switch targets; exit first, then request the new target.
 
-Native requests must be initiated by a user gesture. Call `enter()` directly from a click or key handler, before awaiting network requests.
-
 ## Methods {#methods}
 
 ```ts

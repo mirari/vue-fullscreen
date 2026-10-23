@@ -2,7 +2,7 @@
 
 ## Why can't the page enter native fullscreen automatically on load?
 
-Native fullscreen **can only be triggered by** a user interaction such as a click, touch or key press. This is a browser user activation requirement. Request fullscreen directly in the event handler; waiting for a network response or timer may let user activation expire. Use `pageOnly: true` if content needs to expand automatically without a user interaction. See [user activation and iframe permissions](/en/guide/compatibility#user-activation-and-iframe-permissions).
+Native fullscreen **can only be triggered by** a user interaction such as a click, touch or key press. This is a browser user activation requirement. Request fullscreen directly in the event handler; waiting for a network response or timer may let user activation expire, causing the browser to reject the fullscreen request. Use `pageOnly: true` if content needs to expand automatically without a user interaction. See [user activation and iframe permissions](/en/guide/compatibility#user-activation-and-iframe-permissions).
 
 ## Why does a native fullscreen request fail?
 
