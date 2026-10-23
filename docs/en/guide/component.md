@@ -12,7 +12,7 @@ Wrap content in the component and use `v-model` to control fullscreen. When the 
 
 <UsageDemo kind="component" />
 
-The image preview uses [v-viewer](https://github.com/mirari/v-viewer); install it separately with `npm install v-viewer`.
+Only fullscreen-related code is shown below. See the Playground for the complete example.
 
 ```fullscreen-example
 component vue3 en

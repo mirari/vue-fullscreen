@@ -9,4 +9,6 @@ pageClass: playground-page
 
 <ClientOnly><FullscreenPlayground /></ClientOnly>
 
+图片预览使用 [v-viewer](https://github.com/mirari/v-viewer)，需额外安装：`npm install v-viewer`。
+
 预览中的 `pageOnly` 只填满预览区域。支持单个 `App.vue` 的 JavaScript 与 CSS；内置 `vue` 和`vue-fullscreen`。

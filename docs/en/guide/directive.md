@@ -12,7 +12,7 @@ The directive provides a click trigger without requiring a model value.
 
 <UsageDemo kind="directive" />
 
-The image preview uses [v-viewer](https://github.com/mirari/v-viewer); install it separately with `npm install v-viewer`.
+Only fullscreen-related code is shown below. See the Playground for the complete example.
 
 ```fullscreen-example
 directive vue3 en

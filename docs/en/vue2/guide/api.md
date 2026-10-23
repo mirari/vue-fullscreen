@@ -8,13 +8,13 @@ Import the API to control an existing element. Every operation returns a Promise
 
 <Vue2Demo kind="api" />
 
-The image preview uses [v-viewer](https://github.com/mirari/v-viewer); install it separately with `npm install v-viewer@legacy`.
+Only fullscreen-related code is shown below. See the Playground for the complete example.
 
 ```fullscreen-example
 api vue2 en
 ```
 
-This example uses page-only mode. In native mode, await `fullscreen.exit()` in a route leave guard before removing the target.
+In native mode, await `fullscreen.exit()` in a route leave guard before removing the target.
 
 ## Target types
 

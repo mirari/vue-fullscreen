@@ -1,7 +1,7 @@
 import { defineConfig, postcssIsolateStyles } from 'vitepress'
 import { fileURLToPath } from 'node:url'
 import { format } from 'prettier'
-import { sample } from './theme/playground/samples'
+import { usageSnippet } from './theme/playground/usage-snippets'
 
 const exampleSources = new Map<string, string>()
 for (const vue2 of [false, true]) {
@@ -9,13 +9,11 @@ for (const vue2 of [false, true]) {
     for (const kind of ['component', 'directive', 'api'] as const) {
       exampleSources.set(
         `${kind} ${vue2 ? 'vue2' : 'vue3'} ${english ? 'en' : 'zh'}`,
-        await format(
-          sample(kind, vue2, english).replace(
-            /\n<style scoped>[\s\S]*<\/style>\s*$/,
-            '',
-          ),
-          { parser: 'vue', semi: false, singleQuote: true },
-        ),
+        await format(usageSnippet(kind, vue2, english), {
+          parser: 'vue',
+          semi: false,
+          singleQuote: true,
+        }),
       )
     }
   }

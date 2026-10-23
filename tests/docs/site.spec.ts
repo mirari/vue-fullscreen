@@ -229,8 +229,17 @@ for (const english of [false, true]) {
           english ? 'On this page' : '本页参考',
         )
         const code = page.locator('.vp-doc div.language-vue').first()
-        await expect(code).toContainText('showDetails')
+        await expect(code).toContainText('teleport')
+        await expect(code).toContainText(
+          kind === 'component' ? 'page-only' : 'pageOnly',
+        )
+        await expect(code).toContainText(
+          english ? 'Your fullscreen content' : '需要全屏的内容',
+        )
+        await expect(code).not.toContainText('v-viewer')
+        await expect(code).not.toContainText('showDetails')
         await expect(code).not.toContainText('<style')
+        const source = await code.locator('pre code').innerText()
         await page
           .locator('.vp-doc')
           .getByRole('link', { name: playground, exact: true })
@@ -256,6 +265,30 @@ for (const english of [false, true]) {
         await expect(page.locator('.playground-status')).toHaveText(
           english ? 'Ready' : '已就绪',
         )
+        await expect(page.locator('.cm-content')).toContainText('v-viewer')
+        // The focused code must also work when copied into the Playground.
+        await page.locator('.cm-content').click()
+        await page.locator('.cm-content').press('ControlOrMeta+A')
+        await page.keyboard.insertText(source)
+        await page.locator('.playground-run').click()
+        await expect(page.locator('.playground-status')).toHaveText(
+          english ? 'Ready' : '已就绪',
+        )
+        const frame = page.frameLocator('.playground-output iframe')
+        await frame
+          .getByRole('button', {
+            name: english ? 'Enter fullscreen' : '进入全屏',
+            exact: true,
+          })
+          .click()
+        await expect(frame.locator('.fullscreen')).toBeVisible()
+        await frame
+          .getByRole('button', {
+            name: english ? 'Exit fullscreen' : '退出全屏',
+            exact: true,
+          })
+          .click()
+        await expect(frame.locator('.fullscreen')).toHaveCount(0)
       }
       await page.goto(`${prefix}playground?example=unknown`)
       await expect(

@@ -8,13 +8,13 @@
 
 <Vue2Demo kind="api" />
 
-图片预览使用 [v-viewer](https://github.com/mirari/v-viewer)，需额外安装：`npm install v-viewer@legacy`。
+以下仅展示全屏相关代码，完整示例见演练场。
 
 ```fullscreen-example
 api vue2 zh
 ```
 
-示例使用网页全屏。原生模式下，应在路由离开守卫中等待 `fullscreen.exit()`，再移除目标。
+原生模式下，应在路由离开守卫中等待 `fullscreen.exit()`，再移除目标。
 
 ## 目标类型
 

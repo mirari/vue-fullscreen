@@ -9,4 +9,6 @@ Edit the code and click **Run** to test `pageOnly`, `teleport` and popups in the
 
 <ClientOnly><FullscreenPlayground vue2 /></ClientOnly>
 
+The image preview uses [v-viewer](https://github.com/mirari/v-viewer); install it separately with `npm install v-viewer@legacy`.
+
 `pageOnly` fills the preview area. Supports the Options API, JavaScript and CSS in a single `App.vue`, with Vue 2.7 and `vue-fullscreen` included.

@@ -8,7 +8,7 @@
 
 <UsageDemo kind="api" />
 
-图片预览使用 [v-viewer](https://github.com/mirari/v-viewer)，需额外安装：`npm install v-viewer`。
+以下仅展示全屏相关代码，完整示例见演练场。
 
 ```fullscreen-example
 api vue3 zh

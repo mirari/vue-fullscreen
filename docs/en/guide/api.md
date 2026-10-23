@@ -8,7 +8,7 @@ Control an existing element from buttons or application logic, with reactive ful
 
 <UsageDemo kind="api" />
 
-The image preview uses [v-viewer](https://github.com/mirari/v-viewer); install it separately with `npm install v-viewer`.
+Only fullscreen-related code is shown below. See the Playground for the complete example.
 
 ```fullscreen-example
 api vue3 en
