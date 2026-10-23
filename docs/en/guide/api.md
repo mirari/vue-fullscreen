@@ -1,6 +1,6 @@
 # API
 
-Control an existing element from buttons, keyboard shortcuts or application logic, with reactive fullscreen state.
+Use `useFullscreen()` for reactive state and methods to control the same fullscreen target from multiple buttons, keyboard shortcuts or application logic.
 
 ## Playground {#playground}
 

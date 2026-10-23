@@ -1,6 +1,6 @@
 # Vue 2 API
 
-Control an existing element from buttons, keyboard shortcuts or application logic. Every operation returns a Promise.
+Control the same fullscreen target from multiple buttons, keyboard shortcuts or application logic. The plugin exposes the `fullscreen` singleton as `$fullscreen`.
 
 ## Playground {#playground}
 
