@@ -27,6 +27,28 @@ for (const version of ['vue2', 'vue3']) {
     ),
     resolve(destination, 'vue.js'),
   )
+  await cp(
+    resolve('node_modules/viewerjs/dist/viewer.css'),
+    resolve(destination, 'viewer.css'),
+  )
+  const viewerEntry = resolve(
+    version === 'vue2'
+      ? 'packages/vue2/node_modules/v-viewer/index.js'
+      : 'node_modules/v-viewer/index.js',
+  )
+  await build({
+    configFile: false,
+    build: {
+      outDir: destination,
+      emptyOutDir: false,
+      lib: {
+        entry: viewerEntry,
+        formats: ['es'],
+        fileName: () => 'v-viewer.js',
+      },
+      rolldownOptions: { external: ['vue'] },
+    },
+  })
   const sources = new Map()
   for (const kind of ['component', 'directive', 'api']) {
     for (const language of ['zh', 'en']) {
@@ -53,6 +75,7 @@ for (const version of ['vue2', 'vue3']) {
           find: 'vue-fullscreen',
           replacement: resolve(`packages/${version}/src/index.ts`),
         },
+        { find: /^v-viewer$/, replacement: viewerEntry },
         ...(version === 'vue2'
           ? [
               {
@@ -108,7 +131,7 @@ for (const version of ['vue2', 'vue3']) {
   if (version === 'vue2')
     await writeFile(
       resolve(destination, 'demo.html'),
-      '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fullscreen example</title></head><body><div id="app"></div><script type="module" src="./demos.js"></script></body></html>',
+      '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fullscreen example</title><link rel="stylesheet" href="./viewer.css"></head><body><div id="app"></div><script type="module" src="./demos.js"></script></body></html>',
     )
 }
 

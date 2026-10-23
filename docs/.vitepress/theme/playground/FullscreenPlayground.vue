@@ -73,7 +73,7 @@ let timeout: ReturnType<typeof setTimeout> | undefined
 
 function loadRuntime() {
   return (runtime ??= Promise.all(
-    ['vue', 'vue-fullscreen'].map(async (name) => {
+    ['vue', 'vue-fullscreen', 'v-viewer'].map(async (name) => {
       const response = await fetch(
         withBase(`/playground/${props.vue2 ? 'vue2' : 'vue3'}/${name}.js`),
         { signal: AbortSignal.timeout(15000) },
@@ -83,7 +83,20 @@ function loadRuntime() {
       return [name, moduleUrl(await response.text())]
     }),
   )
-    .then(Object.fromEntries)
+    .then(async (entries) => {
+      const response = await fetch(
+        withBase(`/playground/${props.vue2 ? 'vue2' : 'vue3'}/viewer.css`),
+        { signal: AbortSignal.timeout(15000) },
+      )
+      if (!response.ok)
+        throw new Error(`Unable to load viewer.css: HTTP ${response.status}`)
+      return {
+        ...Object.fromEntries(entries),
+        'viewerjs/dist/viewer.css': moduleUrl(
+          `const style = document.createElement('style'); style.textContent = ${JSON.stringify(await response.text())}; document.head.appendChild(style)`,
+        ),
+      }
+    })
     .catch((error) => {
       runtime = undefined
       throw error

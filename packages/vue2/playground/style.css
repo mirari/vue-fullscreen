@@ -19,7 +19,7 @@ body {
   background: var(--demo-background);
   accent-color: var(--demo-accent);
 }
-button {
+main button {
   padding: 0.75rem;
   margin: 0.5rem;
   cursor: pointer;
@@ -49,7 +49,7 @@ output {
   margin: 0;
   border: 0;
   background: transparent;
-  cursor: pointer;
+  cursor: zoom-in;
 }
 .picture-topbar {
   display: flex;
@@ -70,20 +70,4 @@ output {
 #target.fullscreen .demo-picture {
   height: calc(100vh - 210px);
   min-height: 120px;
-}
-#body-popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 340px;
-  max-width: calc(100vw - 48px);
-  max-height: calc(100vh - 48px);
-  overflow: auto;
-  box-sizing: border-box;
-  padding: 16px;
-  background: var(--demo-background);
-  color: var(--demo-text);
-  border: 2px solid var(--demo-accent);
-  z-index: 1001;
 }

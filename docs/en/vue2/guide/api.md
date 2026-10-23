@@ -8,6 +8,8 @@ Import the API to control an existing element. Every operation returns a Promise
 
 <Vue2Demo kind="api" />
 
+The image preview uses [v-viewer](https://github.com/mirari/v-viewer); install it separately with `npm install v-viewer@legacy`.
+
 ```fullscreen-example
 api vue2 en
 ```

@@ -1,4 +1,32 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
+
+async function expectBodyViewer(popup: Locator, visible: boolean) {
+  await expect(popup).toHaveClass(/viewer-in/)
+  expect(await popup.evaluate((el) => el.parentElement === document.body)).toBe(
+    true,
+  )
+  await expect
+    .poll(() =>
+      popup.evaluate((el) => {
+        const box = el.getBoundingClientRect()
+        return el.contains(
+          document.elementFromPoint(
+            box.x + box.width / 2,
+            box.y + box.height / 2,
+          ),
+        )
+      }),
+    )
+    .toBe(visible)
+}
+
+async function closeViewer(popup: Locator, image: Locator, visible: boolean) {
+  if (visible)
+    await popup.getByRole('button', { name: 'Close', exact: true }).click()
+  else await image.click({ position: { x: 8, y: 8 } })
+  await expect(popup).not.toHaveClass(/viewer-in/)
+  await expect(image).toHaveAttribute('aria-expanded', 'false')
+}
 
 for (const teleport of [false, true]) {
   for (const browserExit of [false, true]) {
@@ -88,29 +116,14 @@ for (const english of [false, true]) {
             ),
           ).toBe(!pageOnly)
           const details = target.getByRole('button', {
-            name: english ? 'Details' : '详情',
+            name: english ? 'Preview image' : '预览图片',
             exact: true,
           })
-          const popup = frame.locator('#body-popup')
+          const popup = frame.locator('body > .viewer-container')
           await details.click({ position: { x: 8, y: 8 } })
           await expect(details).toHaveAttribute('aria-expanded', 'true')
-          await expect(popup).not.toHaveAttribute('hidden')
-          await expect
-            .poll(() =>
-              popup.evaluate((el) => {
-                const r = el.getBoundingClientRect()
-                return el.contains(
-                  document.elementFromPoint(
-                    r.x + r.width / 2,
-                    r.y + r.height / 2,
-                  ),
-                )
-              }),
-            )
-            .toBe(pageOnly || teleport)
-          await details.click({ position: { x: 8, y: 8 } })
-          await expect(details).toHaveAttribute('aria-expanded', 'false')
-          await expect(popup).toHaveAttribute('hidden')
+          await expectBodyViewer(popup, pageOnly || teleport)
+          await closeViewer(popup, details, pageOnly || teleport)
           await frame.locator('#exit').click()
           await expect(frame.locator('#enter')).toBeEnabled()
           await expect(target).not.toHaveClass(/fullscreen/)
@@ -230,6 +243,42 @@ for (const english of [false, true]) {
       await expect(
         page.locator('.playground-examples button').first(),
       ).toHaveAttribute('aria-pressed', 'true')
+    })
+
+    test(`${prefix} playground v-viewer works in fullscreen and cleans up on rerun`, async ({
+      page,
+    }) => {
+      await page.goto(`${prefix}playground?example=component`)
+      await expect(page.locator('.playground-status')).toHaveText(
+        english ? 'Ready' : '已就绪',
+      )
+      const frame = page.frameLocator('.playground-output iframe')
+      const popup = frame.locator('body > .viewer-container')
+      const image = frame.locator('.image-trigger')
+      for (const teleport of [false, true]) {
+        await frame.getByLabel('teleport', { exact: true }).setChecked(teleport)
+        await frame.locator('#enter').click()
+        await expect(frame.locator('#demo-component, #target')).toHaveClass(
+          /demo-fullscreen/,
+        )
+        await image.click({ position: { x: 8, y: 8 } })
+        await expectBodyViewer(popup, teleport)
+        await closeViewer(popup, image, teleport)
+        await frame.locator('#exit').click()
+      }
+      // Rerunning replaces the iframe and removes the previous viewer session.
+      await image.click({ position: { x: 8, y: 8 } })
+      await expectBodyViewer(popup, true)
+      await page.locator('.playground-run').click()
+      await expect(page.locator('.playground-status')).toHaveText(
+        english ? 'Ready' : '已就绪',
+      )
+      await expect(
+        frame.locator('body > .viewer-container.viewer-in'),
+      ).toHaveCount(0)
+      await expect(frame.locator('body')).not.toHaveClass(/viewer-open/)
+      await image.click({ position: { x: 8, y: 8 } })
+      await expectBodyViewer(popup, true)
     })
 
     test(`${prefix} playground theme follows the document without losing edits`, async ({
@@ -403,38 +452,20 @@ for (const english of [false, true]) {
               ),
             ).toBe(teleport)
           const details = target.getByRole('button', {
-            name: english ? 'Details' : '详情',
+            name: english ? 'Preview image' : '预览图片',
             exact: true,
           })
-          const popup = page.getByRole('dialog', {
-            name: english ? 'Image details' : '图片详情',
-            exact: true,
-          })
+          const popup = page.locator('body > .viewer-container')
           await details.click({ position: { x: 8, y: 8 } })
           await expect(details).toHaveAttribute('aria-expanded', 'true')
-          await expect(popup).toBeAttached()
-          await expect
-            .poll(() =>
-              popup.evaluate((el) => {
-                const r = el.getBoundingClientRect()
-                return el.contains(
-                  document.elementFromPoint(
-                    r.x + r.width / 2,
-                    r.y + r.height / 2,
-                  ),
-                )
-              }),
-            )
-            .toBe(!native || teleport)
+          await expectBodyViewer(popup, !native || teleport)
           if (native && !teleport)
             await expect(target.getByRole('status')).toContainText(
               english
                 ? 'outside the native fullscreen element'
                 : '不属于当前原生全屏元素',
             )
-          await details.click({ position: { x: 8, y: 8 } })
-          await expect(popup).toHaveCount(0)
-          await expect(details).toHaveAttribute('aria-expanded', 'false')
+          await closeViewer(popup, details, !native || teleport)
           await target.getByRole('button', { name: text.exit }).click()
           await expect(target).not.toHaveClass(/demo-fullscreen/)
           await expect(demo.locator(`#demo-${kind}`)).toBeVisible()
@@ -447,7 +478,7 @@ for (const english of [false, true]) {
     }
   }
 
-  for (const kind of ['api', 'directive']) {
+  for (const kind of ['component', 'api', 'directive']) {
     test(`${english ? 'en' : 'zh'} ${kind} cleanup before navigation`, async ({
       page,
     }) => {
@@ -459,12 +490,16 @@ for (const english of [false, true]) {
         })
         .click()
       await expect(page.locator(`body > #demo-${kind}`)).toBeVisible()
+      await page.locator(`#demo-${kind} .image-trigger`).click()
+      await expectBodyViewer(page.locator('body > .viewer-container'), true)
       await page
         .locator('.VPNavBarMenu')
         .getByRole('link', { name: text.guide, exact: true })
         .evaluate((el: HTMLElement) => el.click())
       await expect(page).toHaveURL(/getting-started$/)
       await expect(page.locator(`body > #demo-${kind}`)).toHaveCount(0)
+      await expect(page.locator('body > .viewer-container')).toHaveCount(0)
+      await expect(page.locator('body')).not.toHaveClass(/viewer-open/)
       await expect
         .poll(() => page.evaluate(() => document.fullscreenElement === null))
         .toBe(true)
@@ -614,34 +649,30 @@ for (const english of [false, true]) {
     page,
   }) => {
     await page.goto(`${english ? './en/' : './'}guide/getting-started`)
-    const demo = page.locator('[data-demo="component"]')
+    const demo = page.locator('[data-comparison="teleport"]')
     const target = page.locator('#demo-component')
-    const popup = page.getByRole('dialog', {
-      name: english ? 'Image details' : '图片详情',
-    })
-    const popupButton = target.getByRole('button', {
-      name: english ? 'Details' : '详情',
+    const popup = page.locator('body > .viewer-container')
+    const image = target.getByRole('button', {
+      name: english ? 'Preview image' : '预览图片',
       exact: true,
     })
     await expect(demo.getByLabel('pageOnly', { exact: true })).toHaveCount(0)
-    // Clicking the image opens a working body popup before entering fullscreen.
-    await popupButton.click({ position: { x: 8, y: 8 } })
-    await expect(popup).toBeVisible()
-    expect(
-      await popup.evaluate((el) => {
-        const r = el.getBoundingClientRect()
-        return (
-          Math.abs(r.x + r.width / 2 - innerWidth / 2) < 1 &&
-          Math.abs(r.y + r.height / 2 - innerHeight / 2) < 1
-        )
-      }),
-    ).toBe(true)
-    await popupButton.click({ position: { x: 8, y: 8 } })
-    await expect(popup).toHaveCount(0)
+    await image.click({ position: { x: 8, y: 8 } })
+    await expectBodyViewer(popup, true)
+    const previewImage = popup.locator('.viewer-canvas img')
+    await expect(previewImage).toBeVisible()
+    const width = await previewImage.evaluate(
+      (el) => el.getBoundingClientRect().width,
+    )
+    await popup.getByRole('button', { name: 'Zoom In', exact: true }).click()
+    await expect
+      .poll(() =>
+        previewImage.evaluate((el) => el.getBoundingClientRect().width),
+      )
+      .toBeGreaterThan(width)
+    await closeViewer(popup, image, true)
     for (const teleport of [false, true]) {
       await demo.getByLabel('teleport', { exact: true }).setChecked(teleport)
-      // An existing body popup must also survive entry into fullscreen.
-      await popupButton.click({ position: { x: 8, y: 8 } })
       await demo
         .getByRole('button', {
           name: english ? 'Enter fullscreen' : '进入全屏',
@@ -652,17 +683,6 @@ for (const english of [false, true]) {
       expect(
         await target.evaluate((el) => el.parentElement === document.body),
       ).toBe(teleport)
-      await expect
-        .poll(() =>
-          target.evaluate((el) => {
-            const r = el.getBoundingClientRect()
-            return (
-              Math.abs(r.width - innerWidth) < 2 &&
-              Math.abs(r.height - innerHeight) < 2
-            )
-          }),
-        )
-        .toBe(true)
       expect(
         await target.evaluate(
           (el) =>
@@ -670,54 +690,23 @@ for (const english of [false, true]) {
             (el.parentElement === document.body ? document.body : el),
         ),
       ).toBe(true)
-      await expect(popup).toBeAttached()
-      expect(
-        await popup.evaluate((el) => el.parentElement === document.body),
-      ).toBe(true)
-      await expect
-        .poll(() =>
-          popup.evaluate((el) => {
-            const r = el.getBoundingClientRect()
-            return el.contains(
-              document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2),
-            )
-          }),
-        )
-        .toBe(teleport)
+      await image.click({ position: { x: 8, y: 8 } })
+      await expectBodyViewer(popup, teleport)
       if (!teleport)
         await expect(target.getByRole('status')).toContainText(
           english
             ? 'outside the native fullscreen element'
             : '不属于当前原生全屏元素',
         )
-      // Clicking the image toggles even a popup excluded from native fullscreen.
-      await popupButton.click({ position: { x: 8, y: 8 } })
-      await expect(popup).toHaveCount(0)
-      await expect(popupButton).toHaveAttribute('aria-expanded', 'false')
-      await popupButton.click({ position: { x: 8, y: 8 } })
-      await expect(popup).toBeAttached()
-      await expect(popupButton).toHaveAttribute('aria-expanded', 'true')
-      // Also exercise opening the popup from within fullscreen.
-      if (teleport) {
-        await popup
-          .getByRole('button', {
-            name: english ? 'Close popup' : '关闭弹窗',
-            exact: true,
-          })
-          .click()
-        await expect(popup).toHaveCount(0)
-        await popupButton.click({ position: { x: 8, y: 8 } })
-        await expect(popup).toBeVisible()
-      }
-      await target
-        .getByRole('button', {
-          name: english ? 'Exit fullscreen' : '退出全屏',
-          exact: true,
-        })
-        .click()
+      await closeViewer(popup, image, teleport)
+      await image.click({ position: { x: 8, y: 8 } })
+      await expectBodyViewer(popup, teleport)
+      // Browser exit must also close a body-mounted viewer.
+      await page.evaluate(() => document.exitFullscreen())
       await expect(target).not.toHaveClass(/demo-fullscreen/)
       await expect(demo.locator('#demo-component')).toBeVisible()
-      await expect(popup).toHaveCount(0)
+      await expect(popup).not.toHaveClass(/viewer-in/)
+      await expect(page.locator('body')).not.toHaveClass(/viewer-open/)
       expect(await page.evaluate(() => document.fullscreenElement)).toBeNull()
     }
   })
@@ -729,79 +718,37 @@ for (const english of [false, true]) {
   }) => {
     await page.goto(english ? './en/vue2/' : './vue2/')
     const demo = page.locator('[data-comparison="teleport"]')
-    const scope = demo.frameLocator('iframe')
+    const frame = demo.frameLocator('iframe')
+    const target = frame.locator('#target')
+    const popup = frame.locator('body > .viewer-container')
+    const image = target.getByRole('button', {
+      name: english ? 'Preview image' : '预览图片',
+      exact: true,
+    })
     await expect(demo.getByLabel('pageOnly', { exact: true })).toHaveCount(0)
-    const controls = scope.locator('main')
-    const target = scope.locator('#target')
-    const popup = scope.locator('#body-popup')
     for (const teleport of [false, true]) {
-      await controls
-        .getByLabel('teleport', { exact: true })
-        .setChecked(teleport)
-      await controls
-        .getByRole('button', {
-          name: english ? 'Enter component fullscreen' : '进入组件全屏',
-          exact: true,
-        })
-        .click()
+      await frame.getByLabel('teleport', { exact: true }).setChecked(teleport)
+      await frame.locator('#enter').click()
       await expect(target).toHaveClass(/fullscreen/)
       expect(
         await target.evaluate((el) => el.parentElement === document.body),
       ).toBe(teleport)
       expect(
-        await target.evaluate((el) => {
-          const r = el.getBoundingClientRect()
-          return (
-            Math.abs(r.width - innerWidth) < 2 &&
-            Math.abs(r.height - innerHeight) < 2
-          )
-        }),
+        await target.evaluate(
+          (el) =>
+            document.fullscreenElement ===
+            (el.parentElement === document.body ? document.body : el),
+        ),
       ).toBe(true)
-      expect(
-        await target.evaluate((el) => document.fullscreenElement === el),
-      ).toBe(!teleport)
-      const details = target.getByRole('button', {
-        name: english ? 'Details' : '详情',
-        exact: true,
-      })
-      await details.click({ position: { x: 8, y: 8 } })
-      await expect(popup).not.toHaveAttribute('hidden')
-      expect(
-        await popup.evaluate((el) => {
-          const r = el.getBoundingClientRect()
-          return (
-            Math.abs(r.x + r.width / 2 - innerWidth / 2) < 1 &&
-            Math.abs(r.y + r.height / 2 - innerHeight / 2) < 1
-          )
-        }),
-      ).toBe(true)
-      await expect
-        .poll(() =>
-          popup.evaluate((el) => {
-            const r = el.getBoundingClientRect()
-            return el.contains(
-              document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2),
-            )
-          }),
-        )
-        .toBe(teleport)
-      await details.click({ position: { x: 8, y: 8 } })
-      await expect(popup).toHaveAttribute('hidden')
-      await expect(details).toHaveAttribute('aria-expanded', 'false')
-      await details.click({ position: { x: 8, y: 8 } })
-      await expect(popup).not.toHaveAttribute('hidden')
-      await expect(details).toHaveAttribute('aria-expanded', 'true')
-      await target
-        .getByRole('button', {
-          name: english ? 'Exit' : '退出全屏',
-          exact: true,
-        })
-        .click()
+      await image.click({ position: { x: 8, y: 8 } })
+      await expectBodyViewer(popup, teleport)
+      await closeViewer(popup, image, teleport)
+      await image.click({ position: { x: 8, y: 8 } })
+      await expectBodyViewer(popup, teleport)
+      await page.evaluate(() => document.exitFullscreen())
       await expect(target).not.toHaveClass(/fullscreen/)
-      expect(
-        await target.evaluate((el) => el.parentElement === document.body),
-      ).toBe(false)
-      await expect(popup).toHaveAttribute('hidden')
+      await expect(popup).not.toHaveClass(/viewer-in/)
+      await expect(frame.locator('body')).not.toHaveClass(/viewer-open/)
     }
   })
 }

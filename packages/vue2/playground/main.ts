@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import { Viewer } from 'v-viewer'
+import 'viewerjs/dist/viewer.css'
 
 import { fullscreen, Fullscreen, vFullscreen } from '../src/index'
 import './style.css'
@@ -35,7 +37,7 @@ const text = zh
       nativeStatus: 'pageOnly: false · 浏览器隐藏工具栏',
       enter: '进入组件全屏',
       content: '全屏内容',
-      details: '详情',
+      details: '预览图片',
       image: '图片',
       hiddenPopup:
         '弹窗已挂载到 body，但在当前原生全屏元素之外。退出并开启 teleport 后再试。',
@@ -54,7 +56,7 @@ const text = zh
       nativeStatus: 'pageOnly: false · the browser hides its toolbar',
       enter: 'Enter component fullscreen',
       content: 'Fullscreen content',
-      details: 'Details',
+      details: 'Preview image',
       image: 'Image',
       hiddenPopup:
         'The popup is mounted under body, outside the current native fullscreen element. Exit and enable teleport to see it.',
@@ -74,32 +76,8 @@ new Vue({
   },
   watch: {
     active(value: boolean) {
-      if (!value) this.popup = false
+      if (!value) (this.$refs.preview as InstanceType<typeof Viewer>)?.hide()
     },
-    popup(value: boolean) {
-      const popup = document.querySelector<HTMLElement>('#body-popup')
-      if (popup) popup.hidden = !value
-    },
-  },
-  mounted() {
-    const popup = document.createElement('aside')
-    popup.id = 'body-popup'
-    popup.hidden = true
-    popup.setAttribute('role', 'dialog')
-    popup.setAttribute('aria-label', text.details)
-    popup.textContent = zh
-      ? '这个弹窗直接挂载在 body 下。'
-      : 'This popup is mounted directly under body.'
-    const close = document.createElement('button')
-    close.textContent = zh ? '关闭弹窗' : 'Close popup'
-    close.onclick = () => {
-      this.popup = false
-    }
-    popup.append(close)
-    document.body.append(popup)
-  },
-  beforeDestroy() {
-    document.querySelector('#body-popup')?.remove()
   },
   methods: {
     changed(isFullscreen: boolean) {
@@ -107,6 +85,11 @@ new Vue({
     },
     report(error: Error) {
       this.error = error.message
+    },
+    previewImage() {
+      const preview = this.$refs.preview as InstanceType<typeof Viewer>
+      if (this.popup) preview.hide()
+      else preview.show()
     },
     enter() {
       if (kind === 'api')
@@ -246,23 +229,45 @@ new Vue({
           comparison === 'pageOnly'
             ? picture
             : h(
-                'button',
+                Viewer,
                 {
-                  class: 'image-trigger',
-                  attrs: {
-                    id: 'popup',
-                    type: 'button',
-                    'aria-label': text.details,
-                    'aria-expanded': String(this.popup),
-                    'aria-controls': 'body-popup',
+                  ref: 'preview',
+                  props: {
+                    zIndex: 10001,
+                    transition: false,
+                    focus: false,
+                    fullscreen: false,
                   },
                   on: {
-                    click: () => {
-                      this.popup = !this.popup
+                    show: () => {
+                      this.popup = true
+                    },
+                    hidden: () => {
+                      this.popup = false
                     },
                   },
                 },
-                [picture],
+                [
+                  h(
+                    'button',
+                    {
+                      class: 'image-trigger',
+                      attrs: {
+                        id: 'popup',
+                        type: 'button',
+                        'aria-label': text.details,
+                        'aria-expanded': String(this.popup),
+                      },
+                      on: {
+                        click: (event: Event) => {
+                          event.stopPropagation()
+                          this.previewImage()
+                        },
+                      },
+                    },
+                    [picture],
+                  ),
+                ],
               ),
           this.active && this.popup && !this.teleport && !pageOnly
             ? h('p', { attrs: { role: 'status' } }, text.hiddenPopup)

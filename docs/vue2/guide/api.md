@@ -8,6 +8,8 @@
 
 <Vue2Demo kind="api" />
 
+图片预览使用 [v-viewer](https://github.com/mirari/v-viewer)，需额外安装：`npm install v-viewer@legacy`。
+
 ```fullscreen-example
 api vue2 zh
 ```

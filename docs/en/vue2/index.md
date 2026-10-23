@@ -140,7 +140,7 @@ For browser support, automatic fallback and iframe permissions, see [compatibili
 
 Native fullscreen displays only the fullscreen element and its descendants. If dialogs or dropdowns from your content are mounted under `body`, enabling `teleport` makes `body` the native fullscreen element so those overlays can appear too. In page-only mode, moving the target can also avoid clipping, positioning and stacking contexts from ancestor elements.
 
-The example below uses native fullscreen. Clicking the image toggles a centered popup mounted under `body`:
+The example below uses native fullscreen. Click the image to open a [v-viewer](https://github.com/mirari/v-viewer) preview, whose modal is mounted under `body` by default:
 
 | Setting           | Native fullscreen element | Result after clicking the image                               |
 | ----------------- | ------------------------- | ------------------------------------------------------------- |

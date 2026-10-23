@@ -8,6 +8,8 @@ Register the directive locally, then click the button to toggle a target element
 
 <Vue2Demo kind="directive" />
 
+The image preview uses [v-viewer](https://github.com/mirari/v-viewer); install it separately with `npm install v-viewer@legacy`.
+
 ```fullscreen-example
 directive vue2 en
 ```

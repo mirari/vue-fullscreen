@@ -8,6 +8,8 @@
 
 <UsageDemo kind="directive" />
 
+图片预览使用 [v-viewer](https://github.com/mirari/v-viewer)，需额外安装：`npm install v-viewer`。
+
 ```fullscreen-example
 directive vue3 zh
 ```

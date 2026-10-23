@@ -2,6 +2,8 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useData } from 'vitepress'
 import { Fullscreen, vFullscreen, useFullscreen } from 'vue-fullscreen'
+import { Viewer } from 'v-viewer'
+import 'viewerjs/dist/viewer.css'
 
 const props = withDefaults(
   defineProps<{
@@ -24,6 +26,7 @@ const active = ref(false)
 const pageOnly = ref(false)
 const teleport = ref(!props.compareTeleport && !props.comparePageOnly)
 const popup = ref(false)
+const preview = ref<InstanceType<typeof Viewer>>()
 const showDetails = computed(() => !props.simple && !props.comparePageOnly)
 let readingPosition: { left: number; top: number } | undefined
 function rememberReadingPosition() {
@@ -31,8 +34,12 @@ function rememberReadingPosition() {
     readingPosition = { left: window.scrollX, top: window.scrollY }
 }
 watch(active, (value) => {
-  if (!value) popup.value = false
+  if (!value) preview.value?.hide()
 })
+function previewImage() {
+  if (popup.value) preview.value?.hide()
+  else preview.value?.show()
+}
 async function fullscreenChanged(value: boolean) {
   if (value) return
   // This documentation page scrolls the window. Keep the library independent
@@ -86,11 +93,7 @@ const text = computed(() =>
         previous: 'Previous image',
         next: 'Next image',
         gallery: 'Image browser',
-        popup: 'Details',
-        popupTitle: 'Image details',
-        popupContent:
-          'This popup is mounted under body, like a dialog from a UI library.',
-        closePopup: 'Close popup',
+        popup: 'Preview image',
         hiddenPopup:
           'The popup is open under body, but is outside the native fullscreen element. Exit and enable “teleport” to see it.',
         error: 'Fullscreen request failed:',
@@ -107,10 +110,7 @@ const text = computed(() =>
         previous: '上一张',
         next: '下一张',
         gallery: '图片浏览',
-        popup: '详情',
-        popupTitle: '图片详情',
-        popupContent: '这个弹窗挂载在 body 下，模拟 UI 组件库的对话框。',
-        closePopup: '关闭弹窗',
+        popup: '预览图片',
         hiddenPopup:
           '弹窗已在 body 下打开，但不属于当前原生全屏元素。退出并勾选「teleport」后再试。',
         error: '无法进入全屏：',
@@ -227,24 +227,34 @@ onBeforeUnmount(() => {
         </p>
       </div>
       <div class="gallery-stage">
-        <button
+        <Viewer
           v-if="showDetails"
-          type="button"
-          class="gallery-image-trigger"
-          :aria-label="text.popup"
-          :aria-expanded="popup"
-          :aria-controls="`${demoId}-popup`"
-          @click="popup = !popup"
+          ref="preview"
+          class="gallery-preview"
+          :z-index="10001"
+          :transition="false"
+          :focus="false"
+          :fullscreen="false"
+          @show="popup = true"
+          @hidden="popup = false"
         >
-          <img
-            class="gallery-image"
-            :src="photoUrl(photo.id, active ? 'full' : 'preview')"
-            :alt="english ? photo.en : photo.zh"
-            width="1280"
-            height="720"
-            decoding="async"
-          />
-        </button>
+          <button
+            type="button"
+            class="gallery-image-trigger"
+            :aria-label="text.popup"
+            :aria-expanded="popup"
+            @click.stop="previewImage"
+          >
+            <img
+              class="gallery-image"
+              :src="photoUrl(photo.id, active ? 'full' : 'preview')"
+              :alt="english ? photo.en : photo.zh"
+              width="1280"
+              height="720"
+              decoding="async"
+            />
+          </button>
+        </Viewer>
         <img
           v-else
           class="gallery-image"
@@ -291,26 +301,6 @@ onBeforeUnmount(() => {
         </button>
       </div>
     </component>
-    <Teleport to="body">
-      <aside
-        v-if="showDetails && popup"
-        :id="`${demoId}-popup`"
-        class="demo-body-popup"
-        role="dialog"
-        :aria-label="text.popupTitle"
-      >
-        <span class="demo-popup-location">body</span>
-        <h2>{{ text.popupTitle }}</h2>
-        <p>
-          {{ english ? photo.en : photo.zh }} · {{ selected + 1 }} /
-          {{ photos.length }}
-        </p>
-        <p>{{ text.popupContent }}</p>
-        <button class="demo-button" @click="popup = false">
-          {{ text.closePopup }}
-        </button>
-      </aside>
-    </Teleport>
     <p v-if="error" role="alert" class="demo-error">
       {{ text.error }} {{ error }}
     </p>

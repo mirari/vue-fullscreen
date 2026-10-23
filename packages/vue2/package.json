@@ -9,6 +9,7 @@
     "build:example": "vite build playground --base ./"
   },
   "devDependencies": {
+    "v-viewer": "4.0.0",
     "vue": "2.7.16"
   }
 }

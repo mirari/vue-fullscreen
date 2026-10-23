@@ -245,6 +245,12 @@ importers:
       typescript:
         specifier: 7.0.2
         version: 7.0.2
+      v-viewer:
+        specifier: 5.0.0
+        version: 5.0.0(vue@3.5.43(typescript@7.0.2))
+      viewerjs:
+        specifier: 1.11.7
+        version: 1.11.7
       vite:
         specifier: 8.3.4
         version: 8.3.4(@types/node@24.19.1)(yaml@2.9.1)
@@ -260,6 +266,9 @@ importers:
 
   packages/vue2:
     devDependencies:
+      v-viewer:
+        specifier: 4.0.0
+        version: 4.0.0(vue@2.7.16)
       vue:
         specifier: 2.7.16
         version: 2.7.16
@@ -2486,6 +2495,16 @@ packages:
     peerDependencies:
       browserslist: '>= 4.21.0'
 
+  v-viewer@4.0.0:
+    resolution: {integrity: sha512-k6veCVdPz5Qju22JRoRJ+0kZI4LiHobZSN26CDdJXy0FY0f/EWh5XhVcPC4olZ8Mj6vyhZRU6Iv9dUBtiLmxZA==}
+    peerDependencies:
+      vue: ^2.4.0
+
+  v-viewer@5.0.0:
+    resolution: {integrity: sha512-qAFihXw3KfQwxmzstdIbV6tPFh7yaGz+eDRcZE/rcgZYLvv016K7Iq1d5d0Kknl91UnSXp7IAbIuUxi6lrz2VQ==}
+    peerDependencies:
+      vue: ^3.0.0
+
   verkit@0.5.0:
     resolution: {integrity: sha512-u4J1hr6Y+C/hit34GwL3eIcUf3wngT8TlYUjK7tk0jxydKLAq3sYvifjdTDA6U3KCKRcQCQDGf/srjxfZF3l7g==}
     engines: {node: '>=18.12.0'}
@@ -2495,6 +2514,9 @@ packages:
 
   vfile@6.0.3:
     resolution: {integrity: sha512-KzIbH/9tXat2u30jf+smMwFCsno4wHVdNmzFyL+T/L3UGqqk6JKfVqOFOZEpZSHADH1k40ab6NUIXZq422ov3Q==}
+
+  viewerjs@1.11.7:
+    resolution: {integrity: sha512-0JuVqOmL5v1jmEAlG5EBDR3XquxY8DWFQbFMprOXgaBB0F7Q/X9xWdEaQc59D8xzwkdUgXEMSSknTpriq95igg==}
 
   vite@5.4.21:
     resolution: {integrity: sha512-o5a9xKjbtuhY6Bi5S3+HvbRERmouabWbyUcpXXUA1u+GNUKoROi9byOJ8M0nHbHYHkYICiMlqxkg1KkYmm25Sw==}
@@ -4887,6 +4909,16 @@ snapshots:
       escalade: 3.2.0
       picocolors: 1.1.1
 
+  v-viewer@4.0.0(vue@2.7.16):
+    dependencies:
+      viewerjs: 1.11.7
+      vue: 2.7.16
+
+  v-viewer@5.0.0(vue@3.5.43(typescript@7.0.2)):
+    dependencies:
+      viewerjs: 1.11.7
+      vue: 3.5.43(typescript@7.0.2)
+
   verkit@0.5.0: {}
 
   vfile-message@4.0.3:
@@ -4898,6 +4930,8 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
+
+  viewerjs@1.11.7: {}
 
   vite@5.4.21(@types/node@24.19.1)(lightningcss@1.33.0):
     dependencies:

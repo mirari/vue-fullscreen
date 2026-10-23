@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useData, withBase } from 'vitepress'
+import 'viewerjs/dist/viewer.css'
 import { moduleUrl } from './playground/module-url'
 import type { Example } from './playground/samples'
 

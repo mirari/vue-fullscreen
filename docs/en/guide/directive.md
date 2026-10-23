@@ -8,6 +8,8 @@ The directive toggles fullscreen when its element is clicked. It does not requir
 
 <UsageDemo kind="directive" />
 
+The image preview uses [v-viewer](https://github.com/mirari/v-viewer); install it separately with `npm install v-viewer`.
+
 ```fullscreen-example
 directive vue3 en
 ```
