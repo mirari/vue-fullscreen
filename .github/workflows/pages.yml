@@ -9,14 +9,12 @@ concurrency:
   group: pages
   cancel-in-progress: false
 jobs:
-  build-and-publish:
+  build:
     if: github.event_name == 'workflow_dispatch' || github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.64.0-noble
       options: --init --ipc=host
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v4
@@ -36,10 +34,28 @@ jobs:
             test-results/docs/
           if-no-files-found: ignore
           retention-days: 14
+      - name: Upload verified documentation site
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-site
+          path: docs/.vitepress/dist
+          include-hidden-files: true
+          retention-days: 1
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v4
+        with:
+          name: documentation-site
+          path: documentation-site
       - name: Publish documentation to existing site branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: docs/.vitepress/dist
+          folder: documentation-site
           clean: true
           single-commit: false
