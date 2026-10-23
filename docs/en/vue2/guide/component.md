@@ -12,7 +12,7 @@ Use `v-model` to control fullscreen. It binds the `value` prop and `input` event
 component vue2 en
 ```
 
-## Props {#props}
+## Component props {#props}
 
 | Prop                 | Type      | Default        | Purpose                                                               |
 | -------------------- | --------- | -------------- | --------------------------------------------------------------------- |
@@ -23,6 +23,16 @@ component vue2 en
 | `exitOnClickWrapper` | `boolean` | `true`         | Exit on wrapper background clicks, not child clicks                   |
 | `fullscreen`         | `boolean` | `false`        | Deprecated model prop                                                 |
 
+## Instance properties {#instance-properties}
+
+Read these through the component ref.
+
+| Property       | Type      | Purpose                  |
+| -------------- | --------- | ------------------------ |
+| `isFullscreen` | `boolean` | Current fullscreen state |
+| `isEnabled`    | `boolean` | Native API support       |
+| `support`      | `boolean` | Alias for `isEnabled`    |
+
 ## Events {#events}
 
 | Event               | Argument     | Purpose                                                      |
@@ -32,7 +42,7 @@ component vue2 en
 | `update:fullscreen` | `boolean`    | Synchronize the deprecated model                             |
 | `error`             | Error object | A model change or wrapper click triggered a failed operation |
 
-## Methods and state {#methods}
+## Methods {#methods}
 
 Set `ref="panel"` on the component to call its methods:
 
@@ -43,18 +53,13 @@ async enterPanel() {
 }
 ```
 
-The instance provides `request()`, `exit()` and `toggle(force?)`, as well as the compatibility members `enter()`, `getState()` and `support`.
-
-| Member         | Type / signature                   | Purpose                  |
-| -------------- | ---------------------------------- | ------------------------ |
-| `request`      | `(): Promise<void>`                | Enter fullscreen         |
-| `exit`         | `(): Promise<void>`                | Exit fullscreen          |
-| `toggle`       | `(force?: boolean): Promise<void>` | Toggle or force a state  |
-| `isFullscreen` | `boolean`                          | Current fullscreen state |
-| `isEnabled`    | `boolean`                          | Native API support       |
-| `enter`        | `(): Promise<void>`                | Alias for `request`      |
-| `getState`     | `(): boolean`                      | Read fullscreen state    |
-| `support`      | `boolean`                          | Alias for `isEnabled`    |
+| Method     | Signature                          | Purpose                 |
+| ---------- | ---------------------------------- | ----------------------- |
+| `request`  | `(): Promise<void>`                | Enter fullscreen        |
+| `exit`     | `(): Promise<void>`                | Exit fullscreen         |
+| `toggle`   | `(force?: boolean): Promise<void>` | Toggle or force a state |
+| `enter`    | `(): Promise<void>`                | Alias for `request`     |
+| `getState` | `(): boolean`                      | Read fullscreen state   |
 
 ## Migrating older versions {#migration}
 

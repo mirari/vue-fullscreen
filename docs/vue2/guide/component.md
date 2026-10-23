@@ -12,7 +12,7 @@
 component vue2 zh
 ```
 
-## 属性 {#props}
+## 组件属性（Props） {#props}
 
 | 属性                 | 类型      | 默认值         | 说明                                  |
 | -------------------- | --------- | -------------- | ------------------------------------- |
@@ -23,6 +23,16 @@ component vue2 zh
 | `exitOnClickWrapper` | `boolean` | `true`         | 点击容器背景退出；点击子元素不会触发  |
 | `fullscreen`         | `boolean` | `false`        | 已废弃的模型属性，保留兼容            |
 
+## 实例属性 {#instance-properties}
+
+通过组件 ref 读取。
+
+| 属性           | 类型      | 作用                   |
+| -------------- | --------- | ---------------------- |
+| `isFullscreen` | `boolean` | 当前全屏状态           |
+| `isEnabled`    | `boolean` | 原生全屏是否可用       |
+| `support`      | `boolean` | `isEnabled` 的兼容属性 |
+
 ## 事件 {#events}
 
 | 事件                | 参数      | 时机                             |
@@ -32,7 +42,7 @@ component vue2 zh
 | `update:fullscreen` | `boolean` | 同步旧模型属性                   |
 | `error`             | 错误对象  | 模型变化或容器点击触发的操作失败 |
 
-## 方法与状态 {#methods}
+## 方法 {#methods}
 
 通过 `this.$refs.panel` 可以调用组件实例：
 
@@ -43,18 +53,15 @@ async enterPanel() {
 }
 ```
 
-模板中的组件需要设置 `ref="panel"`。实例提供 `request()`、`exit()`、`toggle(force?)`，以及兼容方法 `enter()`、`getState()` 和属性 `support`。
+模板中的组件需要设置 `ref="panel"`。
 
-| 成员           | 类型 / 签名                        | 作用                   |
-| -------------- | ---------------------------------- | ---------------------- |
-| `request`      | `(): Promise<void>`                | 请求全屏               |
-| `exit`         | `(): Promise<void>`                | 退出全屏               |
-| `toggle`       | `(force?: boolean): Promise<void>` | 切换或指定状态         |
-| `isFullscreen` | `boolean`                          | 当前全屏状态           |
-| `isEnabled`    | `boolean`                          | 原生全屏是否可用       |
-| `enter`        | `(): Promise<void>`                | `request` 的兼容入口   |
-| `getState`     | `(): boolean`                      | 读取全屏状态           |
-| `support`      | `boolean`                          | `isEnabled` 的兼容属性 |
+| 方法       | 签名                               | 作用                 |
+| ---------- | ---------------------------------- | -------------------- |
+| `request`  | `(): Promise<void>`                | 请求全屏             |
+| `exit`     | `(): Promise<void>`                | 退出全屏             |
+| `toggle`   | `(force?: boolean): Promise<void>` | 切换或指定状态       |
+| `enter`    | `(): Promise<void>`                | `request` 的兼容入口 |
+| `getState` | `(): boolean`                      | 读取全屏状态         |
 
 ## 旧版本迁移 {#migration}
 

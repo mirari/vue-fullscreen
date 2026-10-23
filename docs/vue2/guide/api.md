@@ -47,7 +47,7 @@ fullscreen.toggle(target?: FullscreenTarget, options?: ApiOptions, force?: boole
 fullscreen.exit(): Promise<void>
 ```
 
-## 状态 {#state}
+## 实例属性 {#state}
 
 | 属性           | 类型              | 说明                         |
 | -------------- | ----------------- | ---------------------------- |

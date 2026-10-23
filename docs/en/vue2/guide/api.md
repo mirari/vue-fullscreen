@@ -45,7 +45,7 @@ fullscreen.toggle(target?: FullscreenTarget, options?: ApiOptions, force?: boole
 fullscreen.exit(): Promise<void>
 ```
 
-## State {#state}
+## Instance properties {#state}
 
 | Property       | Type              | Meaning                                          |
 | -------------- | ----------------- | ------------------------------------------------ |

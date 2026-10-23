@@ -48,11 +48,20 @@ useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): Use
 
 ## 返回值 {#returns}
 
-| 返回值                      | 类型                     | 说明                           |
-| --------------------------- | ------------------------ | ------------------------------ |
-| `isFullscreen`              | `Readonly<Ref<boolean>>` | 随实际退出同步的响应式状态     |
-| `isSupported`               | `ComputedRef<boolean>`   | 原生全屏可用性；不影响网页全屏 |
-| `enter` / `exit` / `toggle` | `(): Promise<void>`      | 进入、退出、切换               |
+### 属性 {#properties}
+
+| 属性           | 类型                     | 说明                           |
+| -------------- | ------------------------ | ------------------------------ |
+| `isFullscreen` | `Readonly<Ref<boolean>>` | 随实际退出同步的响应式状态     |
+| `isSupported`  | `ComputedRef<boolean>`   | 原生全屏可用性；不影响网页全屏 |
+
+### 方法 {#methods}
+
+| 方法     | 签名                | 说明     |
+| -------- | ------------------- | -------- |
+| `enter`  | `(): Promise<void>` | 进入全屏 |
+| `exit`   | `(): Promise<void>` | 退出全屏 |
+| `toggle` | `(): Promise<void>` | 切换全屏 |
 
 ## 配置项 {#options}
 

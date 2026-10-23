@@ -12,7 +12,7 @@ Wrap content in the component and use `v-model` to control fullscreen. When the 
 component vue3 en
 ```
 
-## Props {#props}
+## Component props {#props}
 
 | Prop                 | Type      | Default        | Purpose                                                               |
 | -------------------- | --------- | -------------- | --------------------------------------------------------------------- |
@@ -23,6 +23,15 @@ component vue3 en
 | `exitOnClickWrapper` | `boolean` | `true`         | Exit on wrapper background clicks, not child clicks                   |
 | `fullscreen`         | `boolean` | `false`        | Deprecated model prop                                                 |
 
+## Instance properties {#instance-properties}
+
+Read these through the component ref.
+
+| Property       | Type      | Purpose                  |
+| -------------- | --------- | ------------------------ |
+| `isFullscreen` | `boolean` | Current fullscreen state |
+| `isEnabled`    | `boolean` | Native API support       |
+
 ## Events {#events}
 
 | Event               | Argument     | Purpose                                                      |
@@ -32,7 +41,7 @@ component vue3 en
 | `update:fullscreen` | `boolean`    | Synchronize the deprecated model                             |
 | `error`             | Error object | A model change or wrapper click triggered a failed operation |
 
-## Methods and state {#methods}
+## Methods {#methods}
 
 ```vue
 <script setup>
@@ -57,13 +66,11 @@ async function enter() {
 </template>
 ```
 
-| Member         | Type / signature                   | Purpose                  |
-| -------------- | ---------------------------------- | ------------------------ |
-| `request`      | `(): Promise<void>`                | Enter fullscreen         |
-| `exit`         | `(): Promise<void>`                | Exit fullscreen          |
-| `toggle`       | `(force?: boolean): Promise<void>` | Toggle or force a state  |
-| `isFullscreen` | `boolean`                          | Current fullscreen state |
-| `isEnabled`    | `boolean`                          | Native API support       |
+| Method    | Signature                          | Purpose                 |
+| --------- | ---------------------------------- | ----------------------- |
+| `request` | `(): Promise<void>`                | Enter fullscreen        |
+| `exit`    | `(): Promise<void>`                | Exit fullscreen         |
+| `toggle`  | `(force?: boolean): Promise<void>` | Toggle or force a state |
 
 ## Migrating older versions {#migration}
 

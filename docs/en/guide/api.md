@@ -48,11 +48,20 @@ useFullscreen(target?: UseFullscreenTarget, options?: UseFullscreenOptions): Use
 
 ## Return values {#returns}
 
-| Return value                | Type                     | Meaning                                                  |
-| --------------------------- | ------------------------ | -------------------------------------------------------- |
-| `isFullscreen`              | `Readonly<Ref<boolean>>` | Reactive state synchronized with actual exits            |
-| `isSupported`               | `ComputedRef<boolean>`   | Native API availability; page-only mode works regardless |
-| `enter` / `exit` / `toggle` | `(): Promise<void>`      | Enter, exit or toggle                                    |
+### Properties {#properties}
+
+| Property       | Type                     | Meaning                                                  |
+| -------------- | ------------------------ | -------------------------------------------------------- |
+| `isFullscreen` | `Readonly<Ref<boolean>>` | Reactive state synchronized with actual exits            |
+| `isSupported`  | `ComputedRef<boolean>`   | Native API availability; page-only mode works regardless |
+
+### Methods {#methods}
+
+| Method   | Signature           | Meaning           |
+| -------- | ------------------- | ----------------- |
+| `enter`  | `(): Promise<void>` | Enter fullscreen  |
+| `exit`   | `(): Promise<void>` | Exit fullscreen   |
+| `toggle` | `(): Promise<void>` | Toggle fullscreen |
 
 ## Options {#options}
 

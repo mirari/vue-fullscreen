@@ -12,7 +12,7 @@
 component vue3 zh
 ```
 
-## 属性 {#props}
+## 组件属性（Props） {#props}
 
 | 属性                 | 类型      | 默认值         | 说明                                  |
 | -------------------- | --------- | -------------- | ------------------------------------- |
@@ -23,6 +23,15 @@ component vue3 zh
 | `exitOnClickWrapper` | `boolean` | `true`         | 点击容器背景退出；点击子元素不会触发  |
 | `fullscreen`         | `boolean` | `false`        | 已废弃的模型属性，保留兼容            |
 
+## 实例属性 {#instance-properties}
+
+通过组件 ref 读取。
+
+| 属性           | 类型      | 作用             |
+| -------------- | --------- | ---------------- |
+| `isFullscreen` | `boolean` | 当前全屏状态     |
+| `isEnabled`    | `boolean` | 原生全屏是否可用 |
+
 ## 事件 {#events}
 
 | 事件                | 参数      | 时机                             |
@@ -32,7 +41,7 @@ component vue3 zh
 | `update:fullscreen` | `boolean` | 同步旧模型属性                   |
 | `error`             | 错误对象  | 模型变化或容器点击触发的操作失败 |
 
-## 方法与状态 {#methods}
+## 方法 {#methods}
 
 ```vue
 <script setup>
@@ -57,13 +66,11 @@ async function enter() {
 </template>
 ```
 
-| 成员           | 类型 / 签名                        | 作用             |
-| -------------- | ---------------------------------- | ---------------- |
-| `request`      | `(): Promise<void>`                | 请求全屏         |
-| `exit`         | `(): Promise<void>`                | 退出全屏         |
-| `toggle`       | `(force?: boolean): Promise<void>` | 切换或指定状态   |
-| `isFullscreen` | `boolean`                          | 当前全屏状态     |
-| `isEnabled`    | `boolean`                          | 原生全屏是否可用 |
+| 方法      | 签名                               | 作用           |
+| --------- | ---------------------------------- | -------------- |
+| `request` | `(): Promise<void>`                | 请求全屏       |
+| `exit`    | `(): Promise<void>`                | 退出全屏       |
+| `toggle`  | `(force?: boolean): Promise<void>` | 切换或指定状态 |
 
 ## 旧版本迁移 {#migration}
 
