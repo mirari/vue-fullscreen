@@ -1,6 +1,6 @@
 # Vue 2 组件
 
-使用 `v-model` 控制全屏状态。它对应 `value` 属性和 `input` 事件；退出全屏时，绑定的状态会自动变回 `false`。
+把内容放进组件，控制 `v-model` 来进入和退出全屏。它对应 `value` 属性和 `input` 事件；退出全屏时，绑定的状态会自动变回 `false`。
 
 ## 演练场 {#playground}
 

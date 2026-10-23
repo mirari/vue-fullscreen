@@ -1,6 +1,6 @@
 # Component
 
-Wrap content in the component and use `v-model` to control fullscreen. Exiting fullscreen automatically sets the bound value to `false`.
+Wrap content in the component, then change the `v-model` value to enter or exit fullscreen. Exiting fullscreen automatically sets the bound value to `false`.
 
 ## Playground {#playground}
 

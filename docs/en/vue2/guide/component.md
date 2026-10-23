@@ -1,6 +1,6 @@
 # Vue 2 component
 
-Use `v-model` to control fullscreen. It binds the `value` prop and `input` event. Exiting fullscreen automatically sets the bound value to `false`.
+Wrap content in the component, then change the `v-model` value to enter or exit fullscreen. It binds the `value` prop and `input` event. Exiting fullscreen automatically sets the bound value to `false`.
 
 ## Playground {#playground}
 
