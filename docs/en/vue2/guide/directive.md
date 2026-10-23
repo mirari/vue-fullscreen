@@ -3,7 +3,7 @@
 The directive provides a click trigger without requiring a model value.
 
 ::: tip Trigger and fullscreen target
-**The element with `v-fullscreen` is the click trigger; `target` selects the fullscreen element.** The bound element does not automatically become the target. If no target is specified, the directive controls `document.body`.
+**The element with `v-fullscreen` is the click trigger; `target` selects the fullscreen element.** If no target is specified, the directive controls `document.body`.
 :::
 
 ## Playground {#playground}
