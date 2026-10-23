@@ -9,6 +9,4 @@ Edit the code and click **Run** to test `pageOnly`, `teleport` and popups in the
 
 <ClientOnly><FullscreenPlayground /></ClientOnly>
 
-The image preview uses [v-viewer](https://github.com/mirari/v-viewer); install it separately with `npm install v-viewer`.
-
 `pageOnly` fills the preview area. Supports JavaScript and CSS in a single `App.vue`, with `vue` and `vue-fullscreen` included.
