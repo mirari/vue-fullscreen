@@ -73,6 +73,7 @@ new Vue({
     error: '',
     teleport: !comparison,
     popup: false,
+    selected: 0,
   },
   watch: {
     active(value: boolean) {
@@ -87,10 +88,13 @@ new Vue({
     report(error: Error) {
       this.error = error.message
     },
-    previewImage() {
+    previewImage(index: number) {
       const preview = this.$refs.preview as InstanceType<typeof Viewer>
-      if (this.popup) preview.hide()
-      else preview.show()
+      if (this.popup && this.selected === index) preview.hide()
+      else {
+        this.selected = index
+        preview.view(index)
+      }
     },
     enter() {
       if (kind === 'api')
@@ -110,15 +114,6 @@ new Vue({
     },
   },
   render(h) {
-    const picture = h('img', {
-      class: 'demo-picture',
-      attrs: {
-        src: 'https://picsum.photos/id/10/1280/720',
-        alt: text.image,
-        width: 1280,
-        height: 720,
-      },
-    })
     return h('main', [
       h('h1', text.title),
       h(
@@ -264,8 +259,10 @@ new Vue({
                 Viewer,
                 {
                   ref: 'preview',
+                  class: 'popup-gallery',
                   props: {
                     zIndex: 10001,
+                    url: 'data-source',
                     toolbar: false,
                     title: false,
                     transition: false,
@@ -281,27 +278,39 @@ new Vue({
                     },
                   },
                 },
-                [
+                Array.from({ length: 6 }, (_, index) =>
                   h(
                     'button',
                     {
                       class: 'image-trigger',
                       attrs: {
-                        id: 'popup',
                         type: 'button',
-                        'aria-label': text.details,
-                        'aria-expanded': String(this.popup),
+                        'aria-label': `${text.details} ${index + 1}`,
+                        'aria-expanded': String(
+                          this.popup && this.selected === index,
+                        ),
                       },
                       on: {
                         click: (event: Event) => {
                           event.stopPropagation()
-                          this.previewImage()
+                          this.previewImage(index)
                         },
                       },
                     },
-                    [picture],
+                    [
+                      h('img', {
+                        class: 'demo-picture',
+                        attrs: {
+                          src: `https://picsum.photos/id/${10 + index}/640/360`,
+                          'data-source': `https://picsum.photos/id/${10 + index}/1280/720`,
+                          alt: `${text.image} ${index + 1}`,
+                          width: 1280,
+                          height: 720,
+                        },
+                      }),
+                    ],
                   ),
-                ],
+                ),
               ),
           this.active && this.popup && !this.teleport && !pageOnly
             ? h('p', { attrs: { role: 'status' } }, text.hiddenPopup)

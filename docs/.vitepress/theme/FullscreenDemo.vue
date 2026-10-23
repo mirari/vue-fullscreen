@@ -36,9 +36,12 @@ function rememberReadingPosition() {
 watch(active, (value) => {
   if (showDetails.value && !value) preview.value?.hide()
 })
-function previewImage() {
-  if (popup.value) preview.value?.hide()
-  else preview.value?.show()
+function previewImage(index: number) {
+  if (popup.value && selected.value === index) preview.value?.hide()
+  else {
+    selected.value = index
+    preview.value?.view(index)
+  }
 }
 async function fullscreenChanged(value: boolean) {
   await nextTick()
@@ -72,14 +75,14 @@ const photos = Array.from({ length: 6 }, (_, index) => ({
   en: `Image ${index + 1}`,
 }))
 const selected = ref(0)
-const photo = computed(() => photos[selected.value])
 const photoSizes = { thumb: '128/72', preview: '640/360', full: '1280/720' }
 const photoUrl = (id: number, size: 'thumb' | 'preview' | 'full' = 'thumb') =>
   `https://picsum.photos/id/${id}/${photoSizes[size]}`
-function movePhoto(offset: number) {
-  if (showDetails.value)
-    selected.value = (selected.value + offset + photos.length) % photos.length
-  else if (offset < 0) preview.value?.prev(true)
+function movePhoto(offset: number, event: KeyboardEvent) {
+  if (showDetails.value) return
+  event.preventDefault()
+  event.stopPropagation()
+  if (offset < 0) preview.value?.prev(true)
   else preview.value?.next(true)
 }
 const { lang } = useData()
@@ -95,8 +98,6 @@ const text = computed(() =>
         directiveButton: 'Toggle with directive',
         enter: 'Enter fullscreen',
         exit: 'Exit fullscreen',
-        previous: 'Previous image',
-        next: 'Next image',
         gallery: 'Image browser',
         popup: 'Preview image',
         hiddenPopup:
@@ -112,8 +113,6 @@ const text = computed(() =>
         directiveButton: '点击指令按钮',
         enter: '进入全屏',
         exit: '退出全屏',
-        previous: '上一张',
-        next: '下一张',
         gallery: '图片浏览',
         popup: '预览图片',
         hiddenPopup:
@@ -194,8 +193,8 @@ onBeforeUnmount(() => {
       class="demo-surface"
       tabindex="0"
       :aria-label="text.gallery"
-      @keydown.left.stop.prevent="movePhoto(-1)"
-      @keydown.right.stop.prevent="movePhoto(1)"
+      @keydown.left="movePhoto(-1, $event)"
+      @keydown.right="movePhoto(1, $event)"
       :page-only="pageOnly"
       :teleport="teleport"
       :exit-on-click-wrapper="false"
@@ -236,31 +235,35 @@ onBeforeUnmount(() => {
           {{ text.hiddenPopup }}
         </p>
       </div>
-      <div class="gallery-stage">
+      <div class="gallery-stage" :class="{ 'gallery-stage-grid': showDetails }">
         <Viewer
           v-if="showDetails"
           ref="preview"
-          class="gallery-preview"
+          class="gallery-grid"
           :z-index="10001"
           :toolbar="false"
           :title="false"
           :transition="false"
           :focus="false"
           :fullscreen="false"
+          url="data-source"
           @show="popup = true"
           @hidden="popup = false"
         >
           <button
+            v-for="(item, index) in photos"
+            :key="item.id"
             type="button"
             class="gallery-image-trigger"
-            :aria-label="text.popup"
-            :aria-expanded="popup"
-            @click.stop="previewImage"
+            :aria-label="`${text.popup} ${index + 1}`"
+            :aria-expanded="popup && selected === index"
+            @click.stop="previewImage(index)"
           >
             <img
               class="gallery-image"
-              :src="photoUrl(photo.id, active ? 'full' : 'preview')"
-              :alt="english ? photo.en : photo.zh"
+              :src="photoUrl(item.id, 'preview')"
+              :data-source="photoUrl(item.id, 'full')"
+              :alt="english ? item.en : item.zh"
               width="1280"
               height="720"
               decoding="async"
@@ -290,44 +293,6 @@ onBeforeUnmount(() => {
             height="720"
           />
         </Viewer>
-        <button
-          v-if="showDetails"
-          class="gallery-arrow gallery-previous"
-          :aria-label="text.previous"
-          @click="movePhoto(-1)"
-        >
-          <span aria-hidden="true">‹</span>
-        </button>
-        <button
-          v-if="showDetails"
-          class="gallery-arrow gallery-next"
-          :aria-label="text.next"
-          @click="movePhoto(1)"
-        >
-          <span aria-hidden="true">›</span>
-        </button>
-      </div>
-      <div
-        v-if="showDetails"
-        v-show="active"
-        class="gallery-thumbnails"
-        :aria-label="text.gallery"
-      >
-        <button
-          v-for="(item, index) in photos"
-          :key="item.id"
-          :aria-label="english ? item.en : item.zh"
-          :aria-pressed="selected === index"
-          @click="selected = index"
-        >
-          <img
-            :src="photoUrl(item.id)"
-            alt=""
-            width="64"
-            height="40"
-            loading="lazy"
-          />
-        </button>
       </div>
     </component>
     <p v-if="error" role="alert" class="demo-error">

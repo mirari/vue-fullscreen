@@ -134,7 +134,7 @@ for (const english of [false, true]) {
             ),
           ).toBe(!pageOnly)
           const details = target.getByRole('button', {
-            name: english ? 'Preview image' : '预览图片',
+            name: english ? 'Preview image 1' : '预览图片 1',
             exact: true,
           })
           const popup = frame.locator('body > .viewer-container')
@@ -272,7 +272,7 @@ for (const english of [false, true]) {
       )
       const frame = page.frameLocator('.playground-output iframe')
       const popup = frame.locator('body > .viewer-container')
-      const image = frame.locator('.image-trigger')
+      const image = frame.locator('.image-trigger').first()
       for (const teleport of [false, true]) {
         await frame.getByLabel('teleport', { exact: true }).setChecked(teleport)
         await frame.locator('#enter').click()
@@ -429,8 +429,8 @@ for (const english of [false, true]) {
         await page.goto(`${prefix}guide/${kind}`)
         const demo = page.locator(`[data-demo="${kind}"]`)
         await expect(demo).toBeVisible()
-        const image = demo.locator('.gallery-image')
-        await expect(image).toHaveCSS('object-fit', 'contain')
+        const image = demo.locator('.gallery-image').first()
+        await expect(image).toHaveCSS('object-fit', 'cover')
         const preview = await image.boundingBox()
         expect(preview!.height).toBeLessThanOrEqual(280)
         await expect(demo.getByLabel(text.pageOnly)).not.toBeChecked()
@@ -451,8 +451,8 @@ for (const english of [false, true]) {
             .click()
           const target = page.locator(`#demo-${kind}`)
           await expect(target).toHaveClass(/demo-fullscreen/)
-          const fullImage = target.locator('.gallery-image')
-          await expect(fullImage).toHaveCSS('object-fit', 'contain')
+          const fullImage = target.locator('.gallery-image').first()
+          await expect(fullImage).toHaveCSS('object-fit', 'cover')
           await expect
             .poll(async () => {
               const box = await fullImage.boundingBox()
@@ -470,7 +470,7 @@ for (const english of [false, true]) {
               ),
             ).toBe(teleport)
           const details = target.getByRole('button', {
-            name: english ? 'Preview image' : '预览图片',
+            name: english ? 'Preview image 1' : '预览图片 1',
             exact: true,
           })
           const popup = page.locator('body > .viewer-container')
@@ -508,7 +508,7 @@ for (const english of [false, true]) {
         })
         .click()
       await expect(page.locator(`body > #demo-${kind}`)).toBeVisible()
-      await page.locator(`#demo-${kind} .image-trigger`).click()
+      await page.locator(`#demo-${kind} .image-trigger`).first().click()
       await expectBodyViewer(page.locator('body > .viewer-container'), true)
       await page
         .locator('.VPNavBarMenu')
@@ -676,7 +676,7 @@ for (const english of [false, true]) {
     const target = page.locator('#demo-component')
     const popup = page.locator('body > .viewer-container')
     const image = target.getByRole('button', {
-      name: english ? 'Preview image' : '预览图片',
+      name: english ? 'Preview image 1' : '预览图片 1',
       exact: true,
     })
     await expect(demo.getByLabel('pageOnly', { exact: true })).toHaveCount(0)
@@ -736,7 +736,7 @@ for (const english of [false, true]) {
     const target = frame.locator('#target')
     const popup = frame.locator('body > .viewer-container')
     const image = target.getByRole('button', {
-      name: english ? 'Preview image' : '预览图片',
+      name: english ? 'Preview image 1' : '预览图片 1',
       exact: true,
     })
     await expect(demo.getByLabel('pageOnly', { exact: true })).toHaveCount(0)
@@ -774,7 +774,6 @@ for (const english of [false, true]) {
     }) => {
       await page.goto(`${english ? './en/' : './'}${route}`)
       const demo = page.locator('[data-demo="component"]')
-      const image = page.locator('#demo-component .gallery-image')
       if (!route) {
         await expect(demo.getByRole('checkbox')).toHaveCount(0)
         await expect(demo.locator('.demo-caption')).toHaveCount(0)
@@ -829,82 +828,36 @@ for (const english of [false, true]) {
           ),
         ).toBe(true)
         return
-      } else {
-        await expect(demo.getByRole('checkbox')).toHaveCount(1)
       }
-      await expect(demo).not.toContainText(
-        english ? 'Photos:' : '图片：个人摄影',
-      )
-
-      await expect(demo.locator('.gallery-thumbnails')).toBeHidden()
-      await expect(demo.locator('.gallery-thumbnails button')).toHaveCount(6)
-      await expect(
-        demo.locator('.gallery-thumbnails img').first(),
-      ).toHaveAttribute('src', /picsum\.photos\/id\/10\/128\/72$/)
-      await expect
-        .poll(() =>
-          image.evaluate(
-            (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
-          ),
-        )
-        .toBe(true)
-      await demo
-        .getByRole('button', {
-          name: english ? 'Next image' : '下一张',
-          exact: true,
-        })
-        .click()
-      await expect(image).toHaveAttribute(
-        'src',
-        /picsum\.photos\/id\/11\/640\/360$/,
-      )
-      await demo
-        .getByRole('button', {
-          name: english ? 'Enter fullscreen' : '进入全屏',
-          exact: true,
-        })
-        .click()
+      await expect(demo.getByRole('checkbox')).toHaveCount(1)
       const target = page.locator('#demo-component')
-      await expect(target).toHaveClass(/demo-fullscreen/)
-      await expect(target.locator('.gallery-thumbnails')).toBeVisible()
-      await expect(image).toHaveAttribute(
-        'src',
-        /picsum\.photos\/id\/11\/1280\/720$/,
+      const tiles = target.locator('.gallery-image-trigger')
+      await expect(tiles).toHaveCount(6)
+      await expect(target.locator('.viewer-container')).toHaveCount(0)
+      await expect(page.locator('body > .viewer-container')).toHaveCount(0)
+      const boxes = await tiles.evaluateAll((elements) =>
+        elements.map((el) => {
+          const box = el.getBoundingClientRect()
+          return { x: box.x, y: box.y }
+        }),
       )
-      await target
-        .getByRole('button', {
-          name: english ? 'Image 3' : '图片 3',
-          exact: true,
-        })
-        .click()
-      await expect(image).toHaveAttribute(
+      expect(boxes[0].y).toBe(boxes[1].y)
+      expect(boxes[0].y).toBe(boxes[2].y)
+      expect(boxes[3].y).toBeGreaterThan(boxes[0].y)
+      await tiles.nth(2).click()
+      const popup = page.locator('body > .viewer-container')
+      await expectBodyViewer(popup, true)
+      await expect(popup.locator('.viewer-canvas img')).toHaveAttribute(
         'src',
         /picsum\.photos\/id\/12\/1280\/720$/,
       )
-      await expect
-        .poll(() =>
-          image.evaluate(
-            (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
-          ),
-        )
-        .toBe(true)
-      await target.focus()
-      await page.keyboard.press('ArrowLeft')
-      await expect(image).toHaveAttribute(
-        'src',
-        /picsum\.photos\/id\/11\/1280\/720$/,
+      await closeViewer(popup, tiles.nth(2), true)
+      await page.setViewportSize({ width: 390, height: 844 })
+      const mobile = await tiles.evaluateAll((elements) =>
+        elements.map((el) => el.getBoundingClientRect().y),
       )
-      await target
-        .getByRole('button', {
-          name: english ? 'Exit fullscreen' : '退出全屏',
-          exact: true,
-        })
-        .click()
-      await expect(demo.locator('.gallery-thumbnails')).toBeHidden()
-      await expect(image).toHaveAttribute(
-        'src',
-        /picsum\.photos\/id\/11\/640\/360$/,
-      )
+      expect(mobile[0]).toBe(mobile[1])
+      expect(mobile[2]).toBeGreaterThan(mobile[0])
     })
   }
 }

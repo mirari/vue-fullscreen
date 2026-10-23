@@ -28,9 +28,10 @@ import 'viewerjs/dist/viewer.css'
 
 Vue.use(VueFullscreen)
 Vue.use(VueViewer)
+const images = [10, 11, 12, 13, 14, 15]
 
 export default {
-  data: () => ({ active: false, pageOnly: false, teleport: true, showDetails: false, error: '' }),
+  data: () => ({ images, selected: 0, active: false, pageOnly: false, teleport: true, showDetails: false, error: '' }),
   computed: {
     options() {
       return {
@@ -51,7 +52,10 @@ export default {
     exit() { return this.$fullscreen.exit().catch(this.report) },
     `
         : ''
-    }previewImage() { this.showDetails ? this.$refs.preview.hide() : this.$refs.preview.show() },
+    }previewImage(index) {
+      if (this.showDetails && this.selected === index) this.$refs.preview.hide()
+      else { this.selected = index; this.$refs.preview.view(index) }
+    },
   },
   beforeDestroy() {
     if (this.$fullscreen.element === this.$refs.target)
@@ -66,10 +70,15 @@ import { Viewer } from 'v-viewer'
 import 'viewerjs/dist/viewer.css'
 
 const pageOnly = ref(false)
+const images = [10, 11, 12, 13, 14, 15]
+const selected = ref(0)
 const teleport = ref(true)
 const showDetails = ref(false)
 const preview = ref()
-function previewImage() { showDetails.value ? preview.value.hide() : preview.value.show() }
+function previewImage(index) {
+  if (showDetails.value && selected.value === index) preview.value.hide()
+  else { selected.value = index; preview.value.view(index) }
+}
 const error = ref('')
 ${
   kind === 'api'
@@ -122,9 +131,9 @@ ${kind === 'api' ? 'watch(active, changed)\n' : ''}
     </header>
     <div class="surface-placeholder">
       <${tag} id="${id}" ref="target" class="surface" ${props}>
-        <${vue2 ? 'viewer' : 'Viewer'} ref="preview" class="image-preview" :z-index="10001" :toolbar="false" :title="false" :transition="false" :focus="false" :fullscreen="false" @show="showDetails = true" @hidden="showDetails = false">
-          <button class="image-trigger" aria-label="${text.details}" :aria-expanded="showDetails ? 'true' : 'false'" @click.stop="previewImage">
-            <img class="gallery-image demo-picture" src="https://picsum.photos/id/10/1280/720" alt="${text.image}" width="1280" height="720">
+        <${vue2 ? 'viewer' : 'Viewer'} ref="preview" class="image-preview" url="data-source" :z-index="10001" :toolbar="false" :title="false" :transition="false" :focus="false" :fullscreen="false" @show="showDetails = true" @hidden="showDetails = false">
+          <button v-for="(id, index) in images" :key="id" class="image-trigger" :aria-label="'${text.details} ' + (index + 1)" :aria-expanded="showDetails && selected === index ? 'true' : 'false'" @click.stop="previewImage(index)">
+            <img class="gallery-image demo-picture" :src="'https://picsum.photos/id/' + id + '/640/360'" :data-source="'https://picsum.photos/id/' + id + '/1280/720'" :alt="'${text.image} ' + (index + 1)" width="1280" height="720">
           </button>
         </${vue2 ? 'viewer' : 'Viewer'}>
         <button v-if="active" id="exit" class="exit" ${exit} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.exit}</button>
@@ -157,10 +166,11 @@ input { accent-color: var(--sample-accent); }
 .surface-placeholder { height: 300px; }
 .surface { position: relative; height: 300px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; padding: 10px; background: var(--sample-surface); border: 1px solid var(--sample-border); border-radius: 8px; }
 .surface.demo-fullscreen { z-index: 10000; min-height: 100vh; height: 100vh; border-radius: 0; padding: 20px 24px 72px; }
-.image-preview { flex: 1; min-height: 0; width: 100%; }
-.image-trigger { display: block; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 0; background: transparent; cursor: zoom-in; }
+.image-preview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: start; gap: 10px; width: 100%; }
+.image-trigger { display: block; aspect-ratio: 16 / 10; width: 100%; padding: 0; border: 0; border-radius: 4px; overflow: hidden; background: transparent; cursor: zoom-in; }
 .image-trigger:hover { background: transparent; filter: none; }
-.gallery-image { position: static; display: block; width: 100%; height: 100%; object-fit: contain; }
+.gallery-image { position: static; display: block; width: 100%; height: 100%; object-fit: cover; }
 .exit { position: absolute; top: 16px; right: 16px; }
 .surface p[role="status"] { position: absolute; bottom: 68px; margin: 0; padding: 6px 12px; background: var(--sample-surface); font-size: 12px; }
+@media (max-width: 480px) { .image-preview { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 `

@@ -103,26 +103,31 @@
   height: clamp(340px, 52vw, 560px);
 }
 .gallery-image {
-  position: absolute;
-  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 .gallery-image-trigger {
-  position: absolute;
-  inset: 0;
+  display: block;
+  aspect-ratio: 16 / 10;
   width: 100%;
-  height: 100%;
   padding: 0;
   border: 0;
+  border-radius: 4px;
+  overflow: hidden;
   background: transparent;
   cursor: zoom-in;
 }
-.gallery-preview {
-  position: absolute;
-  inset: 0;
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+.gallery-stage-grid {
+  height: auto;
+  overflow: auto;
 }
 .inline-gallery-sources {
   display: none;
@@ -133,59 +138,6 @@
 .demo-fullscreen .gallery-stage {
   flex: 1 1 0;
   height: auto;
-}
-.gallery-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 48px;
-  border: 1px solid #ffffff50;
-  border-radius: 8px;
-  background: #0b142b80;
-  color: white;
-  font-size: 32px;
-  line-height: 1;
-  cursor: pointer;
-}
-.gallery-arrow:hover {
-  background: #0b142bd0;
-}
-.gallery-previous {
-  left: 16px;
-}
-.gallery-next {
-  right: 16px;
-}
-.gallery-thumbnails {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  padding: 14px;
-  flex-shrink: 0;
-}
-.gallery-thumbnails button {
-  border: 2px solid transparent;
-  border-radius: 5px;
-  padding: 2px;
-  opacity: 0.55;
-  cursor: pointer;
-}
-.gallery-thumbnails button[aria-pressed='true'] {
-  border-color: var(--vp-c-brand-1);
-  opacity: 1;
-}
-.gallery-thumbnails img {
-  width: 64px;
-  height: 40px;
-  object-fit: contain;
-  border-radius: 2px;
-}
-.gallery-thumbnails button:hover {
-  opacity: 1;
 }
 .demo-surface button:focus-visible {
   outline: 2px solid var(--vp-c-brand-1);
@@ -234,12 +186,7 @@
 }
 
 @media (max-width: 480px) {
-  .gallery-thumbnails {
-    gap: 6px;
-    padding: 12px 8px;
-  }
-  .gallery-thumbnails img {
-    width: 46px;
-    height: 30px;
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

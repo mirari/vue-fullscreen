@@ -55,10 +55,13 @@ output {
 }
 .image-trigger {
   display: block;
+  aspect-ratio: 16 / 10;
   width: 100%;
   padding: 0;
   margin: 0;
   border: 0;
+  border-radius: 4px;
+  overflow: hidden;
   background: transparent;
   cursor: zoom-in;
 }
@@ -75,12 +78,18 @@ output {
 .demo-picture {
   display: block;
   width: 100%;
-  height: 180px;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
 }
-#target.fullscreen .demo-picture {
-  height: calc(100vh - 210px);
-  min-height: 120px;
+.popup-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 480px) {
+  .popup-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 .inline-gallery-sources {
   display: none;
