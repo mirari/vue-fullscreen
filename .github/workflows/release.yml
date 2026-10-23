@@ -31,7 +31,7 @@ jobs:
         run: node scripts/release-branch.mjs "$RELEASE_TAG"
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
       - run: pnpm run test:browser
       - run: pnpm run test:consumers
       - name: Upload browser test reports

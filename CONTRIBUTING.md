@@ -14,13 +14,13 @@ Use the pnpm version pinned in the root `packageManager` field and install with 
 
 ## Checks
 
-Install Chromium before running browser tests:
+Install the three engines before running the basic browser tests:
 
 ```sh
-pnpm exec playwright install chromium
+pnpm exec playwright install chromium firefox webkit
 ```
 
-On Linux CI or a machine missing browser system libraries, use `pnpm exec playwright install --with-deps chromium`. The browser tests use full Chromium; a headless-shell-only installation is insufficient for native fullscreen coverage.
+On Linux CI or a machine missing browser system libraries, use `pnpm exec playwright install --with-deps chromium firefox webkit`. The Chromium project uses full Chromium; a headless-shell-only installation is insufficient for native fullscreen coverage. To run a single engine, use `pnpm run test:browser --project=firefox` (or `chromium` / `webkit`). The Chromium executable override applies only to the Chromium project.
 
 - `pnpm run lint`: formatting consistency using Prettier.
 - `pnpm run typecheck`: strict TypeScript checks for both adapters and shared core.
@@ -29,9 +29,9 @@ On Linux CI or a machine missing browser system libraries, use `pnpm exec playwr
 - `pnpm run check:packages`: pack actual release directories, install tarballs into isolated consumers with Vue 2.4.0, 2.5.22, 2.6.0, 2.6.14, 2.7.16, 3.0.0 and the current Vue 3 development version; verify SSR ESM/CJS imports, browser-global UMD exports, mounted component lifecycles and TypeScript NodeNext consumers. Vue 2 checks also cover plugin registration, attribute/listener forwarding, model events and component instance types. Vue 3.0's own declarations require `skipLibCheck` with modern TypeScript; current Vue and all Vue 2 consumers are checked without it. Vue 2.5 runtime checks omit Node's global MessageChannel so its old scheduler does not keep the process alive.
 - `pnpm run check:ie11`: ES5 parsing of Vue 2 outputs and simulated missing runtime/DOM capabilities, MS native fullscreen, page fallback and Vue lifecycle. This is not a real IE engine test.
 - `pnpm run build:examples`: build both playgrounds.
-- `pnpm run test:browser`: Chromium tests for both adapters in page and native fullscreen modes. Native exit uses the browser API because synthetic Escape is not a reliable native browser fullscreen command.
+- `pnpm run test:browser`: basic Chromium, Firefox and WebKit tests for both adapters in page and native fullscreen modes (12 cases). Native exit uses the browser API because synthetic Escape is not a reliable native browser fullscreen command.
 
-CI runs checks on Node 22/24, browser and consumer tests on Node 24, and uploads both tarballs. Browser engines other than Chromium are not part of the automated coverage yet.
+CI runs checks on Node 22/24, browser and consumer tests on Node 24, and uploads both tarballs. Basic three-engine tests also run before publishing a release. Documentation and published-package consumer suites remain Chromium-only. CI runs basic browser cases with one worker for stability. WebKit automation does not constitute real Safari or iPhone acceptance; real-device testing on those platforms is deferred.
 
 Browser tests retain failure screenshots and traces. In CI, HTML reports and test output are uploaded even after failures and kept for 14 days, with separate directories for browser, documentation and consumer tests. See the [report instructions](./.github/ISSUE_FIXING.md#查看失败报告).
 
@@ -45,7 +45,7 @@ Run `pnpm run test:consumers` after installing Chromium. The command builds and 
 | Vue with Vite               | Package-root imports, local component/directive registration, component model, directive and API in a production build                       |
 | Nuxt 4                      | Named imports and server rendering, HTML with JavaScript disabled, hydration, component/directive/API interactions and route unmount/remount |
 
-All browser assertions run in Chromium. Local script URLs keep the tests independent of third-party CDN availability; they exercise the same files a CDN serves. Nuxt uses its Node server output; this does not claim coverage of every Nitro deployment adapter. Existing `check:packages` tests additionally cover ESM/CJS imports and TypeScript declarations across supported Vue versions.
+The consumer suite runs in Chromium. Local script URLs keep the tests independent of third-party CDN availability; they exercise the same files a CDN serves. Nuxt uses its Node server output; this does not claim coverage of every Nitro deployment adapter. Existing `check:packages` tests additionally cover ESM/CJS imports and TypeScript declarations across supported Vue versions.
 
 ## Consumer dependency security
 

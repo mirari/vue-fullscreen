@@ -25,7 +25,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check
       - if: matrix.node == 24
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
       - if: matrix.node == 24
         run: pnpm run test:browser
       - if: matrix.node == 24

@@ -2,6 +2,7 @@ import { defineConfig } from '@playwright/test'
 export default defineConfig({
   testDir: './tests/browser',
   outputDir: 'test-results/browser',
+  workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI
     ? [
         ['list'],
@@ -11,14 +12,23 @@ export default defineConfig({
   use: {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    browserName: 'chromium',
-    // Use full Chromium's new headless mode; headless shell lacks native fullscreen.
-    channel: 'chromium',
     headless: true,
-    launchOptions: {
-      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
-    },
   },
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        // Full Chromium is required for native fullscreen coverage.
+        channel: 'chromium',
+        launchOptions: {
+          executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+        },
+      },
+    },
+    { name: 'firefox', use: { browserName: 'firefox' } },
+    { name: 'webkit', use: { browserName: 'webkit' } },
+  ],
   webServer: [
     {
       command:
