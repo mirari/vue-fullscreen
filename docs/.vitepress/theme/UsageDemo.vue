@@ -3,9 +3,13 @@ import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useData, withBase } from 'vitepress'
 import 'viewerjs/dist/viewer.css'
 import { moduleUrl } from './playground/module-url'
-import type { Example } from './playground/samples'
+import type { Comparison, Example } from './playground/samples'
 
-const props = defineProps<{ kind: Example }>()
+const props = defineProps<{
+  kind?: Example
+  vue2?: boolean
+  comparison?: Comparison
+}>()
 const { lang } = useData()
 const host = ref<HTMLElement>()
 const error = ref('')
@@ -14,7 +18,9 @@ let disposed = false
 let unmount: (() => void) | undefined
 onMounted(async () => {
   try {
-    const response = await fetch(withBase('/playground/vue3/demos.js'))
+    const response = await fetch(
+      withBase(`/playground/${props.vue2 ? 'vue2' : 'vue3'}/demos.js`),
+    )
     if (!response.ok)
       throw new Error(`Failed to load example: ${response.status}`)
     const source = await response.text()
@@ -31,7 +37,12 @@ onMounted(async () => {
     }
     const top = anchor?.getBoundingClientRect().top
     const scroll = window.scrollY
-    unmount = mount(host.value, props.kind, lang.value.startsWith('en'))
+    unmount = mount(
+      host.value,
+      props.kind ?? 'component',
+      lang.value.startsWith('en'),
+      props.comparison,
+    )
     ready.value = true
     await nextTick()
     if (
@@ -55,7 +66,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="usage-demo vp-raw" :data-demo="kind">
+  <div
+    class="usage-demo vp-raw"
+    :data-demo="comparison === 'pageOnly' ? 'page-only' : (kind ?? 'component')"
+    :data-comparison="comparison"
+  >
     <p v-if="error" role="alert">{{ error }}</p>
     <p v-else-if="!ready" role="status">
       {{ lang.startsWith('en') ? 'Loading example…' : '正在加载示例…' }}

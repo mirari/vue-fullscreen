@@ -1,14 +1,10 @@
 import { createApp } from 'vue'
-import { examples, styles } from 'virtual:fullscreen-examples'
+import { createMount } from './mount.mjs'
 
-export function mount(host, kind, english) {
-  const style = document.createElement('style')
-  style.textContent = styles
-  document.head.appendChild(style)
-  const app = createApp(examples[`${kind} ${english ? 'en' : 'zh'}`])
+export const mount = createMount((host, component) => {
+  const app = createApp(component)
   app.mount(host)
   return () => {
     app.unmount()
-    style.remove()
   }
-}
+})

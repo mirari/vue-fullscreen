@@ -6,7 +6,7 @@
 
 [编辑此示例](/vue2/playground?example=api)
 
-<Vue2Demo kind="api" />
+<UsageDemo kind="api" vue2 />
 
 ```fullscreen-example
 api vue2 zh

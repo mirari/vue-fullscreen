@@ -10,7 +10,7 @@
 
 [编辑此示例](/vue2/playground?example=directive)
 
-<Vue2Demo kind="directive" />
+<UsageDemo kind="directive" vue2 />
 
 ```fullscreen-example
 directive vue2 zh

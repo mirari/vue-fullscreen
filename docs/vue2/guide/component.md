@@ -6,7 +6,7 @@
 
 [编辑此示例](/vue2/playground?example=component)
 
-<Vue2Demo kind="component" />
+<UsageDemo kind="component" vue2 />
 
 ```fullscreen-example
 component vue2 zh

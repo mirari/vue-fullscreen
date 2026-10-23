@@ -118,7 +118,7 @@ Load Vue first, then vue-fullscreen:
 | User gesture    | Required                                | Not required                    |
 | Exit            | Browser Esc, an exit button or `exit()` | Esc, an exit button or `exit()` |
 
-<ClientOnly><FullscreenDemo compare-page-only /></ClientOnly>
+<ClientOnly><UsageDemo comparison="pageOnly" /></ClientOnly>
 
 For browser support, automatic fallback and iframe permissions, see [compatibility](/en/guide/compatibility).
 
@@ -139,4 +139,4 @@ In page-only mode, moving the target can also avoid clipping, positioning and st
 
 Enter fullscreen with `teleport` off and click the image. Exit, enable `teleport` and repeat. **Both settings make the image panel fullscreen; the difference is whether the body popup is visible.**
 
-<ClientOnly><FullscreenDemo compare-teleport /></ClientOnly>
+<ClientOnly><UsageDemo comparison="teleport" /></ClientOnly>

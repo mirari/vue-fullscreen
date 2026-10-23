@@ -133,7 +133,7 @@ Vue.use(VueFullscreen)
 | 用户手势     | 需要点击、按键等用户操作       | 不需要                  |
 | 退出         | 浏览器 Esc、退出按钮、`exit()` | Esc、退出按钮、`exit()` |
 
-<ClientOnly><Vue2Demo comparison="pageOnly" /></ClientOnly>
+<ClientOnly><UsageDemo comparison="pageOnly" vue2 /></ClientOnly>
 
 浏览器支持、自动降级和 iframe 权限见[兼容性](/vue2/guide/compatibility)。
 
@@ -154,4 +154,4 @@ Vue.use(VueFullscreen)
 
 先关闭 `teleport` 进入全屏并点击图片，再退出、开启 `teleport` 后重复操作。**两种设置下内容区域都会全屏，区别是 body 弹窗是否可见**。
 
-<ClientOnly><Vue2Demo comparison="teleport" /></ClientOnly>
+<ClientOnly><UsageDemo comparison="teleport" vue2 /></ClientOnly>

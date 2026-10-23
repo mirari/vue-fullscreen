@@ -148,6 +148,8 @@ User-facing documentation lives in `docs/`, with Chinese and English navigation,
 
 Usage-page demos and the Playground share `docs/.vitepress/theme/playground/samples.ts`; `docs:prepare` builds the runnable demos from these sources. Displayed usage code comes from `usage-snippets.ts` in the same directory and focuses on fullscreen imports, options, state and controls, omitting image previews and presentation code. The `fullscreen-example` Markdown fence selects a usage mode, Vue version and language. Keep the snippets aligned with the full examples when changing fullscreen behavior, and rerun the documentation browser tests for interactive changes.
 
+Both adapters' usage and quick-start examples use `UsageDemo.vue` to mount standalone bundles directly in the documentation. Only the runtime-specific mount and unmount adapters differ. `pageOnly` fills the document viewport, while `teleport` popups use the document body. Keep scroll restoration in the examples, and clean up their fullscreen sessions and viewers when navigating away. Editable Playground previews remain isolated in sandboxed iframes for both adapters.
+
 The image-preview libraries are development dependencies for the examples. Keep popup containers under `body` to demonstrate `teleport`, with their z-index above the fullscreen panel so page fullscreen also works. `docs:prepare` includes the matching preview runtime and styles in the local Playground assets.
 
 - `pnpm run docs:dev`: develop at `/`.

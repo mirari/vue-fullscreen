@@ -116,7 +116,7 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
 | 用户手势     | 需要点击、按键等用户操作       | 不需要                  |
 | 退出         | 浏览器 Esc、退出按钮、`exit()` | Esc、退出按钮、`exit()` |
 
-<ClientOnly><FullscreenDemo compare-page-only /></ClientOnly>
+<ClientOnly><UsageDemo comparison="pageOnly" /></ClientOnly>
 
 浏览器支持、自动降级和 iframe 权限见[兼容性](/guide/compatibility)。
 
@@ -137,4 +137,4 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
 
 先关闭 `teleport` 进入全屏并点击图片，再退出、开启 `teleport` 后重复操作。**两种设置下图片区域都会全屏，区别是 body 弹窗是否可见**。
 
-<ClientOnly><FullscreenDemo compare-teleport /></ClientOnly>
+<ClientOnly><UsageDemo comparison="teleport" /></ClientOnly>

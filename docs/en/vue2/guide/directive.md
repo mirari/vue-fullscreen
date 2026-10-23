@@ -10,7 +10,7 @@ The directive provides a click trigger without requiring a model value.
 
 [Edit this example](/en/vue2/playground?example=directive)
 
-<Vue2Demo kind="directive" />
+<UsageDemo kind="directive" vue2 />
 
 ```fullscreen-example
 directive vue2 en

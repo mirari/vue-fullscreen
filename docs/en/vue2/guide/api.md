@@ -6,7 +6,7 @@ Control the same fullscreen target from multiple buttons, keyboard shortcuts or 
 
 [Edit this example](/en/vue2/playground?example=api)
 
-<Vue2Demo kind="api" />
+<UsageDemo kind="api" vue2 />
 
 ```fullscreen-example
 api vue2 en

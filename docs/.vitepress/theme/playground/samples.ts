@@ -1,6 +1,13 @@
 export type Example = 'component' | 'directive' | 'api'
+export type Comparison = 'pageOnly' | 'teleport'
 
-export function sample(kind: Example, vue2: boolean, english: boolean) {
+export function sample(
+  kind: Example,
+  vue2: boolean,
+  english: boolean,
+  comparison?: Comparison,
+) {
+  const inline = comparison === 'pageOnly'
   const text = english
     ? {
         enter:
@@ -18,7 +25,7 @@ export function sample(kind: Example, vue2: boolean, english: boolean) {
         image: '风景图片',
         hidden: '弹窗已在 body 下打开，但不属于当前原生全屏元素。',
       }
-  const id = vue2 ? 'target' : `demo-${kind}`
+  const id = inline ? 'demo-page-only' : `demo-${kind}`
   const script = vue2
     ? `<script>
 import Vue from 'vue'
@@ -31,7 +38,7 @@ Vue.use(VueViewer)
 const images = [10, 11, 12, 13, 14, 15]
 
 export default {
-  data: () => ({ images, selected: 0, isFullscreen: false, pageOnly: false, teleport: true, showDetails: false, error: '' }),
+  data: () => ({ images, selected: 0, isFullscreen: false, pageOnly: false, teleport: ${!comparison}, showDetails: false, error: '', readingPosition: null }),
   computed: {
     options() {
       return {
@@ -41,11 +48,22 @@ export default {
     },
   },
   methods: {
+    rememberReadingPosition() {
+      if (!this.isFullscreen && !this.readingPosition)
+        this.readingPosition = { left: window.scrollX, top: window.scrollY }
+    },
     changed(isFullscreen) {
       this.isFullscreen = isFullscreen
-      if (!isFullscreen) this.$refs.preview.hide()
+      ${inline ? '' : 'if (!isFullscreen) this.$refs.preview?.hide()'}
+      this.$nextTick(() => {
+        ${inline ? "window.dispatchEvent(new Event('resize'))" : ''}
+        if (!isFullscreen && this.readingPosition) {
+          window.scrollTo({ ...this.readingPosition, behavior: 'instant' })
+          this.readingPosition = null
+        }
+      })
     },
-    report(error) { this.isFullscreen = false; this.showDetails = false; this.error = error.message },
+    report(error) { this.changed(false); this.showDetails = false; this.error = error.message },
     ${
       kind === 'api'
         ? `enter() { return this.$fullscreen.enter('${id}', this.options).catch(this.report) },
@@ -58,13 +76,14 @@ export default {
     },
   },
   beforeDestroy() {
+    this.readingPosition = null
     if (this.$fullscreen.element === this.$refs.target)
       void this.$fullscreen.exit().catch(() => {})
   },
 }
 </script>`
     : `<script setup>
-import { ${kind === 'directive' ? 'computed, ' : ''}${kind === 'api' ? 'watch, ' : ''}ref } from 'vue'
+import { ${kind === 'directive' ? 'computed, ' : ''}${kind === 'api' ? 'watch, ' : ''}nextTick, onBeforeUnmount, ref } from 'vue'
 import { ${kind === 'component' ? 'Fullscreen' : kind === 'directive' ? 'vFullscreen' : 'useFullscreen'} } from 'vue-fullscreen'
 import { Viewer } from 'v-viewer'
 import 'viewerjs/dist/viewer.css'
@@ -72,7 +91,13 @@ import 'viewerjs/dist/viewer.css'
 const pageOnly = ref(false)
 const images = [10, 11, 12, 13, 14, 15]
 const selected = ref(0)
-const teleport = ref(true)
+const teleport = ref(${!comparison})
+let readingPosition
+function rememberReadingPosition() {
+  if (!isFullscreen.value && !readingPosition)
+    readingPosition = { left: window.scrollX, top: window.scrollY }
+}
+onBeforeUnmount(() => { readingPosition = undefined })
 const showDetails = ref(false)
 const preview = ref()
 function previewImage(index) {
@@ -96,10 +121,16 @@ ${
 }))
 `
     : ''
-}function changed(value) {
-  ${kind !== 'api' ? 'isFullscreen.value = value\n  ' : ''}if (!value) preview.value?.hide()
+}async function changed(value) {
+  ${kind !== 'api' ? 'isFullscreen.value = value\n  ' : ''}${inline ? '' : 'if (!value) preview.value?.hide()'}
+  await nextTick()
+  ${inline ? "window.dispatchEvent(new Event('resize'))" : ''}
+  if (!value && readingPosition) {
+    window.scrollTo({ ...readingPosition, behavior: 'instant' })
+    readingPosition = undefined
+  }
 }
-function report(reason) { ${kind === 'api' ? '' : 'isFullscreen.value = false; '}showDetails.value = false; error.value = reason.message }
+function report(reason) { void changed(false); showDetails.value = false; error.value = reason.message }
 ${kind === 'api' ? 'watch(isFullscreen, changed)\n' : ''}
 </script>`
   const enter =
@@ -125,18 +156,24 @@ ${kind === 'api' ? 'watch(isFullscreen, changed)\n' : ''}
 <template>
   <div class="lab">
     <header class="options">
-      <label class="page-only-control"><input v-model="pageOnly" type="checkbox" :disabled="isFullscreen"> pageOnly</label>
-      <label><input v-model="teleport" type="checkbox" :disabled="isFullscreen"> teleport</label>
-      <button id="enter" :disabled="isFullscreen" ${enter} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.enter}</button>
+      ${comparison === 'teleport' ? '' : '<label class="page-only-control"><input v-model="pageOnly" type="checkbox" :disabled="isFullscreen"> pageOnly</label>'}
+      ${inline ? '' : '<label><input v-model="teleport" type="checkbox" :disabled="isFullscreen"> teleport</label>'}
+      <button id="enter" :disabled="isFullscreen" @click.capture="rememberReadingPosition" ${enter} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.enter}</button>
     </header>
     <div class="surface-placeholder">
       <${tag} id="${id}" ref="target" class="surface" ${props}>
         <button v-if="isFullscreen" id="exit" class="exit" ${exit} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.exit}</button>
-        <${vue2 ? 'viewer' : 'Viewer'} ref="preview" class="image-preview" url="data-source" :z-index="10001" :toolbar="false" :title="false" :transition="false" :focus="false" :fullscreen="false" @show="showDetails = true" @hidden="showDetails = false">
-          <button v-for="(id, index) in images" :key="id" class="image-trigger" :aria-label="'${text.details} ' + (index + 1)" :aria-expanded="showDetails && selected === index ? 'true' : 'false'" @click.stop="previewImage(index)">
+        ${inline ? '<div class="inline-gallery-stage">' : ''}
+        <${vue2 ? 'viewer' : 'Viewer'} ref="preview" class="${inline ? 'inline-gallery-sources' : 'image-preview'}" ${inline ? 'inline :button="false"' : ''} url="data-source" :z-index="10001" :toolbar="false" :title="false" :transition="false" :focus="false" :fullscreen="false" @show="showDetails = true" @hidden="showDetails = false">
+          ${
+            inline
+              ? `<img v-for="(id, index) in images" :key="id" :src="'https://picsum.photos/id/' + id + '/128/72'" :data-source="'https://picsum.photos/id/' + id + '/1280/720'" :alt="'${text.image} ' + (index + 1)" width="1280" height="720">`
+              : `<button v-for="(id, index) in images" :key="id" class="image-trigger gallery-image-trigger" :aria-label="'${text.details} ' + (index + 1)" :aria-expanded="showDetails && selected === index ? 'true' : 'false'" @click.stop="previewImage(index)">
             <img class="gallery-image demo-picture" :src="'https://picsum.photos/id/' + id + '/640/360'" :data-source="'https://picsum.photos/id/' + id + '/1280/720'" :alt="'${text.image} ' + (index + 1)" width="1280" height="720">
-          </button>
+          </button>`
+          }
         </${vue2 ? 'viewer' : 'Viewer'}>
+        ${inline ? '</div>' : ''}
         <p v-if="isFullscreen && showDetails && !pageOnly && !teleport" role="status">${text.hidden}</p>
       </${tag}>
     </div>
@@ -171,6 +208,8 @@ input { accent-color: var(--sample-accent); }
 .image-trigger:hover { background: transparent; filter: none; }
 .gallery-image { position: static; display: block; width: 100%; height: 100%; object-fit: cover; }
 .exit { flex-shrink: 0; margin-bottom: 16px; }
+.inline-gallery-stage { position: relative; flex: 1; min-height: 0; width: 100%; }
+.inline-gallery-sources { display: none; }
 .surface p[role="status"] { position: absolute; bottom: 68px; margin: 0; padding: 6px 12px; background: var(--sample-surface); font-size: 12px; }
 @media (max-width: 480px) { .image-preview { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 `

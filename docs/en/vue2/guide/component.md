@@ -6,7 +6,7 @@ Wrap content in the component, then change the `v-model` value to enter or exit 
 
 [Edit this example](/en/vue2/playground?example=component)
 
-<Vue2Demo kind="component" />
+<UsageDemo kind="component" vue2 />
 
 ```fullscreen-example
 component vue2 en

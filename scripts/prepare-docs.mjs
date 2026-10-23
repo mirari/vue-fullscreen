@@ -1,10 +1,11 @@
 import { build } from 'vite'
 import { resolve } from 'node:path'
-import { cp, mkdir, writeFile } from 'node:fs/promises'
+import { cp, mkdir, rm } from 'node:fs/promises'
 import { sample } from '../docs/.vitepress/theme/playground/samples.ts'
 import { compile } from '../docs/.vitepress/theme/playground/compile.ts'
 
 // Serve the workspace version in the editor, including changes not yet published.
+await rm(resolve('docs/public/vue2-demo'), { recursive: true, force: true })
 for (const version of ['vue2', 'vue3']) {
   const destination = resolve(`docs/public/playground/${version}`)
   await build({
@@ -52,13 +53,18 @@ for (const version of ['vue2', 'vue3']) {
   const sources = new Map()
   for (const kind of ['component', 'directive', 'api']) {
     for (const language of ['zh', 'en']) {
-      sources.set(
-        `${kind} ${language}`,
-        compile(
-          sample(kind, version === 'vue2', language === 'en'),
-          version === 'vue2',
-        ),
-      )
+      for (const comparison of [
+        undefined,
+        ...(kind === 'component' ? ['pageOnly', 'teleport'] : []),
+      ]) {
+        sources.set(
+          `${kind} ${language}${comparison ? ` ${comparison}` : ''}`,
+          compile(
+            sample(kind, version === 'vue2', language === 'en', comparison),
+            version === 'vue2',
+          ),
+        )
+      }
     }
   }
   await build({
@@ -128,16 +134,4 @@ for (const version of ['vue2', 'vue3']) {
       },
     },
   })
-  if (version === 'vue2')
-    await writeFile(
-      resolve(destination, 'demo.html'),
-      '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fullscreen example</title><link rel="stylesheet" href="./viewer.css"></head><body><div id="app"></div><script type="module" src="./demos.js"></script></body></html>',
-    )
 }
-
-await build({
-  configFile: false,
-  root: resolve('packages/vue2/playground'),
-  base: './',
-  build: { outDir: resolve('docs/public/vue2-demo'), emptyOutDir: true },
-})
