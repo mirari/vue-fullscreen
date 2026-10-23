@@ -215,18 +215,47 @@ function s() {
 		},
 		dispose() {
 			r = !0;
-			let e = c, i = n;
-			if (u(), t = !1, a.isEnabled) {
-				let t = () => {
-					if (e && a.element === e) return a.exit();
-				};
-				i ? i.then(t, () => {}).catch(() => {}) : Promise.resolve(t()).catch(() => {});
+			let e = c, t = n;
+			u();
+			try {
+				l(!1);
+			} finally {
+				if (a.isEnabled) {
+					let n = () => {
+						if (e && a.element === e) return a.exit();
+					};
+					t ? t.then(n, () => {}).catch(() => {}) : Promise.resolve(n()).catch(() => {});
+				}
 			}
 		}
 	};
 	return p;
 }
 var c = s(), l = {
+	get options() {
+		return c.options;
+	},
+	get element() {
+		return c.element;
+	},
+	get isFullscreen() {
+		return c.isFullscreen;
+	},
+	get isSupported() {
+		return c.isSupported;
+	},
+	get isEnabled() {
+		return c.isSupported;
+	},
+	enter: (e, t) => c.enter(e, t),
+	request: (e, t) => c.enter(e, t),
+	toggle: (e, t, n) => c.toggle(e, t, n),
+	exit: () => c.exit(),
+	dispose() {
+		let e = c;
+		c = s(), f = null, e.dispose();
+	}
+}, u = {
 	fullscreen: {
 		type: Boolean,
 		default: !1
@@ -247,28 +276,28 @@ var c = s(), l = {
 		type: Boolean,
 		default: !1
 	}
-}, u = /* @__PURE__ */ new WeakMap(), d = null;
-function f(e) {
-	let t = u.get(e);
-	t && e.removeEventListener("click", t), u.delete(e);
-}
+}, d = /* @__PURE__ */ new WeakMap(), f = null;
 function p(e) {
-	f(e), d === e && (d = null, c.dispose(), c = s());
+	let t = d.get(e);
+	t && e.removeEventListener("click", t), d.delete(e);
 }
-function m(e, t) {
-	f(e);
+function m(e) {
+	p(e), f === e && l.dispose();
+}
+function h(e, t) {
+	p(e);
 	let n = () => {
 		try {
 			let { target: n, ...i } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, a = c;
-			a.element || (d = e), a.toggle(n, {
+			a.element || (f = e), a.toggle(n, {
 				teleport: !!t.modifiers.teleport,
 				pageOnly: !!t.modifiers.pageOnly,
 				...i,
 				callback: (e) => {
-					!e && c === a && (d = null), i.callback?.(e);
+					!e && c === a && (f = null), i.callback?.(e);
 				}
 			}).catch((e) => {
-				c === a && !a.element && (d = null), r(e);
+				c === a && !a.element && (f = null), r(e);
 			});
 		} catch (e) {
 			r(e);
@@ -277,15 +306,15 @@ function m(e, t) {
 		let n = document.createEvent("CustomEvent");
 		n.initCustomEvent("fullscreen-error", !0, !1, t), e.dispatchEvent(n);
 	};
-	u.set(e, n), e.addEventListener("click", n);
+	d.set(e, n), e.addEventListener("click", n);
 }
 //#endregion
 //#region packages/vue2/src/index.ts
-var h = /* @__PURE__ */ new WeakMap(), g = e.extend({
+var g = /* @__PURE__ */ new WeakMap(), _ = e.extend({
 	name: "Fullscreen",
 	inheritAttrs: !1,
 	props: {
-		...l,
+		...u,
 		value: {
 			type: Boolean,
 			default: !1
@@ -307,13 +336,13 @@ var h = /* @__PURE__ */ new WeakMap(), g = e.extend({
 	},
 	created() {
 		let e = s();
-		h.set(this, e), this.isSupported = e.isSupported;
+		g.set(this, e), this.isSupported = e.isSupported;
 	},
 	mounted() {
 		(this.value || this.fullscreen) && this.update(!0);
 	},
 	beforeDestroy() {
-		h.get(this)?.dispose(), h.delete(this);
+		g.get(this)?.dispose(), g.delete(this);
 	},
 	watch: {
 		value(e) {
@@ -325,7 +354,7 @@ var h = /* @__PURE__ */ new WeakMap(), g = e.extend({
 	},
 	methods: {
 		enter() {
-			return h.get(this).enter(this.$el, {
+			return g.get(this).enter(this.$el, {
 				pageOnly: this.pageOnly,
 				teleport: this.teleport,
 				fullscreenClass: this.fullscreenClass,
@@ -335,7 +364,7 @@ var h = /* @__PURE__ */ new WeakMap(), g = e.extend({
 			});
 		},
 		exit() {
-			return h.get(this).exit();
+			return g.get(this).exit();
 		},
 		toggle(e) {
 			return e ?? !this.isFullscreen ? this.enter() : this.exit();
@@ -362,15 +391,15 @@ var h = /* @__PURE__ */ new WeakMap(), g = e.extend({
 			}
 		}, this.$slots.default);
 	}
-}), _ = {
-	inserted: m,
-	update: m,
-	unbind: p
-}, v = g, y = _, b = { install(e, { name: t = "fullscreen" } = {}) {
+}), v = {
+	inserted: h,
+	update: h,
+	unbind: m
+}, y = _, b = v, x = { install(e, { name: t = "fullscreen" } = {}) {
 	Object.defineProperty(e.prototype, `$${t}`, {
 		configurable: !0,
-		get: () => c
-	}), e.component(t, g), e.directive(t, _);
+		get: () => l
+	}), e.component(t, _), e.directive(t, v);
 } };
 //#endregion
-export { g as Fullscreen, c as api, c as fullscreen, v as component, b as default, y as directive, a as screenfull, _ as vFullscreen };
+export { _ as Fullscreen, l as api, l as fullscreen, y as component, x as default, b as directive, a as screenfull, v as vFullscreen };

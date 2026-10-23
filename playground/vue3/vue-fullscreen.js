@@ -215,18 +215,47 @@ function _() {
 		},
 		dispose() {
 			r = !0;
-			let e = o, i = n;
-			if (c(), t = !1, h.isEnabled) {
-				let t = () => {
-					if (e && h.element === e) return h.exit();
-				};
-				i ? i.then(t, () => {}).catch(() => {}) : Promise.resolve(t()).catch(() => {});
+			let e = o, t = n;
+			c();
+			try {
+				s(!1);
+			} finally {
+				if (h.isEnabled) {
+					let n = () => {
+						if (e && h.element === e) return h.exit();
+					};
+					t ? t.then(n, () => {}).catch(() => {}) : Promise.resolve(n()).catch(() => {});
+				}
 			}
 		}
 	};
 	return d;
 }
 var v = _(), y = {
+	get options() {
+		return v.options;
+	},
+	get element() {
+		return v.element;
+	},
+	get isFullscreen() {
+		return v.isFullscreen;
+	},
+	get isSupported() {
+		return v.isSupported;
+	},
+	get isEnabled() {
+		return v.isSupported;
+	},
+	enter: (e, t) => v.enter(e, t),
+	request: (e, t) => v.enter(e, t),
+	toggle: (e, t, n) => v.toggle(e, t, n),
+	exit: () => v.exit(),
+	dispose() {
+		let e = v;
+		v = _(), S = null, e.dispose();
+	}
+}, b = {
 	fullscreen: {
 		type: Boolean,
 		default: !1
@@ -247,28 +276,28 @@ var v = _(), y = {
 		type: Boolean,
 		default: !1
 	}
-}, b = /* @__PURE__ */ new WeakMap(), x = null;
-function S(e) {
-	let t = b.get(e);
-	t && e.removeEventListener("click", t), b.delete(e);
-}
+}, x = /* @__PURE__ */ new WeakMap(), S = null;
 function C(e) {
-	S(e), x === e && (x = null, v.dispose(), v = _());
+	let t = x.get(e);
+	t && e.removeEventListener("click", t), x.delete(e);
 }
-function w(e, t) {
-	S(e);
+function w(e) {
+	C(e), S === e && y.dispose();
+}
+function T(e, t) {
+	C(e);
 	let n = () => {
 		try {
 			let { target: n, ...i } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, a = v;
-			a.element || (x = e), a.toggle(n, {
+			a.element || (S = e), a.toggle(n, {
 				teleport: !!t.modifiers.teleport,
 				pageOnly: !!t.modifiers.pageOnly,
 				...i,
 				callback: (e) => {
-					!e && v === a && (x = null), i.callback?.(e);
+					!e && v === a && (S = null), i.callback?.(e);
 				}
 			}).catch((e) => {
-				v === a && !a.element && (x = null), r(e);
+				v === a && !a.element && (S = null), r(e);
 			});
 		} catch (e) {
 			r(e);
@@ -277,13 +306,13 @@ function w(e, t) {
 		let n = document.createEvent("CustomEvent");
 		n.initCustomEvent("fullscreen-error", !0, !1, t), e.dispatchEvent(n);
 	};
-	b.set(e, n), e.addEventListener("click", n);
+	x.set(e, n), e.addEventListener("click", n);
 }
-var T = t({
+var E = t({
 	name: "Fullscreen",
 	inheritAttrs: !1,
 	props: {
-		...y,
+		...b,
 		modelValue: {
 			type: Boolean,
 			default: !1
@@ -329,16 +358,16 @@ var T = t({
 			onClick: this.shadeClick
 		}), this.$slots.default?.());
 	}
-}), E = {
-	mounted: w,
-	updated: w,
-	beforeUnmount: C
-}, D = T, O = E, k = (e) => typeof e == "function" ? e() : l(e);
-function A(t, r = {}) {
+}), D = {
+	mounted: T,
+	updated: T,
+	beforeUnmount: w
+}, O = E, k = D, A = (e) => typeof e == "function" ? e() : l(e);
+function j(t, r = {}) {
 	let i = _(), o = c(!1), l = () => i.enter(t, {
-		pageOnly: k(r.pageOnly ?? !1),
-		teleport: k(r.teleport ?? !1),
-		fullscreenClass: k(r.fullscreenClass ?? "fullscreen"),
+		pageOnly: A(r.pageOnly ?? !1),
+		teleport: A(r.teleport ?? !1),
+		fullscreenClass: A(r.fullscreenClass ?? "fullscreen"),
 		callback: (e) => {
 			o.value = e;
 		}
@@ -354,4 +383,4 @@ function A(t, r = {}) {
 	};
 }
 //#endregion
-export { T as Fullscreen, D as component, O as directive, h as screenfull, A as useFullscreen, E as vFullscreen };
+export { E as Fullscreen, O as component, k as directive, h as screenfull, j as useFullscreen, D as vFullscreen };
