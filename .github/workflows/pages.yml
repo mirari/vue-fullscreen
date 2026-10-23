@@ -12,6 +12,9 @@ jobs:
   build-and-publish:
     if: github.event_name == 'workflow_dispatch' || github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --init --ipc=host
     permissions:
       contents: write
     steps:
@@ -22,7 +25,6 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm run test:docs
       - name: Upload documentation test reports
         if: always()

@@ -33,6 +33,8 @@ On Linux CI or a machine missing browser system libraries, use `pnpm exec playwr
 
 CI runs checks on Node 22/24, browser and consumer tests on Node 24, and uploads both tarballs. Basic three-engine tests also run before publishing a release. Documentation and published-package consumer suites remain Chromium-only. CI runs basic browser cases with one worker for stability. WebKit automation does not constitute real Safari or iPhone acceptance; real-device testing on those platforms is deferred.
 
+Browser jobs in CI, release validation and documentation deployment use the official Playwright Docker image, with all three browsers and their system libraries preinstalled. They do not run `playwright install`. Keep the image tag in all three workflows aligned with the exact `@playwright/test` version (currently `mcr.microsoft.com/playwright:v1.64.0-noble`); update them together when upgrading Playwright. pnpm dependencies remain cached through `actions/setup-node`.
+
 Browser tests retain failure screenshots and traces. In CI, HTML reports and test output are uploaded even after failures and kept for 14 days, with separate directories for browser, documentation and consumer tests. See the [report instructions](./.github/ISSUE_FIXING.md#查看失败报告).
 
 ## Published-package consumer tests

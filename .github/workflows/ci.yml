@@ -24,16 +24,25 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check
-      - if: matrix.node == 24
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
-      - if: matrix.node == 24
-        run: pnpm run test:browser
-      - if: matrix.node == 24
-        run: pnpm run test:docs
-      - if: matrix.node == 24
-        run: pnpm run test:consumers
+  browser:
+    needs: check
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --init --ipc=host
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run test:browser
+      - run: pnpm run test:docs
+      - run: pnpm run test:consumers
       - name: Upload browser test reports
-        if: always() && matrix.node == 24
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-ci
@@ -43,7 +52,6 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
       - uses: actions/upload-artifact@v4
-        if: matrix.node == 24
         with:
           name: fullscreen-packages
           path: artifacts/*.tgz
