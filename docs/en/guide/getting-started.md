@@ -132,8 +132,6 @@ Enabling `teleport` moves the target element under `body`, expands it to fill th
 
 In page-only mode, moving the target can also avoid clipping, positioning and stacking contexts from ancestor elements.
 
-The example below uses native fullscreen. Click the image to open a [v-viewer](https://github.com/mirari/v-viewer) preview, whose modal is mounted under `body` by default:
-
 | Setting           | Native fullscreen element | Result after clicking the image                               |
 | ----------------- | ------------------------- | ------------------------------------------------------------- |
 | `teleport: false` | Image panel               | The popup is outside the fullscreen element and cannot appear |
