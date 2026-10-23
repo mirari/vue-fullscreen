@@ -44,7 +44,6 @@ async function expectInlineViewerSize(target: Locator, fullscreen: boolean) {
     .toBeLessThan(2)
   const box = await viewer.boundingBox()
   if (fullscreen) expect(box!.height).toBeGreaterThan(300)
-  else expect(box!.height).toBeLessThanOrEqual(280)
 }
 
 for (const teleport of [false, true]) {
@@ -798,6 +797,7 @@ for (const english of [false, true]) {
         const viewer = target.locator('.viewer-container')
         const image = viewer.locator('.viewer-canvas img')
         await expectInlineViewerSize(target, false)
+        expect((await image.boundingBox())!.height).toBeGreaterThan(300)
         await expect(viewer.locator('.viewer-list > li')).toHaveCount(6)
         await viewer.getByRole('button', { name: 'Next', exact: true }).click()
         await expect(image).toHaveAttribute(
@@ -842,6 +842,11 @@ for (const english of [false, true]) {
         await expect(page.locator('body > .viewer-container')).toHaveCount(0)
         await page.setViewportSize({ width: 390, height: 844 })
         await expectInlineViewerSize(target, false)
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true)
         return
       } else {
         await expect(demo.getByRole('checkbox')).toHaveCount(1)

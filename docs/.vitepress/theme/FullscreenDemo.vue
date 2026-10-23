@@ -157,6 +157,7 @@ onBeforeUnmount(() => {
 <template>
   <section
     class="fullscreen-demo vp-raw"
+    :class="{ 'fullscreen-demo-home': simple }"
     :data-demo="comparePageOnly ? 'page-only' : kind"
     :data-comparison="
       comparePageOnly ? 'pageOnly' : compareTeleport ? 'teleport' : undefined

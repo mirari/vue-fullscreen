@@ -107,6 +107,12 @@
   min-height: 0;
   overflow: hidden;
 }
+.fullscreen-demo-home .demo-surface:not(.demo-fullscreen) {
+  padding-bottom: 0;
+}
+.fullscreen-demo-home .demo-surface:not(.demo-fullscreen) .gallery-stage {
+  height: clamp(340px, 52vw, 560px);
+}
 .gallery-image {
   position: absolute;
   inset: 0;
