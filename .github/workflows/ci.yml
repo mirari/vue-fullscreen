@@ -38,6 +38,8 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Align home directory ownership for Firefox
+        run: chown "$(id -u):$(id -g)" "$HOME"
       - run: pnpm run test:browser
       - run: pnpm run test:docs
       - run: pnpm run test:consumers
