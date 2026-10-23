@@ -95,7 +95,7 @@ Vue.use(VueFullscreen)
 
 ### 浏览器全局
 
-通过 UNPKG 加载 Vue 2 的最新版本和本包的 `legacy` 渠道，先加载 Vue：
+先加载 Vue，再加载 vue-fullscreen：
 
 ```html
 <div id="app">
@@ -115,8 +115,6 @@ Vue.use(VueFullscreen)
   }).$mount('#app')
 </script>
 ```
-
-TypeScript 类型声明由 `exports` 根据 ESM 或 CommonJS 自动选择。
 
 ## 全屏选项
 

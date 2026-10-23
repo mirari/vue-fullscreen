@@ -6,7 +6,7 @@ Vue 2 versions from `2.4.0` onward are supported through `vue-fullscreen@legacy`
 
 ## Fullscreen API browser support
 
-Native fullscreen is provided by the browser. See [Can I use: Fullscreen API](https://caniuse.com/fullscreen) for version coverage and [MDN's requestFullscreen compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility) for device restrictions.
+See [Can I use: Fullscreen API](https://caniuse.com/fullscreen) for version coverage and [MDN's requestFullscreen compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility) for device restrictions.
 
 | Browser / device         | Native fullscreen support                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------ |
@@ -66,7 +66,7 @@ A global `core-js/stable` import in the application entry is one option. Load it
 
 Modern browsers with these capabilities do not need the optional entry. Your application, Vue 2 and other dependencies must still be compatible with IE 11. These polyfills cannot make Vue 3 work in IE.
 
-Automated checks parse the emitted code as ES5 and exercise missing capabilities, the ms-prefixed native API, page-only fallback, DOM restoration and directive errors in a simulated environment. This is not an actual IE browser run; verify your application on IE 11 before deployment. IE 10 and earlier are not supported. The VitePress documentation site and Vite demo pages require a modern browser.
+IE 10 and earlier are not supported. The documentation site and example pages require a modern browser.
 
 ## User activation and iframe permissions
 

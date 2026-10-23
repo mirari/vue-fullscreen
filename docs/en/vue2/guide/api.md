@@ -4,7 +4,7 @@ Control the same fullscreen target from multiple buttons, keyboard shortcuts or 
 
 ## Playground {#playground}
 
-[Playground](/en/vue2/playground?example=api)
+[Edit this example](/en/vue2/playground?example=api)
 
 <Vue2Demo kind="api" />
 

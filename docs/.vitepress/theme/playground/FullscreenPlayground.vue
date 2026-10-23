@@ -29,7 +29,6 @@ const text = computed(() =>
         ready: 'Ready',
         changed: 'Changes to run',
         error: 'Error',
-        empty: 'Logs and errors appear here.',
         shortcut: 'Ctrl / ⌘ + Enter to run',
       }
     : {
@@ -47,7 +46,6 @@ const text = computed(() =>
         ready: '已就绪',
         changed: '有待运行的修改',
         error: '出错',
-        empty: '日志和错误会显示在这里。',
         shortcut: 'Ctrl / ⌘ + Enter 运行',
       },
 )
@@ -341,7 +339,6 @@ onBeforeUnmount(() => {
           :aria-label="text.console"
           aria-live="polite"
         >
-          <p v-if="!logs.length" class="playground-empty">{{ text.empty }}</p>
           <pre
             v-for="(entry, index) in logs"
             :key="index"
@@ -351,8 +348,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="playground-footer">
-      <span>{{ text.shortcut }}</span
-      ><span>vue-fullscreen</span>
+      <span>{{ text.shortcut }}</span>
     </div>
   </section>
 </template>
@@ -506,11 +502,6 @@ onBeforeUnmount(() => {
 }
 .playground-console .console-warn {
   color: var(--vp-c-warning-1);
-}
-.playground-console .playground-empty {
-  margin: 12px 16px;
-  color: var(--vp-c-text-3);
-  font-size: 12px;
 }
 .playground-footer {
   display: flex;

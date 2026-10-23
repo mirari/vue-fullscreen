@@ -8,7 +8,7 @@ The directive provides a click trigger without requiring a model value.
 
 ## Playground {#playground}
 
-[Playground](/en/vue2/playground?example=directive)
+[Edit this example](/en/vue2/playground?example=directive)
 
 <Vue2Demo kind="directive" />
 

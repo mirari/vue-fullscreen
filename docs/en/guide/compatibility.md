@@ -12,7 +12,7 @@ This API reference covers `5.x`. For Vue 2, use `vue-fullscreen@legacy`; see [Vu
 
 ## Fullscreen API browser support
 
-Native fullscreen is provided by the browser. See [Can I use: Fullscreen API](https://caniuse.com/fullscreen) for version coverage and [MDN's requestFullscreen compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility) for device restrictions.
+See [Can I use: Fullscreen API](https://caniuse.com/fullscreen) for version coverage and [MDN's requestFullscreen compatibility table](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility) for device restrictions.
 
 | Browser / device         | Native fullscreen support                                                                              |
 | ------------------------ | ------------------------------------------------------------------------------------------------------ |

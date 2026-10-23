@@ -6,7 +6,7 @@
 
 ## Fullscreen API 浏览器支持
 
-原生全屏由浏览器提供。完整版本列表见 [Can I use：Fullscreen API](https://caniuse.com/fullscreen)，设备限制见 [MDN 的 requestFullscreen 兼容性表](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility)。以下为常见环境概览。
+完整版本列表见 [Can I use：Fullscreen API](https://caniuse.com/fullscreen)，设备限制见 [MDN 的 requestFullscreen 兼容性表](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility)。
 
 | 浏览器 / 设备            | 原生全屏支持                                                        |
 | ------------------------ | ------------------------------------------------------------------- |
@@ -66,7 +66,7 @@ CommonJS 项目可先执行 `require('vue-fullscreen/polyfills')`，再执行 `r
 
 具备这些能力的现代浏览器无需引入可选入口。应用代码、Vue 2 和其他依赖仍需兼容 IE 11；这些 polyfill 不能让 Vue 3 支持 IE。
 
-自动检查覆盖产物 ES5 语法，以及模拟缺失能力、ms 前缀全屏 API、网页降级、DOM 恢复和指令错误事件。这不是 IE 浏览器实机测试，部署前仍需在 IE 11 中验证实际应用。不支持 IE 10 及更早版本。VitePress 文档站和 Vite 示例页面本身需要现代浏览器。
+不支持 IE 10 及更早版本。文档站和示例页面需要现代浏览器。
 
 ## 用户操作与 iframe 权限
 

@@ -4,7 +4,7 @@ Wrap content in the component, then change the `v-model` value to enter or exit 
 
 ## Playground {#playground}
 
-[Playground](/en/vue2/playground?example=component)
+[Edit this example](/en/vue2/playground?example=component)
 
 <Vue2Demo kind="component" />
 

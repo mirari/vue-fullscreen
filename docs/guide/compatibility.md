@@ -12,7 +12,7 @@ npm install vue-fullscreen
 
 ## Fullscreen API 浏览器支持
 
-原生全屏由浏览器提供。完整版本列表见 [Can I use：Fullscreen API](https://caniuse.com/fullscreen)，设备限制见 [MDN 的 requestFullscreen 兼容性表](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility)。以下为常见环境概览。
+完整版本列表见 [Can I use：Fullscreen API](https://caniuse.com/fullscreen)，设备限制见 [MDN 的 requestFullscreen 兼容性表](https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen#browser_compatibility)。
 
 | 浏览器 / 设备            | 原生全屏支持                                                        |
 | ------------------------ | ------------------------------------------------------------------- |

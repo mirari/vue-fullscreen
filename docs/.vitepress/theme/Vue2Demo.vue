@@ -31,8 +31,8 @@ const source = computed(() =>
     <p>
       <span v-if="comparison !== 'teleport'">{{
         english
-          ? 'Page-only mode fills the embedded frame. Open the example separately to fill the browser viewport.'
-          : '网页全屏只覆盖下方嵌入区域。独立打开示例后，可以体验覆盖整个网页的效果。'
+          ? 'pageOnly fills only this preview. '
+          : 'pageOnly 仅覆盖此预览区域。'
       }}</span>
       <a :href="source" target="_blank" rel="noopener">{{
         english ? 'Open example separately' : '独立打开示例'

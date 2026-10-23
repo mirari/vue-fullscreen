@@ -1,6 +1,6 @@
 # Getting started with Vue 2
 
-This section describes the Vue 2 package. Built on [screenfull](https://github.com/sindresorhus/screenfull).
+Built on [screenfull](https://github.com/sindresorhus/screenfull).
 
 ::: warning Upgrading existing projects
 4.x is a new major release and retains the Vue plugin. Use `v-model` for component state; see the [migration example](/en/vue2/guide/component#migration).
@@ -97,7 +97,7 @@ Vue.use(VueFullscreen)
 
 ### Browser global
 
-Load the latest Vue 2 build and the package's `legacy` channel from UNPKG. Load Vue first:
+Load Vue first, then vue-fullscreen:
 
 ```html
 <div id="app">
@@ -117,8 +117,6 @@ Load the latest Vue 2 build and the package's `legacy` channel from UNPKG. Load 
   }).$mount('#app')
 </script>
 ```
-
-TypeScript declarations are selected automatically through `exports` for ESM and CommonJS.
 
 ## Fullscreen options
 

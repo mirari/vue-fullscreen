@@ -4,7 +4,7 @@ Use `useFullscreen()` for reactive state and methods to control the same fullscr
 
 ## Playground {#playground}
 
-[Playground](/en/playground?example=api)
+[Edit this example](/en/playground?example=api)
 
 <UsageDemo kind="api" />
 

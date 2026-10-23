@@ -291,7 +291,10 @@ for (const english of [false, true]) {
         const source = await code.locator('pre code').innerText()
         await page
           .locator('.vp-doc')
-          .getByRole('link', { name: playground, exact: true })
+          .getByRole('link', {
+            name: english ? 'Edit this example' : '编辑此示例',
+            exact: true,
+          })
           .click()
         await expect(page).toHaveURL(
           new RegExp(`/playground\\?example=${kind}$`),

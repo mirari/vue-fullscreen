@@ -8,7 +8,7 @@ The directive provides a click trigger without requiring a model value.
 
 ## Playground {#playground}
 
-[Playground](/en/playground?example=directive)
+[Edit this example](/en/playground?example=directive)
 
 <UsageDemo kind="directive" />
 

@@ -78,7 +78,7 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
 
 ### 浏览器全局
 
-通过 UNPKG 加载 Vue 3 的最新版本和本包的 `latest` 渠道，先加载 Vue：
+先加载 Vue，再加载 vue-fullscreen：
 
 ```html
 <div id="app">
@@ -98,8 +98,6 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
   }).mount('#app')
 </script>
 ```
-
-TypeScript 类型声明由 `exports` 根据 ESM 或 CommonJS 自动选择。
 
 ## 全屏选项
 

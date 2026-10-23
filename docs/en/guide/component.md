@@ -4,7 +4,7 @@ Wrap content in the component, then change the `v-model` value to enter or exit 
 
 ## Playground {#playground}
 
-[Playground](/en/playground?example=component)
+[Edit this example](/en/playground?example=component)
 
 <UsageDemo kind="component" />
 

@@ -80,7 +80,7 @@ const { Fullscreen, vFullscreen, useFullscreen } = require('vue-fullscreen')
 
 ### Browser global
 
-Load the latest Vue 3 build and the package's `latest` channel from UNPKG. Load Vue first:
+Load Vue first, then vue-fullscreen:
 
 ```html
 <div id="app">
@@ -100,8 +100,6 @@ Load the latest Vue 3 build and the package's `latest` channel from UNPKG. Load 
   }).mount('#app')
 </script>
 ```
-
-TypeScript declarations are selected automatically through `exports` for ESM and CommonJS.
 
 ## Fullscreen options
 
