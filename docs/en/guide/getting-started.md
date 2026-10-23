@@ -126,7 +126,11 @@ For browser support, automatic fallback and iframe permissions, see [compatibili
 
 `teleport` temporarily moves the fullscreen target under `document.body` and restores its original position on exit. Its default is `false`.
 
-Native fullscreen displays only the fullscreen element and its descendants. If dialogs or dropdowns from your content are mounted under `body`, enabling `teleport` makes `body` the native fullscreen element so those overlays can appear too. In page-only mode, moving the target can also avoid clipping, positioning and stacking contexts from ancestor elements.
+Native fullscreen displays only the fullscreen element and its descendants. With `teleport` disabled, dialogs, dropdowns and other overlays mounted under `body`, outside the target element, cannot appear even when they are open.
+
+Enabling `teleport` moves the target element under `body`, expands it to fill the viewport, and requests native fullscreen for `body`. Both the target content and these overlays are then included in fullscreen and can appear together.
+
+In page-only mode, moving the target can also avoid clipping, positioning and stacking contexts from ancestor elements.
 
 The example below uses native fullscreen. Click the image to open a [v-viewer](https://github.com/mirari/v-viewer) preview, whose modal is mounted under `body` by default:
 
