@@ -102,7 +102,7 @@ for (const provider of ['optional entry', 'app-owned core-js']) {
       assert.equal(api.isSupported, native)
       const target = w.document.querySelector('#target')
       await api.request(target, { teleport: true, fullscreenClass: 'full one' })
-      assert.equal(target.parentNode, w.document.body)
+      assert.equal(target.parentNode.parentNode, w.document.body)
       assert(target.classList.contains('one'))
       if (native) {
         assert.equal(w.document.msFullscreenElement, w.document.body)
@@ -146,9 +146,13 @@ for (const provider of ['optional entry', 'app-owned core-js']) {
       window.app = new Vue({ render: function(h) { return h('fullscreen', { ref: 'fs', props: { pageOnly: true, teleport: true } }, ['content']); } }).$mount('#app');
     `)
       await w.app.$refs.fs.request()
-      assert.equal(w.app.$el.parentNode, w.document.body)
+      assert.equal(w.app.$el.parentNode.parentNode, w.document.body)
       w.app.$destroy()
-      assert(!w.document.querySelector('body > .fullscreen'))
+      assert(
+        !w.document.querySelector(
+          'body > [data-fullscreen-teleport] > .fullscreen',
+        ),
+      )
       console.log(
         `IE 11 capability simulation passed (${provider}): ${native ? 'MS native API' : 'page fallback'}`,
       )

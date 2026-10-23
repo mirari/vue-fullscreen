@@ -11,7 +11,9 @@ for (const port of [4172, 4173]) {
         expect(await page.evaluate(() => document.fullscreenEnabled)).toBe(true)
       await page.locator('#enter').click()
       await expect(page.locator('#state')).toHaveText('true')
-      await expect(page.locator('body > #target')).toBeVisible()
+      await expect(
+        page.locator('body > [data-fullscreen-teleport] > #target'),
+      ).toBeVisible()
       if (!pageOnly)
         expect(
           await page.evaluate(
@@ -23,7 +25,9 @@ for (const port of [4172, 4173]) {
       await expect(page.locator('main > #target')).toBeVisible()
       expect(await page.evaluate(() => document.fullscreenElement)).toBeNull()
       await page.locator('#api').click()
-      await expect(page.locator('body > #api-target')).toBeVisible()
+      await expect(
+        page.locator('body > [data-fullscreen-teleport] > #api-target'),
+      ).toBeVisible()
       if (pageOnly) await page.keyboard.press('Escape')
       else await page.evaluate(() => document.exitFullscreen())
       await expect(page.locator('main > #api-target')).toBeVisible()

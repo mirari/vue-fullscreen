@@ -175,7 +175,7 @@ for (const [line, versions] of [
         }
         if (typeof instance.isSupported !== 'boolean') throw Error('Missing component support flag');
         await instance.enter();
-        if (!instance.isFullscreen || !document.querySelector('body > .fullscreen')) throw Error('Component enter failed');
+        if (!instance.isFullscreen || !document.querySelector('body > [data-fullscreen-teleport] > .fullscreen')) throw Error('Component enter failed');
         await instance.exit();
         if (instance.isFullscreen || document.querySelector('.fullscreen')) throw Error('Component exit failed');
         if (${JSON.stringify(line)} === 'vue2') {
@@ -211,7 +211,36 @@ for (const [line, versions] of [
           if (!controls.isFullscreen.value || !instance.$el.classList.contains('fullscreen')) throw Error('Component target resolution failed');
           await controls.exit();
         }
-        close(); dom.window.close();
+        close();
+        const legacy = ${JSON.stringify(line)} === 'vue2';
+        const state = legacy ? { visible: true, active: false } : vue.reactive({ visible: true, active: false });
+        const host = document.createElement('main'), mount = document.createElement('div');
+        host.appendChild(mount); document.body.appendChild(host);
+        const render = h => state.visible ? h(component, legacy ? {
+          attrs: { id: 'conditional-target' }, props: { value: state.active, pageOnly: true, teleport: true },
+          on: { input: value => { state.active = value } },
+        } : {
+          id: 'conditional-target', modelValue: state.active, pageOnly: true, teleport: true,
+          'onUpdate:modelValue': value => { state.active = value },
+        }) : h('p', 'replacement');
+        const conditional = legacy
+          ? new vue.default({ data: state, render(h) { return render(h) } }).$mount(mount)
+          : vue.createApp({ render() { return render(vue.h) } });
+        if (!legacy) conditional.mount(mount);
+        const parent = document.querySelector('#conditional-target').parentNode;
+        const tick = legacy ? vue.default.nextTick : vue.nextTick;
+        for (let cycle = 0; cycle < 2; cycle++) {
+          state.active = true; await tick();
+          state.visible = false; await tick();
+          if (state.active || parent.textContent !== 'replacement') throw Error('Conditional root replacement escaped its mount');
+          state.visible = true; await tick();
+          if (document.querySelector('#conditional-target').parentNode !== parent) throw Error('Conditional root remounted outside its parent');
+        }
+        if (legacy) { conditional.$destroy(); conditional.$el.remove() } else conditional.unmount();
+        await tick();
+        host.remove();
+        if (document.querySelector('[data-fullscreen-teleport]')) throw Error('Teleport container leaked');
+        dom.window.close();
         console.log('Installed component lifecycle OK');
       `,
         ],

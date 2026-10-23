@@ -139,7 +139,7 @@ describe('fullscreen lifecycle', () => {
       fullscreenClass: 'existing overlay',
       callback,
     })
-    expect(node.parentNode).toBe(document.body)
+    expect(node.parentNode!.parentNode).toBe(document.body)
     expect(node.style.position).toBe('fixed')
     await api.exit()
     expect(node.parentNode).toBe(parent)
@@ -150,6 +150,7 @@ describe('fullscreen lifecycle', () => {
     expect(node.className).toBe('existing')
     expect(callback.mock.calls).toEqual([[true], [false]])
     expect(api.element).toBeNull()
+    expect(document.querySelector('[data-fullscreen-teleport]')).toBeNull()
   })
   it('removes Escape listeners on manual exit and dispose', async () => {
     const remove = vi.spyOn(document, 'removeEventListener'),
@@ -185,6 +186,7 @@ describe('fullscreen lifecycle', () => {
     expect(node.className).toBe('existing')
     expect(native.listeners.size).toBe(0)
     expect(api.element).toBeNull()
+    expect(document.querySelector('[data-fullscreen-teleport]')).toBeNull()
     native.fail = false
     await api.request(node)
     expect(api.isFullscreen).toBe(true)
@@ -229,6 +231,7 @@ describe('fullscreen lifecycle', () => {
     expect(native.element).toBeNull()
     expect(node.parentNode).toBe(parent)
     expect(native.listeners.size).toBe(0)
+    expect(document.querySelector('[data-fullscreen-teleport]')).toBeNull()
   })
 })
 describe.each(['API', 'directive'] as const)(
@@ -346,7 +349,7 @@ describe('directive lifecycle', () => {
     bindDirective(first, binding)
     bindDirective(second, binding)
     first.click()
-    expect(node.parentNode).toBe(document.body)
+    expect(node.parentNode!.parentNode).toBe(document.body)
     // A second directive can act as the exit control for the same session.
     second.click()
     expect(api.isFullscreen).toBe(false)

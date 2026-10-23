@@ -71,7 +71,7 @@ it('resolves template refs and reactive options when entering and reacts to Esca
   expect(controls.isFullscreen.value).toBe(false)
   teleport.value = true
   await controls.toggle()
-  expect(target.value.parentNode).toBe(document.body)
+  expect(target.value.parentNode!.parentNode).toBe(document.body)
   await controls.toggle()
   expect(controls.isFullscreen.value).toBe(false)
   expect(target.value.parentNode).toBe(parent)
@@ -174,10 +174,15 @@ it('restores teleported nodes before unmount and disposes its controller', async
   })
   app.mount(host)
   await controls.enter()
-  expect(document.querySelector('body > #composable-target')).not.toBeNull()
+  expect(
+    document.querySelector(
+      'body > [data-fullscreen-teleport] > #composable-target',
+    ),
+  ).not.toBeNull()
   app.unmount()
   await nextTick()
   expect(controls.isFullscreen.value).toBe(false)
   expect(document.querySelector('#composable-target')).toBeNull()
+  expect(document.querySelector('[data-fullscreen-teleport]')).toBeNull()
   await expect(controls.enter()).rejects.toThrow('disposed')
 })

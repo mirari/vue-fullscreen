@@ -163,13 +163,20 @@ for (const english of [false, true]) {
           await expectSurfaceTheme(target)
           await expectExitAction(target)
           expect(
-            await target.evaluate((el) => el.parentElement === document.body),
+            await target.evaluate(
+              (el) =>
+                el.parentElement?.hasAttribute('data-fullscreen-teleport') ===
+                true,
+            ),
           ).toBe(teleport)
           expect(
             await target.evaluate(
               (el) =>
                 document.fullscreenElement ===
-                (el.parentElement === document.body ? document.body : el),
+                (el.parentElement?.hasAttribute('data-fullscreen-teleport') ===
+                true
+                  ? document.body
+                  : el),
             ),
           ).toBe(!pageOnly)
           const details = target.getByRole('button', {
@@ -572,7 +579,11 @@ for (const english of [false, true]) {
             })
             .toBeGreaterThan(preview!.height * 1.5)
           expect(
-            await target.evaluate((el) => el.parentElement === document.body),
+            await target.evaluate(
+              (el) =>
+                el.parentElement?.hasAttribute('data-fullscreen-teleport') ===
+                true,
+            ),
           ).toBe(teleport)
           if (native)
             expect(
@@ -620,7 +631,9 @@ for (const english of [false, true]) {
             name: kind === 'directive' ? text.directive : text.enter,
           })
           .click()
-        await expect(page.locator(`body > #demo-${kind}`)).toBeVisible()
+        await expect(
+          page.locator(`body > [data-fullscreen-teleport] > #demo-${kind}`),
+        ).toBeVisible()
         await page.locator(`#demo-${kind} .image-trigger`).first().click()
         await expectBodyViewer(page.locator('body > .viewer-container'), true)
         await page
@@ -628,7 +641,9 @@ for (const english of [false, true]) {
           .getByRole('link', { name: text.guide, exact: true })
           .evaluate((el: HTMLElement) => el.click())
         await expect(page).toHaveURL(/getting-started$/)
-        await expect(page.locator(`body > #demo-${kind}`)).toHaveCount(0)
+        await expect(
+          page.locator(`body > [data-fullscreen-teleport] > #demo-${kind}`),
+        ).toHaveCount(0)
         await expect(page.locator('body > .viewer-container')).toHaveCount(0)
         await expect(page.locator('body')).not.toHaveClass(/viewer-open/)
         await expect
@@ -778,13 +793,20 @@ for (const vue2 of [false, true]) {
           .click()
         await expect(target).toHaveClass(/demo-fullscreen/)
         expect(
-          await target.evaluate((el) => el.parentElement === document.body),
+          await target.evaluate(
+            (el) =>
+              el.parentElement?.hasAttribute('data-fullscreen-teleport') ===
+              true,
+          ),
         ).toBe(teleport)
         expect(
           await target.evaluate(
             (el) =>
               document.fullscreenElement ===
-              (el.parentElement === document.body ? document.body : el),
+              (el.parentElement?.hasAttribute('data-fullscreen-teleport') ===
+              true
+                ? document.body
+                : el),
           ),
         ).toBe(true)
         await image.click({ position: { x: 8, y: 8 } })

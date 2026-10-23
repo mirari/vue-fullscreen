@@ -76,7 +76,7 @@ export function createFullscreen(): FullscreenController {
   let isFullscreen = false
   let pending: Promise<void> | null = null
   let disposed = false
-  let restore: (() => void) | undefined
+  let restore: ((disposing: boolean) => void) | undefined
   let options: VueFullscreenApi['options'] = {
     fullscreenClass: 'fullscreen',
     teleport: false,
@@ -88,11 +88,11 @@ export function createFullscreen(): FullscreenController {
     isFullscreen = value
     options.callback?.(value)
   }
-  const cleanup = () => {
+  const cleanup = (disposing = false) => {
     if (typeof document !== 'undefined')
       document.removeEventListener('keyup', onKey)
     if (screenfull.isEnabled) screenfull.off('change', onChange)
-    restore?.()
+    restore?.(disposing)
     restore = undefined
     element = null
     nativeTarget = null
@@ -166,7 +166,8 @@ export function createFullscreen(): FullscreenController {
           ] as const,
       )
       let marker: Comment | undefined
-      restore = () => {
+      let teleportContainer: HTMLElement | undefined
+      restore = (disposing) => {
         added.forEach((name) => node.classList.remove(name))
         if (options.pageOnly || options.teleport) {
           for (const [key, value, priority] of styles) {
@@ -175,9 +176,29 @@ export function createFullscreen(): FullscreenController {
           }
         }
         if (marker?.parentNode) {
+          const parent = marker.parentNode
           if (node.parentNode) marker.parentNode.replaceChild(node, marker)
           else marker.parentNode.removeChild(marker)
+          if (disposing && teleportContainer) {
+            const container = teleportContainer
+            // Vue may already have cached this parent for a root replacement.
+            // Return it to the original position until the render pass finishes.
+            parent.insertBefore(
+              container,
+              node.parentNode === parent ? node : null,
+            )
+            void Promise.resolve().then(() => {
+              const parent = container.parentNode
+              if (!parent) return
+              while (container.firstChild)
+                parent.insertBefore(container.firstChild, container)
+              parent.removeChild(container)
+            })
+            return
+          }
         }
+        if (teleportContainer?.parentNode)
+          teleportContainer.parentNode.removeChild(teleportContainer)
       }
       element = node
       added.forEach((name) => node.classList.add(name))
@@ -193,7 +214,11 @@ export function createFullscreen(): FullscreenController {
       if (options.teleport && node.parentNode) {
         marker = document.createComment('fullscreen')
         node.parentNode.insertBefore(marker, node)
-        document.body.appendChild(node)
+        teleportContainer = document.createElement('div')
+        teleportContainer.setAttribute('data-fullscreen-teleport', '')
+        teleportContainer.style.display = 'contents'
+        document.body.appendChild(teleportContainer)
+        teleportContainer.appendChild(node)
       }
       if (options.pageOnly) {
         document.addEventListener('keyup', onKey)
@@ -246,7 +271,7 @@ export function createFullscreen(): FullscreenController {
       const owned = nativeTarget
       const request = pending
       // Restore DOM synchronously before Vue removes its nodes.
-      cleanup()
+      cleanup(true)
       try {
         notify(false)
       } finally {
