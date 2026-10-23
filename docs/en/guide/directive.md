@@ -18,7 +18,7 @@ directive vue3 en
 
 With a regular `setup()` function or the Options API, register the directive locally in the component’s `directives` option as `fullscreen: vFullscreen`.
 
-## Binding values and modifiers {#reference}
+## Binding values {#reference}
 
 ```vue
 <!-- No binding: target document.body -->
@@ -37,11 +37,11 @@ With a regular `setup()` function or the Options API, register the directive loc
 </button>
 ```
 
-### Modifiers
+The binding object also accepts `fullscreenClass` and `callback(isFullscreen)`. Bind the same directive inside the target to provide an exit button. Unmounting the directive that started the session cleans it up automatically.
+
+## Modifiers {#modifiers}
 
 [`.pageOnly`](/en/guide/getting-started#pageonly) and [`.teleport`](/en/guide/getting-started#teleport) set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
-
-The binding object also accepts `fullscreenClass` and `callback(isFullscreen)`. Bind the same directive inside the target to provide an exit button. Unmounting the directive that started the session cleans it up automatically.
 
 ## Targets {#target}
 
@@ -53,12 +53,14 @@ Set `target` in the binding object to select the fullscreen element:
 | Vue ref object     | `{ target: panelRef }`                               |
 | Component instance | `{ target: panelComponent }`; uses its `$el`         |
 | id string          | `{ target: 'panel' }` or `{ target: '#panel' }`      |
-| CSS selector       | `{ target: '#panel' }` or `{ target: '.panel' }`     |
+| CSS selector       | `{ target: '.panel' }`                               |
 | Getter             | `{ target: () => document.getElementById('panel') }` |
 
-The current target is resolved on each entry. Omitting `target` or passing `null` directly uses `document.body`. Missing selectors, unmounted refs and other unresolved targets dispatch `fullscreen-error`.
+Strings are resolved by id first (with an optional `#` prefix), then as CSS selectors. An id takes priority when both match. The current target is resolved on each entry.
 
-Target resolution is shared with the API: strings are resolved by id first (with an optional `#` prefix), then as CSS selectors. An id takes priority when both match. The shorthands `v-fullscreen="'panel'"`, `v-fullscreen="'#panel'"` and `v-fullscreen="'.panel'"` follow the same rule.
+Omitting the target or passing `null` directly uses `document.body`. Missing selectors, unmounted refs and other unresolved targets dispatch `fullscreen-error`.
+
+The shorthands `v-fullscreen="'panel'"`, `v-fullscreen="'#panel'"` and `v-fullscreen="'.panel'"` follow the same resolution rule.
 
 ## Options {#options}
 

@@ -14,16 +14,22 @@ api vue2 en
 
 In native mode, await `fullscreen.exit()` in a route leave guard before removing the target.
 
-## Target types
+## Targets {#target}
 
-Targets accept an HTML element, Vue template ref, component instance (using its `$el`), id string (`'panel'` or `'#panel'`) or getter. The target is resolved on each entry. Missing ids and unmounted refs reject the Promise. Omitting the target or passing `null` directly uses `document.body`.
+Pass the fullscreen target as the first argument to `fullscreen.enter()`:
 
-```js
-await fullscreen.enter('panel') // id
-await fullscreen.enter('#panel') // id with #
-await fullscreen.enter('.panel') // CSS selector
-await fullscreen.enter(this.$refs.target) // DOM element or Vue component
-```
+| Target type        | Example                                                     |
+| ------------------ | ----------------------------------------------------------- |
+| HTML element       | `fullscreen.enter(document.getElementById('panel'))`        |
+| Vue ref object     | `fullscreen.enter(panelRef)`                                |
+| Component instance | `fullscreen.enter(this.$refs.panel)`; uses its `$el`        |
+| id string          | `fullscreen.enter('panel')` or `fullscreen.enter('#panel')` |
+| CSS selector       | `fullscreen.enter('.panel')`                                |
+| Getter             | `fullscreen.enter(() => this.$refs.panel)`                  |
+
+Strings are resolved by id first (with an optional `#` prefix), then as CSS selectors. An id takes priority when both match. The current target is resolved on each entry.
+
+Omitting the target or passing `null` directly uses `document.body`. Missing selectors, unmounted refs and other unresolved targets reject the Promise.
 
 ## Toggle or force a state
 

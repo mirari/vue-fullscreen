@@ -14,15 +14,20 @@ api vue3 en
 
 ## Targets {#target}
 
-Targets accept an HTML element, Vue template ref, component instance (using its `$el`), id string (`'panel'` or `'#panel'`) or getter. The target is resolved on each entry. Missing ids and unmounted refs reject the Promise. Omitting the target or passing `null` directly uses `document.body`.
+Pass the fullscreen target as the first argument to `useFullscreen()`:
 
-```js
-useFullscreen(document.getElementById('panel')) // HTML element
-useFullscreen(target) // Vue template ref
-useFullscreen('panel') // id
-useFullscreen('#panel') // id with #
-useFullscreen('.panel') // CSS selector
-```
+| Target type        | Example                                                 |
+| ------------------ | ------------------------------------------------------- |
+| HTML element       | `useFullscreen(document.getElementById('panel'))`       |
+| Vue ref object     | `useFullscreen(panelRef)`                               |
+| Component instance | `useFullscreen(panelComponent)`; uses its `$el`         |
+| id string          | `useFullscreen('panel')` or `useFullscreen('#panel')`   |
+| CSS selector       | `useFullscreen('.panel')`                               |
+| Getter             | `useFullscreen(() => document.getElementById('panel'))` |
+
+Strings are resolved by id first (with an optional `#` prefix), then as CSS selectors. An id takes priority when both match. The current target is resolved on each entry.
+
+Omitting the target or passing `null` directly uses `document.body`. Missing selectors, unmounted refs and other unresolved targets reject the Promise.
 
 Each call maintains its own fullscreen state. To control the same target from multiple places, share the state and methods returned by a single `useFullscreen()` call. Component unmount restores moved nodes and removes listeners, exiting fullscreen. Native requests must run directly from a click or key handler, before awaiting network requests.
 

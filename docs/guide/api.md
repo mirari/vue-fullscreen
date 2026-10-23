@@ -14,15 +14,20 @@ api vue3 zh
 
 ## 目标 {#target}
 
-目标支持 HTML 元素、Vue 模板 ref、组件实例（使用 `$el`）、id 字符串、CSS 选择器以及 getter。字符串先按 id 查找（允许带 `#`），未找到时再按 CSS 选择器解析；两者都能匹配时，id 优先。每次进入时解析当前目标，无法解析或 ref 尚未挂载会拒绝 Promise。省略目标或直接传入 `null` 时控制 `document.body`。
+通过 `useFullscreen()` 的第一个参数指定全屏目标，支持以下类型：
 
-```js
-useFullscreen(document.getElementById('panel')) // HTML 元素
-useFullscreen(target) // Vue 模板 ref
-useFullscreen('panel') // id
-useFullscreen('#panel') // 带 # 的 id
-useFullscreen('.panel') // CSS 选择器
-```
+| 目标类型     | 示例                                                    |
+| ------------ | ------------------------------------------------------- |
+| HTML 元素    | `useFullscreen(document.getElementById('panel'))`       |
+| Vue ref 对象 | `useFullscreen(panelRef)`                               |
+| 组件实例     | `useFullscreen(panelComponent)`，使用其 `$el`           |
+| id 字符串    | `useFullscreen('panel')` 或 `useFullscreen('#panel')`   |
+| CSS 选择器   | `useFullscreen('.panel')`                               |
+| getter       | `useFullscreen(() => document.getElementById('panel'))` |
+
+字符串先按 id 查找（允许带 `#`），未找到时再按 CSS 选择器解析；两者都能匹配时，id 优先。每次进入全屏时解析当前目标。
+
+省略目标或直接传入 `null` 时使用 `document.body`；选择器未匹配、ref 尚未挂载等无法解析目标的情况会拒绝 Promise。
 
 各次调用的全屏状态相互独立。需要从多个位置控制同一目标时，共享同一次 `useFullscreen()` 调用返回的状态和方法。组件卸载时自动退出，恢复被移动的元素并移除监听器。原生全屏请求应直接由点击或按键触发，不要先等待网络请求。
 

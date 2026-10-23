@@ -18,7 +18,7 @@ directive vue3 zh
 
 普通 `setup()` 或 Options API 中，在组件的 `directives` 选项里用 `fullscreen: vFullscreen` 局部注册。
 
-## 绑定值与修饰符 {#reference}
+## 绑定值 {#reference}
 
 ```vue
 <!-- 不传参数：控制 document.body -->
@@ -37,11 +37,11 @@ directive vue3 zh
 </button>
 ```
 
-### 修饰符
+对象还支持 `fullscreenClass` 与 `callback(isFullscreen)`。在全屏目标内部也绑定同一指令，即可作为退出按钮；开启会话的指令卸载时自动清理。
+
+## 修饰符 {#modifiers}
 
 [`.pageOnly`](/guide/getting-started#pageonly) 和 [`.teleport`](/guide/getting-started#teleport) 对应同名配置。对象中的显式选项优先于修饰符。例如 `.pageOnly="{ pageOnly: false }"` 最终使用原生模式。
-
-对象还支持 `fullscreenClass` 与 `callback(isFullscreen)`。在全屏目标内部也绑定同一指令，即可作为退出按钮；开启会话的指令卸载时自动清理。
 
 ## 目标 {#target}
 
@@ -53,12 +53,14 @@ directive vue3 zh
 | Vue ref 对象 | `{ target: panelRef }`                               |
 | 组件实例     | `{ target: panelComponent }`，使用其 `$el`           |
 | id 字符串    | `{ target: 'panel' }` 或 `{ target: '#panel' }`      |
-| CSS 选择器   | `{ target: '#panel' }` 或 `{ target: '.panel' }`     |
+| CSS 选择器   | `{ target: '.panel' }`                               |
 | getter       | `{ target: () => document.getElementById('panel') }` |
 
-每次进入全屏时解析当前目标。省略 `target` 或直接传入 `null` 时使用 `document.body`；选择器未匹配、ref 尚未挂载等无法解析目标的情况会触发 `fullscreen-error`。
+字符串先按 id 查找（允许带 `#`），未找到时再按 CSS 选择器解析；两者都能匹配时，id 优先。每次进入全屏时解析当前目标。
 
-目标解析与 API 共用同一规则：字符串先按 id 查找（允许带 `#`），未找到时再按 CSS 选择器解析；两者都能匹配时，id 优先。简写 `v-fullscreen="'panel'"`、`v-fullscreen="'#panel'"` 和 `v-fullscreen="'.panel'"` 也遵循此规则。
+省略目标或直接传入 `null` 时使用 `document.body`；选择器未匹配、ref 尚未挂载等无法解析目标的情况会触发 `fullscreen-error`。
+
+简写 `v-fullscreen="'panel'"`、`v-fullscreen="'#panel'"` 和 `v-fullscreen="'.panel'"` 也遵循相同的解析规则。
 
 ## 配置项 {#options}
 

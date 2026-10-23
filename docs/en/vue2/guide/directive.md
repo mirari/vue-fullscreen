@@ -16,7 +16,7 @@ The directive provides a click trigger without requiring a model value.
 directive vue2 en
 ```
 
-## Binding values and modifiers {#reference}
+## Binding values {#reference}
 
 ```vue
 <!-- No binding: target document.body -->
@@ -35,28 +35,30 @@ directive vue2 en
 </button>
 ```
 
-### Modifiers
+The binding object also accepts `fullscreenClass` and `callback(isFullscreen)`. The directive uses the shared API, so `fullscreen.exit()` can exit a session started by a directive.
+
+## Modifiers {#modifiers}
 
 [`.pageOnly`](/en/vue2/#pageonly) and [`.teleport`](/en/vue2/#teleport) set the corresponding options. Explicit object values take precedence over modifiers. For example, `.pageOnly="{ pageOnly: false }"` requests native mode.
-
-The binding object also accepts `fullscreenClass` and `callback(isFullscreen)`. The directive uses the shared API, so `fullscreen.exit()` can exit a session started by a directive.
 
 ## Targets {#target}
 
 Set `target` in the binding object to select the fullscreen element:
 
-| Target type        | Example                                          |
-| ------------------ | ------------------------------------------------ |
-| HTML element       | `{ target: document.getElementById('panel') }`   |
-| Vue ref object     | `{ target: panelRef }`                           |
-| Component instance | `{ target: this.$refs.panel }`; uses its `$el`   |
-| id string          | `{ target: 'panel' }` or `{ target: '#panel' }`  |
-| CSS selector       | `{ target: '#panel' }` or `{ target: '.panel' }` |
-| Getter             | `{ target: () => this.$refs.panel }`             |
+| Target type        | Example                                         |
+| ------------------ | ----------------------------------------------- |
+| HTML element       | `{ target: document.getElementById('panel') }`  |
+| Vue ref object     | `{ target: panelRef }`                          |
+| Component instance | `{ target: this.$refs.panel }`; uses its `$el`  |
+| id string          | `{ target: 'panel' }` or `{ target: '#panel' }` |
+| CSS selector       | `{ target: '.panel' }`                          |
+| Getter             | `{ target: () => this.$refs.panel }`            |
 
-The current target is resolved on each entry. Omitting `target` or passing `null` directly uses `document.body`. Missing selectors, unmounted refs and other unresolved targets dispatch `fullscreen-error`.
+Strings are resolved by id first (with an optional `#` prefix), then as CSS selectors. An id takes priority when both match. The current target is resolved on each entry.
 
-Target resolution is shared with the API: strings are resolved by id first (with an optional `#` prefix), then as CSS selectors. An id takes priority when both match. The shorthands `v-fullscreen="'panel'"`, `v-fullscreen="'#panel'"` and `v-fullscreen="'.panel'"` follow the same rule.
+Omitting the target or passing `null` directly uses `document.body`. Missing selectors, unmounted refs and other unresolved targets dispatch `fullscreen-error`.
+
+The shorthands `v-fullscreen="'panel'"`, `v-fullscreen="'#panel'"` and `v-fullscreen="'.panel'"` follow the same resolution rule.
 
 ## Options {#options}
 

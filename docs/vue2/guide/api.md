@@ -14,16 +14,22 @@ api vue2 zh
 
 原生模式下，应在路由离开守卫中等待 `fullscreen.exit()`，再移除目标。
 
-## 目标类型
+## 目标 {#target}
 
-目标支持 HTML 元素、Vue 模板 ref、组件实例（使用 `$el`）、id 字符串、CSS 选择器以及 getter。字符串先按 id 查找（允许带 `#`），未找到时再按 CSS 选择器解析；两者都能匹配时，id 优先。每次进入时解析当前目标，无法解析或 ref 尚未挂载会拒绝 Promise。省略目标或直接传入 `null` 时控制 `document.body`。
+通过 `fullscreen.enter()` 的第一个参数指定全屏目标，支持以下类型：
 
-```js
-await fullscreen.enter('panel') // id
-await fullscreen.enter('#panel') // 带 # 的 id
-await fullscreen.enter('.panel') // CSS 选择器
-await fullscreen.enter(this.$refs.target) // DOM 元素或 Vue 组件
-```
+| 目标类型     | 示例                                                        |
+| ------------ | ----------------------------------------------------------- |
+| HTML 元素    | `fullscreen.enter(document.getElementById('panel'))`        |
+| Vue ref 对象 | `fullscreen.enter(panelRef)`                                |
+| 组件实例     | `fullscreen.enter(this.$refs.panel)`，使用其 `$el`          |
+| id 字符串    | `fullscreen.enter('panel')` 或 `fullscreen.enter('#panel')` |
+| CSS 选择器   | `fullscreen.enter('.panel')`                                |
+| getter       | `fullscreen.enter(() => this.$refs.panel)`                  |
+
+字符串先按 id 查找（允许带 `#`），未找到时再按 CSS 选择器解析；两者都能匹配时，id 优先。每次进入全屏时解析当前目标。
+
+省略目标或直接传入 `null` 时使用 `document.body`；选择器未匹配、ref 尚未挂载等无法解析目标的情况会拒绝 Promise。
 
 ## 切换与强制状态
 
