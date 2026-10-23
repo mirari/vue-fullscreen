@@ -49,20 +49,20 @@ All browser assertions run in Chromium. Local script URLs keep the tests indepen
 
 ## Consumer dependency security
 
-`tests/consumers/fixture` is a private test application with its own npm lockfile. Its Nuxt, Vite and Vue installations exercise packed releases; they are not dependencies of the published `vue-fullscreen` tarballs. Direct dependency updates must update both the manifest and lockfile; compatible transitive updates can change only the lockfile. Run `pnpm run test:consumers` from the repository root after either change.
+`tests/consumers/fixture` is a private test application with its own npm lockfile and registry setting. Its `.npmrc` uses the official registry so newly patched dependencies do not depend on mirror synchronization. Its Nuxt, Vite and Vue installations exercise packed releases; they are not dependencies of the published `vue-fullscreen` tarballs. Direct dependency updates must update both the manifest and lockfile; compatible transitive updates can change only the lockfile. Run `pnpm run test:consumers` from the repository root after either change.
 
-Run its audit against the official registry, since some registry mirrors do not implement the audit endpoint:
+Run audits against the official registry, since some registry mirrors do not implement the audit endpoint:
 
 ```sh
+pnpm audit --registry=https://registry.npmjs.org
 cd tests/consumers/fixture
 npm audit --registry=https://registry.npmjs.org
 ```
 
-The following upstream findings remain in the fixture as of 2026-10-22. They are recorded for review, rather than treated as fixed or automatically dismissed:
+The remaining upstream advisories are listed below. They are recorded for review, rather than treated as fixed or automatically dismissed. npm may also report parent packages affected by `node-forge`; those entries refer to the same underlying advisory.
 
 | Package      | Advisory                                                                                      | Exposure in this fixture                                                                                                                   |
 | ------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `braces`     | [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm); no patched release  | Nitro's `globby` / `fast-glob` build dependency. Keep glob patterns under repository control.                                              |
 | `node-forge` | [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv); no patched release  | Nitro's `listhen` dependency for TLS certificate handling. The consumer servers use local HTTP and do not verify untrusted RSA signatures. |
 | Vue 2        | [GHSA-5j4c-8p2g-v4jx](https://github.com/advisories/GHSA-5j4c-8p2g-v4jx); no public Vue 2 fix | The `vue2` alias deliberately tests 2.7.16. Its template compiler processes repository-authored HTML; do not compile untrusted templates.  |
 
@@ -155,6 +155,6 @@ The image-preview libraries are development dependencies for the examples. Keep 
 - `pnpm run docs:preview`: serve the production build.
 - `pnpm run test:docs`: build and test the production site with Chromium, including custom-domain root-path navigation and fullscreen examples.
 
-VitePress is pinned to its stable 1.6.4 release and uses its own compatible Vite dependency; the library still builds with Vite 8. The root Vue 3 dependency supplies the docs runtime, while the Vue 2 workspace keeps its own runtime. Demo imports resolve to the local Vue 3 adapter.
+VitePress is pinned to stable 1.6.4. A scoped `vitepress>vite` override uses Vite 6.4.4 to include the [Windows dev-server security fixes](https://github.com/advisories/GHSA-587h-7wmj-h5pm) missing from its Vite 5 dependency. Keep this override until VitePress supports a patched version directly, and verify documentation development, builds and browser tests when changing it. The library still builds with Vite 8. The root Vue 3 dependency supplies the docs runtime, while the Vue 2 workspace keeps its own runtime. Demo imports resolve to the local Vue 3 adapter.
 
 The default base is `/`, matching `vue-fullscreen.mirari.cc`. For a separate project-subpath deployment use `DOCS_BASE=/vue-fullscreen/ pnpm run docs:build`. Keep the base consistent when serving previews. Browser tests exercise the production root path.
