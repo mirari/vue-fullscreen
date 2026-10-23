@@ -130,8 +130,8 @@ function s() {
 		pageOnly: !1
 	}, c = null, l = (e) => {
 		t !== e && (t = e, s.callback?.(e));
-	}, u = () => {
-		typeof document < "u" && document.removeEventListener("keyup", f), a.isEnabled && a.off("change", d), i?.(), i = void 0, e = null, c = null;
+	}, u = (t = !1) => {
+		typeof document < "u" && document.removeEventListener("keyup", f), a.isEnabled && a.off("change", d), i?.(t), i = void 0, e = null, c = null;
 	}, d = () => {
 		a.element === c && a.isFullscreen ? l(!0) : (u(), l(!1));
 	}, f = (e) => {
@@ -185,17 +185,31 @@ function s() {
 				e,
 				h.style.getPropertyValue(e),
 				h.style.getPropertyPriority(e)
-			]), v;
-			if (i = () => {
+			]), v, y;
+			if (i = (e) => {
 				if (g.forEach((e) => h.classList.remove(e)), s.pageOnly || s.teleport) for (let [e, t, n] of _) t ? h.style.setProperty(e, t, n) : h.style.removeProperty(e);
-				v?.parentNode && (h.parentNode ? v.parentNode.replaceChild(h, v) : v.parentNode.removeChild(v));
+				if (v?.parentNode) {
+					let t = v.parentNode;
+					if (h.parentNode ? v.parentNode.replaceChild(h, v) : v.parentNode.removeChild(v), e && y) {
+						let e = y;
+						t.insertBefore(e, h.parentNode === t ? h : null), Promise.resolve().then(() => {
+							let t = e.parentNode;
+							if (t) {
+								for (; e.firstChild;) t.insertBefore(e.firstChild, e);
+								t.removeChild(e);
+							}
+						});
+						return;
+					}
+				}
+				y?.parentNode && y.parentNode.removeChild(y);
 			}, e = h, g.forEach((e) => h.classList.add(e)), (s.pageOnly || s.teleport) && Object.assign(h.style, {
 				position: "fixed",
 				left: "0",
 				top: "0",
 				width: "100%",
 				height: "100%"
-			}), s.teleport && h.parentNode && (v = document.createComment("fullscreen"), h.parentNode.insertBefore(v, h), document.body.appendChild(h)), s.pageOnly) return document.addEventListener("keyup", f), l(!0), Promise.resolve();
+			}), s.teleport && h.parentNode && (v = document.createComment("fullscreen"), h.parentNode.insertBefore(v, h), y = document.createElement("div"), y.setAttribute("data-fullscreen-teleport", ""), y.style.display = "contents", document.body.appendChild(y), y.appendChild(h)), s.pageOnly) return document.addEventListener("keyup", f), l(!0), Promise.resolve();
 			c = s.teleport ? document.body : h, a.on("change", d);
 			try {
 				return n = a.request(c).then(() => {
@@ -216,7 +230,7 @@ function s() {
 		dispose() {
 			r = !0;
 			let e = c, t = n;
-			u();
+			u(!0);
 			try {
 				l(!1);
 			} finally {
