@@ -1,6 +1,6 @@
 # Vue 2 API
 
-Import the API to control an existing element. Every operation returns a Promise.
+Control an existing element from buttons, keyboard shortcuts or application logic. Every operation returns a Promise.
 
 ## Playground {#playground}
 

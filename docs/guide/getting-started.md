@@ -53,7 +53,7 @@ import { vFullscreen } from 'vue-fullscreen'
 
 ### API
 
-通过 `useFullscreen()` 获取响应式状态和操作方法。详细用法见 [API](/guide/api)。
+通过 `useFullscreen()` 获取响应式状态和操作方法，适合从多个按钮、快捷键或业务逻辑中控制同一全屏目标。详细用法见 [API](/guide/api)。
 
 ```vue
 <script setup>

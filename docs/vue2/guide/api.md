@@ -1,6 +1,6 @@
 # Vue 2 API
 
-导入 API 可以控制已有元素。每个操作都返回 Promise。
+适合通过按钮、快捷键或业务逻辑控制已有元素。每个操作都返回 Promise。
 
 ## 演练场 {#playground}
 

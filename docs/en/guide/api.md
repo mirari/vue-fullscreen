@@ -1,6 +1,6 @@
 # API
 
-Control an existing element from buttons or application logic, with reactive fullscreen state.
+Control an existing element from buttons, keyboard shortcuts or application logic, with reactive fullscreen state.
 
 ## Playground {#playground}
 
@@ -23,7 +23,7 @@ useFullscreen('panel') // id
 useFullscreen('#panel') // id with #
 ```
 
-Each call maintains its own fullscreen state. Component unmount restores moved nodes and removes listeners, exiting fullscreen. Native requests must run directly from a click or key handler, before awaiting network requests.
+Each call maintains its own fullscreen state. To control the same target from multiple places, share the state and methods returned by a single `useFullscreen()` call. Component unmount restores moved nodes and removes listeners, exiting fullscreen. Native requests must run directly from a click or key handler, before awaiting network requests.
 
 ## Use outside components
 

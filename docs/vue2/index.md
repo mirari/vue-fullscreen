@@ -71,7 +71,7 @@ export default {
 
 ### API
 
-插件将 `fullscreen` 单例注册为实例属性 `$fullscreen`，可以直接调用。详细用法见 [API](/vue2/guide/api)。
+适合从多个按钮、快捷键或业务逻辑中控制同一全屏目标。插件将 `fullscreen` 单例注册为实例属性 `$fullscreen`，可以直接调用。详细用法见 [API](/vue2/guide/api)。
 
 ```vue
 <template>

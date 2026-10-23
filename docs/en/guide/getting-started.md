@@ -53,7 +53,7 @@ import { vFullscreen } from 'vue-fullscreen'
 
 ### API
 
-Use `useFullscreen()` for reactive state and fullscreen controls. See [API usage](/en/guide/api).
+Use `useFullscreen()` for reactive state and methods to control the same fullscreen target from multiple buttons, keyboard shortcuts or application logic. See [API usage](/en/guide/api).
 
 ```vue
 <script setup>

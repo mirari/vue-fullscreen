@@ -73,7 +73,7 @@ The button is the trigger. This example omits the target and toggles fullscreen 
 
 ### API
 
-The plugin exposes the `fullscreen` singleton as `$fullscreen`. See [API usage](/en/vue2/guide/api).
+Control the same fullscreen target from multiple buttons, keyboard shortcuts or application logic. The plugin exposes the `fullscreen` singleton as `$fullscreen`. See [API usage](/en/vue2/guide/api).
 
 ```vue
 <template>
