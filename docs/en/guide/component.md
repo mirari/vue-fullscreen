@@ -71,8 +71,6 @@ async function enter() {
 | `isFullscreen` | `boolean`                          | Current fullscreen state |
 | `isEnabled`    | `boolean`                          | Native API support       |
 
-Handle rejected Promises when calling methods directly. The component cleans up listeners and moved DOM nodes on unmount.
-
 ## Migrating older versions {#migration}
 
 ```js

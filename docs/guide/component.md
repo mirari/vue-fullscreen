@@ -71,8 +71,6 @@ async function enter() {
 | `isFullscreen` | `boolean`                          | 当前全屏状态     |
 | `isEnabled`    | `boolean`                          | 原生全屏是否可用 |
 
-直接调用方法时捕获返回 Promise 的拒绝。组件卸载时清理监听器和被移动的 DOM。
-
 ## 旧版本迁移 {#migration}
 
 ```js

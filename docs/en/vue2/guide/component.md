@@ -62,8 +62,6 @@ The instance provides `request()`, `exit()` and `toggle(force?)`, as well as the
 | `getState`     | `(): boolean`                      | Read fullscreen state    |
 | `support`      | `boolean`                          | Alias for `isEnabled`    |
 
-Handle rejected Promises when calling methods directly. The component cleans up listeners and moved DOM nodes on unmount.
-
 ## Migrating older versions {#migration}
 
 ```vue

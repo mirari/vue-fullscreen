@@ -62,8 +62,6 @@ async enterPanel() {
 | `getState`     | `(): boolean`                      | 读取全屏状态           |
 | `support`      | `boolean`                          | `isEnabled` 的兼容属性 |
 
-直接调用方法时捕获返回 Promise 的拒绝。组件卸载时清理监听器和被移动的 DOM。
-
 ## 旧版本迁移 {#migration}
 
 ```vue
