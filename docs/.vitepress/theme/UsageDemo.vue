@@ -12,8 +12,17 @@ let disposed = false
 let unmount: (() => void) | undefined
 onMounted(async () => {
   try {
-    const { mount } = await import(
-      /* @vite-ignore */ withBase('/playground/vue3/demos.js')
+    const response = await fetch(withBase('/playground/vue3/demos.js'))
+    if (!response.ok)
+      throw new Error(`Failed to load example: ${response.status}`)
+    const source = await response.text()
+    if (disposed) return
+    // This standalone bundle is a public asset, not a Vite source module.
+    const url = URL.createObjectURL(
+      new Blob([source], { type: 'text/javascript' }),
+    )
+    const { mount } = await import(/* @vite-ignore */ url).finally(() =>
+      URL.revokeObjectURL(url),
     )
     if (disposed) return
     const hash = location.hash
