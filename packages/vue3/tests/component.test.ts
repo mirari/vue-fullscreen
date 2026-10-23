@@ -57,6 +57,12 @@ it('syncs v-model, forwards attributes and cleans up teleport on unmount', async
   visible.value = false
   await nextTick()
   expect(document.querySelector('#vue3-target')).toBeNull()
+  expect(model.value).toBe(false)
+  expect(changes).toEqual([true, false, true, false])
+  visible.value = true
+  await nextTick()
+  expect(model.value).toBe(false)
+  expect(document.querySelector('.fullscreen')).toBeNull()
   app.unmount()
   host.remove()
 })

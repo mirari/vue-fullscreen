@@ -184,6 +184,27 @@ for (const [line, versions] of [
           await fullscreen.enter(instance, { pageOnly: true });
           if (fullscreen.element !== instance.$el) throw Error('Component target resolution failed');
           await fullscreen.exit();
+          for (const format of ['cjs', 'umd']) {
+            let bundle;
+            if (format === 'cjs') bundle = require('vue-fullscreen');
+            else {
+              const context = { Vue: vue.default, document, Element, HTMLElement };
+              require('node:vm').runInNewContext(require('node:fs').readFileSync(require('node:path').join(require('node:path').dirname(require.resolve('vue-fullscreen/package.json')), 'index.umd.js'), 'utf8'), context);
+              bundle = context.VueFullscreen;
+            }
+            const savedApi = bundle.fullscreen;
+            const { enter, exit } = savedApi;
+            const button = document.createElement('button');
+            const states = [];
+            bundle.vFullscreen.inserted(button, { value: { target: instance.$el, pageOnly: true, teleport: true, callback: value => states.push(value) }, modifiers: {} });
+            button.click();
+            bundle.vFullscreen.unbind(button);
+            if (states.join(',') !== 'true,false') throw Error('Directive cleanup did not reset state');
+            if (bundle.fullscreen !== savedApi) throw Error('Singleton identity changed');
+            await enter(instance, { pageOnly: true });
+            if (savedApi.element !== instance.$el) throw Error('Captured API stopped working');
+            await exit();
+          }
         } else {
           const controls = useFullscreen(instance, { pageOnly: true });
           await controls.enter();

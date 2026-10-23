@@ -310,6 +310,30 @@ describe.each(['API', 'directive'] as const)(
   },
 )
 describe('directive lifecycle', () => {
+  it('keeps captured API references and methods usable after directive cleanup', async () => {
+    const savedApi = api
+    const { enter, request, toggle, exit } = savedApi
+    const node = target()
+    const parent = node.parentNode
+    const button = document.createElement('button')
+    const callback = vi.fn()
+    bindDirective(button, {
+      value: { target: node, pageOnly: true, teleport: true, callback },
+      modifiers: {},
+    })
+    button.click()
+    disposeDirective(button)
+    expect(callback.mock.calls).toEqual([[true], [false]])
+    expect(node.parentNode).toBe(parent)
+    expect(api).toBe(savedApi)
+    for (const start of [enter, request, toggle]) {
+      await start(node, { pageOnly: true })
+      expect(savedApi.element).toBe(node)
+      expect(savedApi.isFullscreen).toBe(true)
+      await exit()
+      expect(savedApi.element).toBeNull()
+    }
+  })
   it('cleans up the owning directive while allowing other bound buttons to enter again', async () => {
     const node = target()
     const parent = node.parentNode

@@ -247,19 +247,51 @@ export function createFullscreen(): FullscreenController {
       const request = pending
       // Restore DOM synchronously before Vue removes its nodes.
       cleanup()
-      isFullscreen = false
-      if (screenfull.isEnabled) {
-        const exitOwned = () => {
-          if (owned && screenfull.element === owned) return screenfull.exit()
+      try {
+        notify(false)
+      } finally {
+        if (screenfull.isEnabled) {
+          const exitOwned = () => {
+            if (owned && screenfull.element === owned) return screenfull.exit()
+          }
+          if (request) void request.then(exitOwned, () => {}).catch(() => {})
+          else void Promise.resolve(exitOwned()).catch(() => {})
         }
-        if (request) void request.then(exitOwned, () => {}).catch(() => {})
-        else void Promise.resolve(exitOwned()).catch(() => {})
       }
     },
   }
   return controller
 }
-export let api = createFullscreen()
+let sharedController = createFullscreen()
+// Keep the public singleton and captured methods stable across directive cleanup.
+export const api: FullscreenController = {
+  get options() {
+    return sharedController.options
+  },
+  get element() {
+    return sharedController.element
+  },
+  get isFullscreen() {
+    return sharedController.isFullscreen
+  },
+  get isSupported() {
+    return sharedController.isSupported
+  },
+  get isEnabled() {
+    return sharedController.isSupported
+  },
+  enter: (target, options) => sharedController.enter(target, options),
+  request: (target, options) => sharedController.enter(target, options),
+  toggle: (target, options, force) =>
+    sharedController.toggle(target, options, force),
+  exit: () => sharedController.exit(),
+  dispose() {
+    const controller = sharedController
+    sharedController = createFullscreen()
+    directiveOwner = null
+    controller.dispose()
+  },
+}
 
 export const componentProps = {
   fullscreen: { type: Boolean, default: false },
@@ -285,9 +317,7 @@ export function unbindDirective(el: HTMLElement) {
 export function disposeDirective(el: HTMLElement) {
   unbindDirective(el)
   if (directiveOwner === el) {
-    directiveOwner = null
     api.dispose()
-    api = createFullscreen()
   }
 }
 export function bindDirective(el: HTMLElement, binding: FullscreenBinding) {
@@ -299,7 +329,7 @@ export function bindDirective(el: HTMLElement, binding: FullscreenBinding) {
           ? { target: binding.value }
           : (binding.value ?? {})
       const { target, ...options } = config
-      const controller = api
+      const controller = sharedController
       if (!controller.element) directiveOwner = el
       void controller
         .toggle(target, {
@@ -307,12 +337,14 @@ export function bindDirective(el: HTMLElement, binding: FullscreenBinding) {
           pageOnly: !!binding.modifiers.pageOnly,
           ...options,
           callback: (isFullscreen) => {
-            if (!isFullscreen && api === controller) directiveOwner = null
+            if (!isFullscreen && sharedController === controller)
+              directiveOwner = null
             options.callback?.(isFullscreen)
           },
         })
         .catch((error) => {
-          if (api === controller && !controller.element) directiveOwner = null
+          if (sharedController === controller && !controller.element)
+            directiveOwner = null
           report(error)
         })
     } catch (error) {

@@ -20,16 +20,19 @@ it('cleans up the owning directive and keeps the plugin API usable', async () =>
       })
     },
   }).$mount()
+  const savedApi = vm.$fullscreen
+  const { enter, exit } = savedApi
   vm.$el.dispatchEvent(new MouseEvent('click'))
   expect(target.parentNode).toBe(document.body)
   vm.$destroy()
   expect(target.parentNode).toBe(parent)
   expect(fullscreen.isFullscreen).toBe(false)
   expect(vm.$fullscreen).toBe(fullscreen)
+  expect(vm.$fullscreen).toBe(savedApi)
   expect(vm.$fullscreen.isSupported).toBe(false)
-  await vm.$fullscreen.enter(target, { pageOnly: true })
+  await enter(target, { pageOnly: true })
   expect(vm.$fullscreen.element).toBe(target)
-  await vm.$fullscreen.exit()
+  await exit()
   parent.remove()
 })
 it('preserves Vue 2 v-model, deprecated methods and destroys teleported nodes', async () => {
@@ -79,6 +82,12 @@ it('preserves Vue 2 v-model, deprecated methods and destroys teleported nodes', 
   vm.visible = false
   await Vue.nextTick()
   expect(document.querySelector('#vue2-target')).toBeNull()
+  expect(vm.active).toBe(false)
+  expect(changes).toEqual([true, false, true, false])
+  vm.visible = true
+  await Vue.nextTick()
+  expect(document.querySelector('#vue2-target')!.parentNode).toBe(vm.$el)
+  expect(document.querySelector('.fullscreen')).toBeNull()
   vm.$destroy()
   vm.$el.remove()
 })
