@@ -5,6 +5,6 @@ pageClass: playground-page
 
 # Vue 2 演练场
 
-修改代码后点击「运行」，在预览中测试 `pageOnly`、`teleport` 和弹窗效果。原生全屏**只能由**点击、触摸或按键等用户操作触发。
+修改代码后点击「运行」，在预览中测试 `pageOnly`、`teleport` 和弹窗效果。
 
 <ClientOnly><FullscreenPlayground vue2 /></ClientOnly>
