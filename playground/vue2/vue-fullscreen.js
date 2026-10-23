@@ -114,6 +114,9 @@ function o(e) {
 	let t;
 	if (t = e == null ? document.body : typeof e == "function" ? e() : typeof e == "object" && !(e instanceof Element) && !("$el" in e) && "value" in e ? e.value : e, typeof t == "string") {
 		let e = t.charAt(0) === "#" ? t.slice(1) : t, n = document.getElementById(e);
+		if (!n) try {
+			n = document.querySelector(t);
+		} catch {}
 		if (!n) throw Error(`Fullscreen target not found: ${t}`);
 		t = n;
 	}
@@ -143,13 +146,19 @@ function s() {
 		get isFullscreen() {
 			return t;
 		},
-		get isEnabled() {
+		get isSupported() {
 			return a.isEnabled;
 		},
-		toggle(e, n, r) {
-			return r ?? !t ? this.request(e, n) : this.exit();
+		get isEnabled() {
+			return this.isSupported;
 		},
-		request(p, m = {}) {
+		toggle(e, n, r) {
+			return r ?? !t ? this.enter(e, n) : this.exit();
+		},
+		request(e, t = {}) {
+			return p.enter(e, t);
+		},
+		enter(p, m = {}) {
 			if (r) return Promise.reject(/* @__PURE__ */ Error("Fullscreen controller has been disposed"));
 			if (n) return n;
 			if (t) return Promise.resolve();
@@ -238,27 +247,28 @@ var c = s(), l = {
 		type: Boolean,
 		default: !1
 	}
-}, u = /* @__PURE__ */ new WeakMap();
-function d(e) {
+}, u = /* @__PURE__ */ new WeakMap(), d = null;
+function f(e) {
 	let t = u.get(e);
 	t && e.removeEventListener("click", t), u.delete(e);
 }
-function f(e, t) {
-	d(e);
+function p(e) {
+	f(e), d === e && (d = null, c.dispose(), c = s());
+}
+function m(e, t) {
+	f(e);
 	let n = () => {
 		try {
-			let { target: e, ...n } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, i = typeof e == "string" ? document.querySelector(e) : e;
-			if (typeof e == "string" && !i) throw Error(`Fullscreen target not found: ${e}`);
-			let a = c;
-			a.element, a.toggle(i, {
+			let { target: n, ...i } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, a = c;
+			a.element || (d = e), a.toggle(n, {
 				teleport: !!t.modifiers.teleport,
 				pageOnly: !!t.modifiers.pageOnly,
-				...n,
+				...i,
 				callback: (e) => {
-					n.callback?.(e);
+					!e && c === a && (d = null), i.callback?.(e);
 				}
 			}).catch((e) => {
-				c === a && a.element, r(e);
+				c === a && !a.element && (d = null), r(e);
 			});
 		} catch (e) {
 			r(e);
@@ -271,7 +281,7 @@ function f(e, t) {
 }
 //#endregion
 //#region packages/vue2/src/index.ts
-var p = /* @__PURE__ */ new WeakMap(), m = e.extend({
+var h = /* @__PURE__ */ new WeakMap(), g = e.extend({
 	name: "Fullscreen",
 	inheritAttrs: !1,
 	props: {
@@ -284,21 +294,26 @@ var p = /* @__PURE__ */ new WeakMap(), m = e.extend({
 	data() {
 		return {
 			isFullscreen: !1,
-			isEnabled: !1
+			isSupported: !1
 		};
 	},
-	computed: { support() {
-		return this.isEnabled;
-	} },
+	computed: {
+		isEnabled() {
+			return this.isSupported;
+		},
+		support() {
+			return this.isSupported;
+		}
+	},
 	created() {
 		let e = s();
-		p.set(this, e), this.isEnabled = e.isEnabled;
+		h.set(this, e), this.isSupported = e.isSupported;
 	},
 	mounted() {
 		(this.value || this.fullscreen) && this.update(!0);
 	},
 	beforeDestroy() {
-		p.get(this)?.dispose(), p.delete(this);
+		h.get(this)?.dispose(), h.delete(this);
 	},
 	watch: {
 		value(e) {
@@ -309,8 +324,8 @@ var p = /* @__PURE__ */ new WeakMap(), m = e.extend({
 		}
 	},
 	methods: {
-		request() {
-			return p.get(this).request(this.$el, {
+		enter() {
+			return h.get(this).enter(this.$el, {
 				pageOnly: this.pageOnly,
 				teleport: this.teleport,
 				fullscreenClass: this.fullscreenClass,
@@ -320,16 +335,16 @@ var p = /* @__PURE__ */ new WeakMap(), m = e.extend({
 			});
 		},
 		exit() {
-			return p.get(this).exit();
+			return h.get(this).exit();
 		},
 		toggle(e) {
-			return e ?? !this.isFullscreen ? this.request() : this.exit();
+			return e ?? !this.isFullscreen ? this.enter() : this.exit();
 		},
 		update(e) {
 			this.toggle(e).catch((e) => this.$emit("error", e));
 		},
-		enter() {
-			return this.request();
+		request() {
+			return this.enter();
 		},
 		getState() {
 			return this.isFullscreen;
@@ -347,12 +362,15 @@ var p = /* @__PURE__ */ new WeakMap(), m = e.extend({
 			}
 		}, this.$slots.default);
 	}
-}), h = {
-	inserted: f,
-	update: f,
-	unbind: d
-}, g = m, _ = h, v = { install(e, { name: t = "fullscreen" } = {}) {
-	e.prototype[`$${t}`] = c, e.component(t, m), e.directive(t, h);
+}), _ = {
+	inserted: m,
+	update: m,
+	unbind: p
+}, v = g, y = _, b = { install(e, { name: t = "fullscreen" } = {}) {
+	Object.defineProperty(e.prototype, `$${t}`, {
+		configurable: !0,
+		get: () => c
+	}), e.component(t, g), e.directive(t, _);
 } };
 //#endregion
-export { m as Fullscreen, c as api, c as fullscreen, g as component, v as default, _ as directive, a as screenfull, h as vFullscreen };
+export { g as Fullscreen, c as api, c as fullscreen, v as component, b as default, y as directive, a as screenfull, _ as vFullscreen };

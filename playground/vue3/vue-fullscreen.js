@@ -114,6 +114,9 @@ function g(e) {
 	let t;
 	if (t = e == null ? document.body : typeof e == "function" ? e() : typeof e == "object" && !(e instanceof Element) && !("$el" in e) && "value" in e ? e.value : e, typeof t == "string") {
 		let e = t.charAt(0) === "#" ? t.slice(1) : t, n = document.getElementById(e);
+		if (!n) try {
+			n = document.querySelector(t);
+		} catch {}
 		if (!n) throw Error(`Fullscreen target not found: ${t}`);
 		t = n;
 	}
@@ -143,13 +146,19 @@ function _() {
 		get isFullscreen() {
 			return t;
 		},
-		get isEnabled() {
+		get isSupported() {
 			return h.isEnabled;
 		},
-		toggle(e, n, r) {
-			return r ?? !t ? this.request(e, n) : this.exit();
+		get isEnabled() {
+			return this.isSupported;
 		},
-		request(d, f = {}) {
+		toggle(e, n, r) {
+			return r ?? !t ? this.enter(e, n) : this.exit();
+		},
+		request(e, t = {}) {
+			return d.enter(e, t);
+		},
+		enter(d, f = {}) {
 			if (r) return Promise.reject(/* @__PURE__ */ Error("Fullscreen controller has been disposed"));
 			if (n) return n;
 			if (t) return Promise.resolve();
@@ -250,18 +259,16 @@ function w(e, t) {
 	S(e);
 	let n = () => {
 		try {
-			let { target: n, ...i } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, a = typeof n == "string" ? document.querySelector(n) : n;
-			if (typeof n == "string" && !a) throw Error(`Fullscreen target not found: ${n}`);
-			let o = v;
-			o.element || (x = e), o.toggle(a, {
+			let { target: n, ...i } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, a = v;
+			a.element || (x = e), a.toggle(n, {
 				teleport: !!t.modifiers.teleport,
 				pageOnly: !!t.modifiers.pageOnly,
 				...i,
 				callback: (e) => {
-					!e && v === o && (x = null), i.callback?.(e);
+					!e && v === a && (x = null), i.callback?.(e);
 				}
 			}).catch((e) => {
-				v === o && !o.element && (x = null), r(e);
+				v === a && !a.element && (x = null), r(e);
 			});
 		} catch (e) {
 			r(e);
@@ -291,7 +298,7 @@ var T = t({
 	setup(e, { emit: t }) {
 		let n = c(), r = c(!1), i = _(), s = (e) => {
 			r.value = e, t("change", e), t("update:modelValue", e), t("update:fullscreen", e);
-		}, l = () => i.request(n.value, {
+		}, l = () => i.enter(n.value, {
 			pageOnly: e.pageOnly,
 			teleport: e.teleport,
 			fullscreenClass: e.fullscreenClass,
@@ -303,11 +310,13 @@ var T = t({
 			(e.modelValue || e.fullscreen) && p(!0);
 		}), a(() => i.dispose()), {
 			wrapper: n,
+			enter: l,
 			request: l,
 			exit: d,
 			toggle: f,
 			isFullscreen: r,
-			isEnabled: i.isEnabled,
+			isSupported: i.isSupported,
+			isEnabled: i.isSupported,
 			shadeClick: (t) => {
 				e.exitOnClickWrapper && t.target === n.value && p(!1);
 			}
@@ -326,7 +335,7 @@ var T = t({
 	beforeUnmount: C
 }, D = T, O = E, k = (e) => typeof e == "function" ? e() : l(e);
 function A(t, r = {}) {
-	let i = _(), o = c(!1), l = () => i.request(t, {
+	let i = _(), o = c(!1), l = () => i.enter(t, {
 		pageOnly: k(r.pageOnly ?? !1),
 		teleport: k(r.teleport ?? !1),
 		fullscreenClass: k(r.fullscreenClass ?? "fullscreen"),
@@ -338,7 +347,7 @@ function A(t, r = {}) {
 		i.dispose(), o.value = !1;
 	}), {
 		isFullscreen: s(o),
-		isSupported: e(() => i.isEnabled),
+		isSupported: e(() => i.isSupported),
 		enter: l,
 		exit: () => i.exit(),
 		toggle: () => i.isFullscreen ? i.exit() : l()

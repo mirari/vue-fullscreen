@@ -3046,6 +3046,9 @@ function Bo(e) {
 	let t;
 	if (t = e == null ? document.body : typeof e == "function" ? e() : typeof e == "object" && !(e instanceof Element) && !("$el" in e) && "value" in e ? e.value : e, typeof t == "string") {
 		let e = t.charAt(0) === "#" ? t.slice(1) : t, n = document.getElementById(e);
+		if (!n) try {
+			n = document.querySelector(t);
+		} catch {}
 		if (!n) throw Error(`Fullscreen target not found: ${t}`);
 		t = n;
 	}
@@ -3075,13 +3078,19 @@ function Vo() {
 		get isFullscreen() {
 			return t;
 		},
-		get isEnabled() {
+		get isSupported() {
 			return zo.isEnabled;
 		},
-		toggle(e, n, r) {
-			return r ?? !t ? this.request(e, n) : this.exit();
+		get isEnabled() {
+			return this.isSupported;
 		},
-		request(d, f = {}) {
+		toggle(e, n, r) {
+			return r ?? !t ? this.enter(e, n) : this.exit();
+		},
+		request(e, t = {}) {
+			return d.enter(e, t);
+		},
+		enter(d, f = {}) {
 			if (r) return Promise.reject(/* @__PURE__ */ Error("Fullscreen controller has been disposed"));
 			if (n) return n;
 			if (t) return Promise.resolve();
@@ -3182,18 +3191,16 @@ function Jo(e, t) {
 	Ko(e);
 	let n = () => {
 		try {
-			let { target: n, ...i } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, a = typeof n == "string" ? document.querySelector(n) : n;
-			if (typeof n == "string" && !a) throw Error(`Fullscreen target not found: ${n}`);
-			let o = Ho;
-			o.element || (Go = e), o.toggle(a, {
+			let { target: n, ...i } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, a = Ho;
+			a.element || (Go = e), a.toggle(n, {
 				teleport: !!t.modifiers.teleport,
 				pageOnly: !!t.modifiers.pageOnly,
 				...i,
 				callback: (e) => {
-					!e && Ho === o && (Go = null), i.callback?.(e);
+					!e && Ho === a && (Go = null), i.callback?.(e);
 				}
 			}).catch((e) => {
-				Ho === o && !o.element && (Go = null), r(e);
+				Ho === a && !a.element && (Go = null), r(e);
 			});
 		} catch (e) {
 			r(e);
@@ -3223,7 +3230,7 @@ var Yo = /* @__PURE__ */ ir({
 	setup(e, { emit: t }) {
 		let n = /* @__PURE__ */ G(), r = /* @__PURE__ */ G(!1), i = Vo(), a = (e) => {
 			r.value = e, t("change", e), t("update:modelValue", e), t("update:fullscreen", e);
-		}, o = () => i.request(n.value, {
+		}, o = () => i.enter(n.value, {
 			pageOnly: e.pageOnly,
 			teleport: e.teleport,
 			fullscreenClass: e.fullscreenClass,
@@ -3235,11 +3242,13 @@ var Yo = /* @__PURE__ */ ir({
 			(e.modelValue || e.fullscreen) && l(!0);
 		}), Sr(() => i.dispose()), {
 			wrapper: n,
+			enter: o,
 			request: o,
 			exit: s,
 			toggle: c,
 			isFullscreen: r,
-			isEnabled: i.isEnabled,
+			isSupported: i.isSupported,
+			isEnabled: i.isSupported,
 			shadeClick: (t) => {
 				e.exitOnClickWrapper && t.target === n.value && l(!1);
 			}
@@ -3258,7 +3267,7 @@ var Yo = /* @__PURE__ */ ir({
 	beforeUnmount: qo
 }, Zo = (e) => typeof e == "function" ? e() : K(e);
 function Qo(e, t = {}) {
-	let n = Vo(), r = /* @__PURE__ */ G(!1), i = () => n.request(e, {
+	let n = Vo(), r = /* @__PURE__ */ G(!1), i = () => n.enter(e, {
 		pageOnly: Zo(t.pageOnly ?? !1),
 		teleport: Zo(t.teleport ?? !1),
 		fullscreenClass: Zo(t.fullscreenClass ?? "fullscreen"),
@@ -3270,7 +3279,7 @@ function Qo(e, t = {}) {
 		n.dispose(), r.value = !1;
 	}), {
 		isFullscreen: /* @__PURE__ */ Rt(r),
-		isSupported: ja(() => n.isEnabled),
+		isSupported: ja(() => n.isSupported),
 		enter: i,
 		exit: () => n.exit(),
 		toggle: () => n.isFullscreen ? n.exit() : i()
@@ -5006,6 +5015,12 @@ var ys = { class: "lab" }, bs = { class: "options" }, xs = { class: "page-only-c
 				onError: d
 			}, {
 				default: An(() => [
+					l.value ? (J(), Y("button", {
+						key: 0,
+						id: "exit",
+						class: "exit",
+						onClick: f[3] ||= (e) => l.value = !1
+					}, "退出全屏")) : $("v-if", !0),
 					Z(K(_s), {
 						ref_key: "preview",
 						ref: o,
@@ -5017,8 +5032,8 @@ var ys = { class: "lab" }, bs = { class: "options" }, xs = { class: "page-only-c
 						transition: !1,
 						focus: !1,
 						fullscreen: !1,
-						onShow: f[3] ||= (e) => a.value = !0,
-						onHidden: f[4] ||= (e) => a.value = !1
+						onShow: f[4] ||= (e) => a.value = !0,
+						onHidden: f[5] ||= (e) => a.value = !1
 					}, {
 						default: An(() => [(J(), Y(Ui, null, kr(n, (e, t) => X("button", {
 							key: e,
@@ -5036,12 +5051,6 @@ var ys = { class: "lab" }, bs = { class: "options" }, xs = { class: "page-only-c
 						}, null, 8, Ds)], 8, Es)), 64))]),
 						_: 1
 					}, 512),
-					l.value ? (J(), Y("button", {
-						key: 0,
-						id: "exit",
-						class: "exit",
-						onClick: f[5] ||= (e) => l.value = !1
-					}, "退出全屏")) : $("v-if", !0),
 					l.value && a.value && !t.value && !i.value ? (J(), Y("p", Os, "弹窗已在 body 下打开，但不属于当前原生全屏元素。")) : $("v-if", !0)
 				]),
 				_: 1
@@ -5124,6 +5133,12 @@ var js = { class: "lab" }, Ms = { class: "options" }, Ns = { class: "page-only-c
 				onError: d
 			}, {
 				default: An(() => [
+					l.value ? (J(), Y("button", {
+						key: 0,
+						id: "exit",
+						class: "exit",
+						onClick: f[3] ||= (e) => l.value = !1
+					}, "Exit fullscreen")) : $("v-if", !0),
 					Z(K(_s), {
 						ref_key: "preview",
 						ref: o,
@@ -5135,8 +5150,8 @@ var js = { class: "lab" }, Ms = { class: "options" }, Ns = { class: "page-only-c
 						transition: !1,
 						focus: !1,
 						fullscreen: !1,
-						onShow: f[3] ||= (e) => a.value = !0,
-						onHidden: f[4] ||= (e) => a.value = !1
+						onShow: f[4] ||= (e) => a.value = !0,
+						onHidden: f[5] ||= (e) => a.value = !1
 					}, {
 						default: An(() => [(J(), Y(Ui, null, kr(n, (e, t) => X("button", {
 							key: e,
@@ -5154,12 +5169,6 @@ var js = { class: "lab" }, Ms = { class: "options" }, Ns = { class: "page-only-c
 						}, null, 8, zs)], 8, Rs)), 64))]),
 						_: 1
 					}, 512),
-					l.value ? (J(), Y("button", {
-						key: 0,
-						id: "exit",
-						class: "exit",
-						onClick: f[5] ||= (e) => l.value = !1
-					}, "Exit fullscreen")) : $("v-if", !0),
 					l.value && a.value && !t.value && !i.value ? (J(), Y("p", Bs, "The popup is open under body, but is outside the native fullscreen element.")) : $("v-if", !0)
 				]),
 				_: 1
@@ -5239,6 +5248,12 @@ var Us = { class: "lab" }, Ws = { class: "options" }, Gs = { class: "page-only-c
 				}, [...d[8] ||= [Q("点击指令按钮", -1)]], 40, Js)), [[K(Xo), u.value]])
 			]),
 			X("div", Ys, [X("section", Xs, [
+				l.value ? q((J(), Y("button", {
+					key: 0,
+					id: "exit",
+					class: "exit",
+					onFullscreenError: d[3] ||= (e) => f(e.detail)
+				}, [...d[9] ||= [Q("退出全屏", -1)]], 32)), [[K(Xo), u.value]]) : $("v-if", !0),
 				Z(K(_s), {
 					ref_key: "preview",
 					ref: o,
@@ -5250,8 +5265,8 @@ var Us = { class: "lab" }, Ws = { class: "options" }, Gs = { class: "page-only-c
 					transition: !1,
 					focus: !1,
 					fullscreen: !1,
-					onShow: d[3] ||= (e) => a.value = !0,
-					onHidden: d[4] ||= (e) => a.value = !1
+					onShow: d[4] ||= (e) => a.value = !0,
+					onHidden: d[5] ||= (e) => a.value = !1
 				}, {
 					default: An(() => [(J(), Y(Ui, null, kr(n, (e, t) => X("button", {
 						key: e,
@@ -5269,12 +5284,6 @@ var Us = { class: "lab" }, Ws = { class: "options" }, Gs = { class: "page-only-c
 					}, null, 8, Qs)], 8, Zs)), 64))]),
 					_: 1
 				}, 512),
-				l.value ? q((J(), Y("button", {
-					key: 0,
-					id: "exit",
-					class: "exit",
-					onFullscreenError: d[5] ||= (e) => f(e.detail)
-				}, [...d[9] ||= [Q("退出全屏", -1)]], 32)), [[K(Xo), u.value]]) : $("v-if", !0),
 				l.value && a.value && !t.value && !i.value ? (J(), Y("p", $s, "弹窗已在 body 下打开，但不属于当前原生全屏元素。")) : $("v-if", !0)
 			], 512)]),
 			c.value ? (J(), Y("p", ec, Me(c.value), 1)) : $("v-if", !0)
@@ -5348,6 +5357,12 @@ var nc = { class: "lab" }, rc = { class: "options" }, ic = { class: "page-only-c
 				}, [...d[8] ||= [Q("Toggle with directive", -1)]], 40, sc)), [[K(Xo), u.value]])
 			]),
 			X("div", cc, [X("section", lc, [
+				l.value ? q((J(), Y("button", {
+					key: 0,
+					id: "exit",
+					class: "exit",
+					onFullscreenError: d[3] ||= (e) => f(e.detail)
+				}, [...d[9] ||= [Q("Exit fullscreen", -1)]], 32)), [[K(Xo), u.value]]) : $("v-if", !0),
 				Z(K(_s), {
 					ref_key: "preview",
 					ref: o,
@@ -5359,8 +5374,8 @@ var nc = { class: "lab" }, rc = { class: "options" }, ic = { class: "page-only-c
 					transition: !1,
 					focus: !1,
 					fullscreen: !1,
-					onShow: d[3] ||= (e) => a.value = !0,
-					onHidden: d[4] ||= (e) => a.value = !1
+					onShow: d[4] ||= (e) => a.value = !0,
+					onHidden: d[5] ||= (e) => a.value = !1
 				}, {
 					default: An(() => [(J(), Y(Ui, null, kr(n, (e, t) => X("button", {
 						key: e,
@@ -5378,12 +5393,6 @@ var nc = { class: "lab" }, rc = { class: "options" }, ic = { class: "page-only-c
 					}, null, 8, dc)], 8, uc)), 64))]),
 					_: 1
 				}, 512),
-				l.value ? q((J(), Y("button", {
-					key: 0,
-					id: "exit",
-					class: "exit",
-					onFullscreenError: d[5] ||= (e) => f(e.detail)
-				}, [...d[9] ||= [Q("Exit fullscreen", -1)]], 32)), [[K(Xo), u.value]]) : $("v-if", !0),
 				l.value && a.value && !t.value && !i.value ? (J(), Y("p", fc, "The popup is open under body, but is outside the native fullscreen element.")) : $("v-if", !0)
 			], 512)]),
 			c.value ? (J(), Y("p", pc, Me(c.value), 1)) : $("v-if", !0)
@@ -5456,6 +5465,12 @@ var hc = { class: "lab" }, gc = { class: "options" }, _c = { class: "page-only-c
 				ref: l,
 				class: "surface"
 			}, [
+				K(u) ? (J(), Y("button", {
+					key: 0,
+					id: "exit",
+					class: "exit",
+					onClick: p[3] ||= (e) => K(f)().catch(m)
+				}, "退出全屏")) : $("v-if", !0),
 				Z(K(_s), {
 					ref_key: "preview",
 					ref: o,
@@ -5467,8 +5482,8 @@ var hc = { class: "lab" }, gc = { class: "options" }, _c = { class: "page-only-c
 					transition: !1,
 					focus: !1,
 					fullscreen: !1,
-					onShow: p[3] ||= (e) => a.value = !0,
-					onHidden: p[4] ||= (e) => a.value = !1
+					onShow: p[4] ||= (e) => a.value = !0,
+					onHidden: p[5] ||= (e) => a.value = !1
 				}, {
 					default: An(() => [(J(), Y(Ui, null, kr(n, (e, t) => X("button", {
 						key: e,
@@ -5486,12 +5501,6 @@ var hc = { class: "lab" }, gc = { class: "options" }, _c = { class: "page-only-c
 					}, null, 8, Cc)], 8, Sc)), 64))]),
 					_: 1
 				}, 512),
-				K(u) ? (J(), Y("button", {
-					key: 0,
-					id: "exit",
-					class: "exit",
-					onClick: p[5] ||= (e) => K(f)().catch(m)
-				}, "退出全屏")) : $("v-if", !0),
 				K(u) && a.value && !t.value && !i.value ? (J(), Y("p", wc, "弹窗已在 body 下打开，但不属于当前原生全屏元素。")) : $("v-if", !0)
 			], 512)]),
 			c.value ? (J(), Y("p", Tc, Me(c.value), 1)) : $("v-if", !0)
@@ -5564,6 +5573,12 @@ var Dc = { class: "lab" }, Oc = { class: "options" }, kc = { class: "page-only-c
 				ref: l,
 				class: "surface"
 			}, [
+				K(u) ? (J(), Y("button", {
+					key: 0,
+					id: "exit",
+					class: "exit",
+					onClick: p[3] ||= (e) => K(f)().catch(m)
+				}, "Exit fullscreen")) : $("v-if", !0),
 				Z(K(_s), {
 					ref_key: "preview",
 					ref: o,
@@ -5575,8 +5590,8 @@ var Dc = { class: "lab" }, Oc = { class: "options" }, kc = { class: "page-only-c
 					transition: !1,
 					focus: !1,
 					fullscreen: !1,
-					onShow: p[3] ||= (e) => a.value = !0,
-					onHidden: p[4] ||= (e) => a.value = !1
+					onShow: p[4] ||= (e) => a.value = !0,
+					onHidden: p[5] ||= (e) => a.value = !1
 				}, {
 					default: An(() => [(J(), Y(Ui, null, kr(n, (e, t) => X("button", {
 						key: e,
@@ -5594,12 +5609,6 @@ var Dc = { class: "lab" }, Oc = { class: "options" }, kc = { class: "page-only-c
 					}, null, 8, Fc)], 8, Pc)), 64))]),
 					_: 1
 				}, 512),
-				K(u) ? (J(), Y("button", {
-					key: 0,
-					id: "exit",
-					class: "exit",
-					onClick: p[5] ||= (e) => K(f)().catch(m)
-				}, "Exit fullscreen")) : $("v-if", !0),
 				K(u) && a.value && !t.value && !i.value ? (J(), Y("p", Ic, "The popup is open under body, but is outside the native fullscreen element.")) : $("v-if", !0)
 			], 512)]),
 			c.value ? (J(), Y("p", Lc, Me(c.value), 1)) : $("v-if", !0)
@@ -5616,7 +5625,7 @@ var zc = {
 	"directive en": mc,
 	"api zh": Ec,
 	"api en": Rc
-}, Bc = "\n.lab[data-v-playground] { --sample-bg: #f6f6f7; --sample-surface: #fff; --sample-text: #3c3c43; --sample-border: #c2c2c4; --sample-accent: #5b51d8; --sample-button-text: #fff; box-sizing: border-box; font: 14px/1.7 system-ui, sans-serif; color: var(--sample-text);\n}\n.dark .lab[data-v-playground] { --sample-bg: #1b1b1f; --sample-surface: #202127; --sample-text: #dfdfe5; --sample-border: #67676c; --sample-accent: #aaa2ff; --sample-button-text: #202127;\n}\n.lab[data-v-playground] { padding: 16px; background: var(--sample-bg);\n}\nbutton[data-v-playground], input[data-v-playground] { font: inherit;\n}\nbutton[data-v-playground] { padding: 8px 16px; border: 1px solid var(--sample-accent); border-radius: 6px; background: var(--sample-accent); color: var(--sample-button-text); cursor: pointer;\n}\nbutton[data-v-playground]:hover { filter: brightness(.94);\n}\nbutton[data-v-playground]:disabled { opacity: .5; cursor: default;\n}\nbutton[data-v-playground]:focus-visible, input[data-v-playground]:focus-visible { outline: 2px solid var(--sample-accent); outline-offset: 3px;\n}\ninput[data-v-playground] { accent-color: var(--sample-accent);\n}\n.options[data-v-playground] { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding-bottom: 16px;\n}\n.options label[data-v-playground] { display: flex; gap: 6px; align-items: center;\n}\n.options button[data-v-playground] { width: 100%; padding: 12px 16px; font-size: 16px;\n}\n.surface-placeholder[data-v-playground] { height: 300px;\n}\n.surface[data-v-playground] { position: relative; height: 300px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; padding: 10px; background: var(--sample-surface); border: 1px solid var(--sample-border); border-radius: 8px;\n}\n.surface.demo-fullscreen[data-v-playground] { z-index: 10000; min-height: 100vh; height: 100vh; border-radius: 0; padding: 20px 24px 72px;\n}\n.image-preview[data-v-playground] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: start; gap: 10px; width: 100%;\n}\n.image-trigger[data-v-playground] { display: block; aspect-ratio: 16 / 10; width: 100%; padding: 0; border: 0; border-radius: 4px; overflow: hidden; background: transparent; cursor: zoom-in;\n}\n.image-trigger[data-v-playground]:hover { background: transparent; filter: none;\n}\n.gallery-image[data-v-playground] { position: static; display: block; width: 100%; height: 100%; object-fit: cover;\n}\n.exit[data-v-playground] { position: absolute; top: 16px; right: 16px;\n}\n.surface p[role=\"status\"][data-v-playground] { position: absolute; bottom: 68px; margin: 0; padding: 6px 12px; background: var(--sample-surface); font-size: 12px;\n}\n@media (max-width: 480px) {\n.image-preview[data-v-playground] { grid-template-columns: repeat(2, minmax(0, 1fr));\n}\n}\n\n";
+}, Bc = "\n.lab[data-v-playground], .surface[data-v-playground] { --sample-bg: #f6f6f7; --sample-surface: #fff; --sample-text: #3c3c43; --sample-border: #c2c2c4; --sample-accent: #5b51d8; --sample-button-text: #fff; box-sizing: border-box; font: 14px/1.7 system-ui, sans-serif; color: var(--sample-text);\n}\n.dark .lab[data-v-playground], .dark .surface[data-v-playground] { --sample-bg: #1b1b1f; --sample-surface: #202127; --sample-text: #dfdfe5; --sample-border: #67676c; --sample-accent: #aaa2ff; --sample-button-text: #202127;\n}\n.lab[data-v-playground] { padding: 16px; background: var(--sample-bg);\n}\nbutton[data-v-playground], input[data-v-playground] { font: inherit;\n}\nbutton[data-v-playground] { padding: 8px 16px; border: 1px solid var(--sample-accent); border-radius: 6px; background: var(--sample-accent); color: var(--sample-button-text); cursor: pointer;\n}\nbutton[data-v-playground]:hover { filter: brightness(.94);\n}\nbutton[data-v-playground]:disabled { opacity: .5; cursor: default;\n}\nbutton[data-v-playground]:focus-visible, input[data-v-playground]:focus-visible { outline: 2px solid var(--sample-accent); outline-offset: 3px;\n}\ninput[data-v-playground] { accent-color: var(--sample-accent);\n}\n.options[data-v-playground] { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding-bottom: 16px;\n}\n.options label[data-v-playground] { display: flex; gap: 6px; align-items: center;\n}\n.options button[data-v-playground], .exit[data-v-playground] { width: 100%; padding: 12px 16px; font-size: 16px;\n}\n.surface-placeholder[data-v-playground] { height: 300px;\n}\n.surface[data-v-playground] { position: relative; height: 300px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; padding: 10px; background: var(--sample-surface); border: 1px solid var(--sample-border); border-radius: 8px;\n}\n.surface.demo-fullscreen[data-v-playground] { z-index: 10000; min-height: 100vh; height: 100vh; overflow: auto; border-radius: 0; padding: 20px 24px;\n}\n.image-preview[data-v-playground] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: start; gap: 10px; width: 100%;\n}\n.image-trigger[data-v-playground] { display: block; aspect-ratio: 16 / 10; width: 100%; padding: 0; border: 0; border-radius: 4px; overflow: hidden; background: transparent; cursor: zoom-in;\n}\n.image-trigger[data-v-playground]:hover { background: transparent; filter: none;\n}\n.gallery-image[data-v-playground] { position: static; display: block; width: 100%; height: 100%; object-fit: cover;\n}\n.exit[data-v-playground] { flex-shrink: 0; margin-bottom: 16px;\n}\n.surface p[role=\"status\"][data-v-playground] { position: absolute; bottom: 68px; margin: 0; padding: 6px 12px; background: var(--sample-surface); font-size: 12px;\n}\n@media (max-width: 480px) {\n.image-preview[data-v-playground] { grid-template-columns: repeat(2, minmax(0, 1fr));\n}\n}\n\n";
 //#endregion
 //#region docs/.vitepress/theme/demos/mount-vue3.mjs
 function Vc(e, t, n) {

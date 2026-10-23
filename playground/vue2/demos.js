@@ -4391,6 +4391,9 @@ function ld(e) {
 	let t;
 	if (t = e == null ? document.body : typeof e == "function" ? e() : typeof e == "object" && !(e instanceof Element) && !("$el" in e) && "value" in e ? e.value : e, typeof t == "string") {
 		let e = t.charAt(0) === "#" ? t.slice(1) : t, n = document.getElementById(e);
+		if (!n) try {
+			n = document.querySelector(t);
+		} catch {}
 		if (!n) throw Error(`Fullscreen target not found: ${t}`);
 		t = n;
 	}
@@ -4420,13 +4423,19 @@ function ud() {
 		get isFullscreen() {
 			return t;
 		},
-		get isEnabled() {
+		get isSupported() {
 			return cd.isEnabled;
 		},
-		toggle(e, n, r) {
-			return r ?? !t ? this.request(e, n) : this.exit();
+		get isEnabled() {
+			return this.isSupported;
 		},
-		request(d, f = {}) {
+		toggle(e, n, r) {
+			return r ?? !t ? this.enter(e, n) : this.exit();
+		},
+		request(e, t = {}) {
+			return d.enter(e, t);
+		},
+		enter(d, f = {}) {
 			if (r) return Promise.reject(/* @__PURE__ */ Error("Fullscreen controller has been disposed"));
 			if (n) return n;
 			if (t) return Promise.resolve();
@@ -4515,27 +4524,28 @@ var dd = ud(), fd = {
 		type: Boolean,
 		default: !1
 	}
-}, pd = /* @__PURE__ */ new WeakMap();
-function md(e) {
+}, pd = /* @__PURE__ */ new WeakMap(), md = null;
+function hd(e) {
 	let t = pd.get(e);
 	t && e.removeEventListener("click", t), pd.delete(e);
 }
-function hd(e, t) {
-	md(e);
+function gd(e) {
+	hd(e), md === e && (md = null, dd.dispose(), dd = ud());
+}
+function _d(e, t) {
+	hd(e);
 	let n = () => {
 		try {
-			let { target: e, ...n } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, i = typeof e == "string" ? document.querySelector(e) : e;
-			if (typeof e == "string" && !i) throw Error(`Fullscreen target not found: ${e}`);
-			let a = dd;
-			a.element, a.toggle(i, {
+			let { target: n, ...i } = typeof t.value == "string" ? { target: t.value } : t.value ?? {}, a = dd;
+			a.element || (md = e), a.toggle(n, {
 				teleport: !!t.modifiers.teleport,
 				pageOnly: !!t.modifiers.pageOnly,
-				...n,
+				...i,
 				callback: (e) => {
-					n.callback?.(e);
+					!e && dd === a && (md = null), i.callback?.(e);
 				}
 			}).catch((e) => {
-				dd === a && a.element, r(e);
+				dd === a && !a.element && (md = null), r(e);
 			});
 		} catch (e) {
 			r(e);
@@ -4548,7 +4558,7 @@ function hd(e, t) {
 }
 //#endregion
 //#region packages/vue2/src/index.ts
-var gd = /* @__PURE__ */ new WeakMap(), _d = X.extend({
+var vd = /* @__PURE__ */ new WeakMap(), yd = X.extend({
 	name: "Fullscreen",
 	inheritAttrs: !1,
 	props: {
@@ -4561,21 +4571,26 @@ var gd = /* @__PURE__ */ new WeakMap(), _d = X.extend({
 	data() {
 		return {
 			isFullscreen: !1,
-			isEnabled: !1
+			isSupported: !1
 		};
 	},
-	computed: { support() {
-		return this.isEnabled;
-	} },
+	computed: {
+		isEnabled() {
+			return this.isSupported;
+		},
+		support() {
+			return this.isSupported;
+		}
+	},
 	created() {
 		let e = ud();
-		gd.set(this, e), this.isEnabled = e.isEnabled;
+		vd.set(this, e), this.isSupported = e.isSupported;
 	},
 	mounted() {
 		(this.value || this.fullscreen) && this.update(!0);
 	},
 	beforeDestroy() {
-		gd.get(this)?.dispose(), gd.delete(this);
+		vd.get(this)?.dispose(), vd.delete(this);
 	},
 	watch: {
 		value(e) {
@@ -4586,8 +4601,8 @@ var gd = /* @__PURE__ */ new WeakMap(), _d = X.extend({
 		}
 	},
 	methods: {
-		request() {
-			return gd.get(this).request(this.$el, {
+		enter() {
+			return vd.get(this).enter(this.$el, {
 				pageOnly: this.pageOnly,
 				teleport: this.teleport,
 				fullscreenClass: this.fullscreenClass,
@@ -4597,16 +4612,16 @@ var gd = /* @__PURE__ */ new WeakMap(), _d = X.extend({
 			});
 		},
 		exit() {
-			return gd.get(this).exit();
+			return vd.get(this).exit();
 		},
 		toggle(e) {
-			return e ?? !this.isFullscreen ? this.request() : this.exit();
+			return e ?? !this.isFullscreen ? this.enter() : this.exit();
 		},
 		update(e) {
 			this.toggle(e).catch((e) => this.$emit("error", e));
 		},
-		enter() {
-			return this.request();
+		request() {
+			return this.enter();
 		},
 		getState() {
 			return this.isFullscreen;
@@ -4624,13 +4639,16 @@ var gd = /* @__PURE__ */ new WeakMap(), _d = X.extend({
 			}
 		}, this.$slots.default);
 	}
-}), vd = {
-	inserted: hd,
-	update: hd,
-	unbind: md
-}, yd = { install(e, { name: t = "fullscreen" } = {}) {
-	e.prototype[`$${t}`] = dd, e.component(t, _d), e.directive(t, vd);
-} }, bd = /* @__PURE__ */ c((/* @__PURE__ */ o(((e, t) => {
+}), bd = {
+	inserted: _d,
+	update: _d,
+	unbind: gd
+}, xd = { install(e, { name: t = "fullscreen" } = {}) {
+	Object.defineProperty(e.prototype, `$${t}`, {
+		configurable: !0,
+		get: () => dd
+	}), e.component(t, yd), e.directive(t, bd);
+} }, Sd = /* @__PURE__ */ c((/* @__PURE__ */ o(((e, t) => {
 	(function(n, r) {
 		typeof e == "object" && t !== void 0 ? t.exports = r() : typeof define == "function" && define.amd ? define(r) : (n = typeof globalThis < "u" ? globalThis : n || self, n.Viewer = r());
 	})(e, (function() {
@@ -5722,17 +5740,17 @@ var gd = /* @__PURE__ */ new WeakMap(), _d = X.extend({
 		}();
 		return V(lt.prototype, rt, it, at, ot, st), lt;
 	}));
-})))(), 1), xd = ["observe", "rebuild"], Sd = ["observe", "rebuild"];
-function Cd(e, t) {
+})))(), 1), Cd = ["observe", "rebuild"], wd = ["observe", "rebuild"];
+function Td(e, t) {
 	if (e == null) return {};
-	var n, r, i = wd(e, t);
+	var n, r, i = Ed(e, t);
 	if (Object.getOwnPropertySymbols) {
 		var a = Object.getOwnPropertySymbols(e);
 		for (r = 0; r < a.length; r++) n = a[r], t.indexOf(n) === -1 && {}.propertyIsEnumerable.call(e, n) && (i[n] = e[n]);
 	}
 	return i;
 }
-function wd(e, t) {
+function Ed(e, t) {
 	if (e == null) return {};
 	var n = {};
 	for (var r in e) if ({}.hasOwnProperty.call(e, r)) {
@@ -5741,25 +5759,25 @@ function wd(e, t) {
 	}
 	return n;
 }
-function Td(e) {
-	return Od(e) || Dd(e) || Rd(e) || Ed();
+function Dd(e) {
+	return Ad(e) || kd(e) || Bd(e) || Od();
 }
-function Ed() {
+function Od() {
 	throw TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
-function Dd(e) {
+function kd(e) {
 	if (typeof Symbol < "u" && e[Symbol.iterator] != null || e["@@iterator"] != null) return Array.from(e);
 }
-function Od(e) {
-	if (Array.isArray(e)) return zd(e);
-}
-function kd(e, t) {
-	return Md(e) || jd(e, t) || Rd(e, t) || Ad();
-}
-function Ad() {
-	throw TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+function Ad(e) {
+	if (Array.isArray(e)) return Vd(e);
 }
 function jd(e, t) {
+	return Pd(e) || Nd(e, t) || Bd(e, t) || Md();
+}
+function Md() {
+	throw TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function Nd(e, t) {
 	var n = e == null ? null : typeof Symbol < "u" && e[Symbol.iterator] || e["@@iterator"];
 	if (n != null) {
 		var r, i, a, o, s = [], c = !0, l = !1;
@@ -5780,10 +5798,10 @@ function jd(e, t) {
 		return s;
 	}
 }
-function Md(e) {
+function Pd(e) {
 	if (Array.isArray(e)) return e;
 }
-function Nd(e, t) {
+function Fd(e, t) {
 	var n = Object.keys(e);
 	if (Object.getOwnPropertySymbols) {
 		var r = Object.getOwnPropertySymbols(e);
@@ -5796,27 +5814,27 @@ function Nd(e, t) {
 function $(e) {
 	for (var t = 1; t < arguments.length; t++) {
 		var n = arguments[t] == null ? {} : arguments[t];
-		t % 2 ? Nd(Object(n), !0).forEach(function(t) {
-			Pd(e, t, n[t]);
-		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n)) : Nd(Object(n)).forEach(function(t) {
+		t % 2 ? Fd(Object(n), !0).forEach(function(t) {
+			Id(e, t, n[t]);
+		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n)) : Fd(Object(n)).forEach(function(t) {
 			Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(n, t));
 		});
 	}
 	return e;
 }
-function Pd(e, t, n) {
-	return (t = Fd(t)) in e ? Object.defineProperty(e, t, {
+function Id(e, t, n) {
+	return (t = Ld(t)) in e ? Object.defineProperty(e, t, {
 		value: n,
 		enumerable: !0,
 		configurable: !0,
 		writable: !0
 	}) : e[t] = n, e;
 }
-function Fd(e) {
-	var t = Id(e, "string");
+function Ld(e) {
+	var t = Rd(e, "string");
 	return typeof t == "symbol" ? t : t + "";
 }
-function Id(e, t) {
+function Rd(e, t) {
 	if (typeof e != "object" || !e) return e;
 	var n;
 	if (typeof Symbol < "u" && (n = e[Symbol.toPrimitive]) !== void 0) {
@@ -5826,10 +5844,10 @@ function Id(e, t) {
 	}
 	return (t === "string" ? String : Number)(e);
 }
-function Ld(e, t) {
+function zd(e, t) {
 	var n = typeof Symbol < "u" && e[Symbol.iterator] || e["@@iterator"];
 	if (!n) {
-		if (Array.isArray(e) || (n = Rd(e)) || t && e && typeof e.length == "number") {
+		if (Array.isArray(e) || (n = Bd(e)) || t && e && typeof e.length == "number") {
 			n && (e = n);
 			var r = 0, i = function() {};
 			return {
@@ -5873,23 +5891,23 @@ function Ld(e, t) {
 		}
 	};
 }
-function Rd(e, t) {
+function Bd(e, t) {
 	if (e) {
-		if (typeof e == "string") return zd(e, t);
+		if (typeof e == "string") return Vd(e, t);
 		var n = {}.toString.call(e).slice(8, -1);
-		return n === "Object" && e.constructor && (n = e.constructor.name), n === "Map" || n === "Set" ? Array.from(e) : n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n) ? zd(e, t) : void 0;
+		return n === "Object" && e.constructor && (n = e.constructor.name), n === "Map" || n === "Set" ? Array.from(e) : n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n) ? Vd(e, t) : void 0;
 	}
 }
-function zd(e, t) {
+function Vd(e, t) {
 	(t == null || t > e.length) && (t = e.length);
 	for (var n = 0, r = Array(t); n < t; n++) r[n] = e[n];
 	return r;
 }
-var Bd = 0;
-function Vd() {
+var Hd = 0;
+function Ud() {
 	var e, t = "", n = [], r = [];
 	function i() {
-		var i = Ld(r.splice(0)), a;
+		var i = zd(r.splice(0)), a;
 		try {
 			for (i.s(); !(a = i.n()).done;) {
 				var o = a.value;
@@ -5941,7 +5959,7 @@ function Vd() {
 				}
 				a.remove();
 			}), n.push({
-				key: ++Bd,
+				key: ++Hd,
 				slot: e,
 				target: a
 			});
@@ -5968,14 +5986,14 @@ function Vd() {
 		clear: i
 	};
 }
-function Hd(e) {
+function Wd(e) {
 	var t = e;
 	return {
 		image: t != null && t.viewed ? t.image : void 0,
 		index: t?.index ?? 0
 	};
 }
-var Ud = [
+var Gd = [
 	"ready",
 	"show",
 	"shown",
@@ -5994,7 +6012,7 @@ var Ud = [
 	"play",
 	"playing",
 	"stop"
-], Wd = {
+], Kd = {
 	backdrop: {
 		type: [Boolean, String],
 		default: void 0
@@ -6190,15 +6208,15 @@ var Ud = [
 		default: void 0
 	}
 };
-function Gd(e) {
-	for (var t = $({}, e.options), n = 0, r = Object.keys(Wd); n < r.length; n++) {
+function qd(e) {
+	for (var t = $({}, e.options), n = 0, r = Object.keys(Kd); n < r.length; n++) {
 		var i = r[n];
 		e[i] !== void 0 && (t[i] = e[i]);
 	}
 	return t;
 }
-function Kd(e, t) {
-	var n = Ud.map(function(n) {
+function Jd(e, t) {
+	var n = Gd.map(function(n) {
 		var r = function(r) {
 			r.target === e && t(n, r);
 		};
@@ -6212,7 +6230,7 @@ function Kd(e, t) {
 		});
 	};
 }
-var qd = [
+var Yd = [
 	"show",
 	"hide",
 	"view",
@@ -6234,8 +6252,8 @@ var qd = [
 	"reset",
 	"toggle"
 ];
-function Jd(e) {
-	return $($({}, Object.fromEntries(qd.map(function(t) {
+function Xd(e) {
+	return $($({}, Object.fromEntries(Yd.map(function(t) {
 		return [t, function() {
 			var n, r = e(), i = [...arguments];
 			return r == null || (n = r[t]) == null ? void 0 : n.apply(r, i);
@@ -6244,7 +6262,7 @@ function Jd(e) {
 		return e()?.tooltip();
 	} });
 }
-function Yd(e) {
+function Zd(e) {
 	var t = (e.tagName === "IMG" ? [e] : Array.from(e.querySelectorAll("img"))).filter(function(e) {
 		return !e.closest(".viewer-container");
 	});
@@ -6254,24 +6272,24 @@ function Yd(e) {
 			return Array.from(e.attributes).map(function(e) {
 				return [e.name, e.value];
 			}).sort(function(e, t) {
-				var n = kd(e, 1)[0], r = kd(t, 1)[0];
+				var n = jd(e, 1)[0], r = jd(t, 1)[0];
 				return n.localeCompare(r);
 			});
 		}))
 	};
 }
-function Xd(e) {
+function Qd(e) {
 	if (e.nodeType !== 1) return !1;
 	var t = e;
 	return t.closest(".viewer-container") ? !1 : t.tagName === "IMG" || Array.from(t.querySelectorAll("img")).some(function(e) {
 		return !e.closest(".viewer-container");
 	});
 }
-function Zd(e) {
-	return e.type === "attributes" ? e.target.tagName === "IMG" && !e.target.closest(".viewer-container") : [].concat(Td(Array.from(e.addedNodes)), Td(Array.from(e.removedNodes))).some(Xd);
+function $d(e) {
+	return e.type === "attributes" ? e.target.tagName === "IMG" && !e.target.closest(".viewer-container") : [].concat(Dd(Array.from(e.addedNodes)), Dd(Array.from(e.removedNodes))).some(Qd);
 }
-function Qd(e) {
-	var t = $({}, arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {}), n, r, i = Yd(e), a, o = 0, s = !1, c = t.onEvent ? Kd(e, function(e, n) {
+function ef(e) {
+	var t = $({}, arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {}), n, r, i = Zd(e), a, o = 0, s = !1, c = t.onEvent ? Jd(e, function(e, n) {
 		return t.onEvent?.call(t, e, n);
 	}) : void 0;
 	function l() {
@@ -6289,13 +6307,13 @@ function Qd(e) {
 			try {
 				if (a && l(), n) n.update();
 				else {
-					n = new bd.default(e, $({}, t.options));
+					n = new Sd.default(e, $({}, t.options));
 					var c = n, u = c.build;
 					c.build = function() {
 						if (!this.destroyed) return u.call(this);
 					};
 				}
-				e.$viewer = n, i = Yd(e);
+				e.$viewer = n, i = Zd(e);
 			} finally {
 				h();
 			}
@@ -6314,7 +6332,7 @@ function Qd(e) {
 	function m() {
 		a = setTimeout(function() {
 			if (a = void 0, !(s || t.observe === !1)) {
-				var n = Yd(e);
+				var n = Zd(e);
 				(n.attributes !== i.attributes || n.sources.length !== i.sources.length || n.sources.some(function(e, t) {
 					return e !== i.sources[t];
 				})) && u();
@@ -6323,7 +6341,7 @@ function Qd(e) {
 	}
 	function h() {
 		r?.disconnect(), !(s || t.observe === !1 || typeof MutationObserver > "u") && (r ??= new MutationObserver(function(e) {
-			e.some(Zd) && p();
+			e.some($d) && p();
 		}), r.observe(e, {
 			attributes: !0,
 			childList: !0,
@@ -6362,16 +6380,16 @@ function Qd(e) {
 		dispose: _
 	};
 }
-function $d(e) {
+function tf(e) {
 	var t = e.images, n = e.options, r = n === void 0 ? {} : n;
 	if (typeof document > "u") throw Error("v-viewer: showViewer must be called in a browser");
 	var i = document.createElement("div");
 	i.hidden = !0, i.className = "v-viewer-token";
-	var a = Ld(t), o;
+	var a = zd(t), o;
 	try {
 		for (a.s(); !(o = a.n()).done;) {
 			for (var s = o.value, c = document.createElement("img"), l = typeof s == "string" ? { src: s } : s, u = 0, d = Object.entries(l); u < d.length; u++) {
-				var f = kd(d[u], 2), p = f[0], m = f[1];
+				var f = jd(d[u], 2), p = f[0], m = f[1];
 				/^on/i.test(p) || c.setAttribute(p, m);
 			}
 			i.appendChild(c);
@@ -6384,7 +6402,7 @@ function $d(e) {
 	document.body.appendChild(i);
 	var h;
 	try {
-		h = new bd.default(i, $($({}, ef(r)), {}, { inline: !1 }));
+		h = new Sd.default(i, $($({}, nf(r)), {}, { inline: !1 }));
 	} catch (e) {
 		throw i.remove(), e;
 	}
@@ -6408,13 +6426,13 @@ function $d(e) {
 	}
 	return h;
 }
-function ef(e) {
-	return Array.isArray(e) ? e.map(ef) : e && Object.prototype.toString.call(e) === "[object Object]" ? Object.fromEntries(Object.entries(e).map(function(e) {
-		var t = kd(e, 2), n = t[0], r = t[1];
-		return [n, ef(r)];
+function nf(e) {
+	return Array.isArray(e) ? e.map(nf) : e && Object.prototype.toString.call(e) === "[object Object]" ? Object.fromEntries(Object.entries(e).map(function(e) {
+		var t = jd(e, 2), n = t[0], r = t[1];
+		return [n, nf(r)];
 	})) : e;
 }
-function tf(e, t) {
+function rf(e, t) {
 	if (e === t) return !0;
 	if (!e || !t || typeof e != "object" || typeof t != "object") return !1;
 	var n = function(e) {
@@ -6423,21 +6441,21 @@ function tf(e, t) {
 	if (!n(e) || !n(t)) return !1;
 	var r = Object.keys(e);
 	return r.length === Object.keys(t).length && r.every(function(n) {
-		return Object.prototype.hasOwnProperty.call(t, n) && tf(e[n], t[n]);
+		return Object.prototype.hasOwnProperty.call(t, n) && rf(e[n], t[n]);
 	});
 }
-function nf() {
+function af() {
 	var e = /* @__PURE__ */ new WeakMap();
 	return {
 		mount: function(t, n) {
 			var r;
 			(r = e.get(t)) == null || r.controller.dispose();
-			var i = n.value ?? {}, a = i.observe, o = i.rebuild, s = Cd(i, xd), c = o ?? !!n.modifiers.rebuild;
+			var i = n.value ?? {}, a = i.observe, o = i.rebuild, s = Td(i, Cd), c = o ?? !!n.modifiers.rebuild;
 			e.set(t, {
-				options: ef(s),
+				options: nf(s),
 				observe: a,
 				rebuild: c,
-				controller: Qd(t, {
+				controller: ef(t, {
 					options: s,
 					rebuild: c,
 					observe: a
@@ -6447,12 +6465,12 @@ function nf() {
 		update: function(t, n) {
 			var r = e.get(t);
 			if (r) {
-				var i = n.value ?? {}, a = i.observe, o = i.rebuild, s = Cd(i, Sd), c = o ?? !!n.modifiers.rebuild, l = !tf(r.options, s);
+				var i = n.value ?? {}, a = i.observe, o = i.rebuild, s = Td(i, wd), c = o ?? !!n.modifiers.rebuild, l = !rf(r.options, s);
 				l || c !== r.rebuild ? r.controller.configure({
 					options: s,
 					rebuild: c,
 					observe: a
-				}, l || c) : a !== r.observe && r.controller.configure({ observe: a }), r.options = ef(s), r.observe = a, r.rebuild = c;
+				}, l || c) : a !== r.observe && r.controller.configure({ observe: a }), r.options = nf(s), r.observe = a, r.rebuild = c;
 			}
 		},
 		unmount: function(t) {
@@ -6461,12 +6479,12 @@ function nf() {
 		}
 	};
 }
-var rf = $d, af = /* @__PURE__ */ new WeakMap(), of = /* @__PURE__ */ new WeakMap();
-function sf(e) {
+var of = tf, sf = /* @__PURE__ */ new WeakMap(), cf = /* @__PURE__ */ new WeakMap();
+function lf(e) {
 	e.$viewer = void 0;
-	var t = of.get(e);
+	var t = cf.get(e);
 	if (t) {
-		var n = Ld(t.portals.values()), r;
+		var n = zd(t.portals.values()), r;
 		try {
 			for (n.s(); !(r = n.n()).done;) {
 				var i = r.value;
@@ -6480,12 +6498,12 @@ function sf(e) {
 		t.portals.clear(), t.bridge.clear();
 	}
 }
-function cf(e) {
-	var t = of.get(e);
+function uf(e) {
+	var t = cf.get(e);
 	if (t) {
 		var n = t.bridge.sync(e.$viewer, function(t) {
 			if (t === "toolbar") {
-				var n, r = e, i = (n = e.$scopedSlots).toolbar?.call(n, $($({}, Jd(function() {
+				var n, r = e, i = (n = e.$scopedSlots).toolbar?.call(n, $($({}, Xd(function() {
 					return e.$viewer;
 				})), {}, {
 					update: function() {
@@ -6494,17 +6512,17 @@ function cf(e) {
 					destroy: function() {
 						return r.destroy();
 					}
-				}, Hd(e.$viewer))) || e.$slots.toolbar;
+				}, Wd(e.$viewer))) || e.$slots.toolbar;
 				return !!(i != null && i.some(function(e) {
 					var t;
 					return !e.isComment && (!!e.tag || !!((t = e.text) != null && t.trim()));
 				}));
 			}
 			return !!e.$scopedSlots[t] || !!e.$slots[t];
-		}), r = Ld(t.portals), i;
+		}), r = zd(t.portals), i;
 		try {
 			for (r.s(); !(i = r.n()).done;) {
-				var a = kd(i.value, 2), o = a[0], s = a[1];
+				var a = jd(i.value, 2), o = a[0], s = a[1];
 				n.indexOf(o) === -1 && (s.$destroy(), s.$el.remove(), t.portals.delete(o));
 			}
 		} catch (e) {
@@ -6512,12 +6530,12 @@ function cf(e) {
 		} finally {
 			r.f();
 		}
-		var c = Ld(n), l;
+		var c = zd(n), l;
 		try {
 			var u = function() {
 				var n = l.value, r = t.portals.get(n);
 				if (r) return r.$forceUpdate(), 1;
-				var i = Jd(function() {
+				var i = Xd(function() {
 					return e.$viewer;
 				}), a = new X({
 					parent: e,
@@ -6529,7 +6547,7 @@ function cf(e) {
 							destroy: function() {
 								return a.destroy();
 							}
-						}, Hd(e.$viewer));
+						}, Wd(e.$viewer));
 						return t("span", { style: { display: "contents" } }, (r = e.$scopedSlots)[n.slot]?.call(r, o) || e.$slots[n.slot]);
 					}
 				}).$mount();
@@ -6543,14 +6561,14 @@ function cf(e) {
 		}
 	}
 }
-var lf = Object.fromEntries(qd.map(function(e) {
+var df = Object.fromEntries(Yd.map(function(e) {
 	return [e, function() {
 		var t, n = this.$viewer, r = [...arguments];
 		return n == null || (t = n[e]) == null ? void 0 : t.apply(n, r);
 	}];
-})), uf = X.extend({
+})), ff = X.extend({
 	name: "Viewer",
-	props: $($({}, Wd), {}, {
+	props: $($({}, Kd), {}, {
 		options: {
 			type: Object,
 			default: function() {
@@ -6564,21 +6582,21 @@ var lf = Object.fromEntries(qd.map(function(e) {
 		}
 	}),
 	computed: { viewerOptions: function() {
-		return Gd(this.$props);
+		return qd(this.$props);
 	} },
 	mounted: function() {
 		this.createViewer();
 	},
 	updated: function() {
-		cf(this);
+		uf(this);
 	},
 	beforeDestroy: function() {
-		this._viewerDisposed = !0, this.destroyViewer(), of.delete(this);
+		this._viewerDisposed = !0, this.destroyViewer(), cf.delete(this);
 	},
 	watch: {
 		observe: function(e) {
 			var t;
-			(t = af.get(this)) == null || t.configure({ observe: e });
+			(t = sf.get(this)) == null || t.configure({ observe: e });
 		},
 		viewerOptions: {
 			deep: !0,
@@ -6596,7 +6614,7 @@ var lf = Object.fromEntries(qd.map(function(e) {
 			});
 		}
 	},
-	methods: $($({}, lf), {}, {
+	methods: $($({}, df), {}, {
 		showTooltip: function() {
 			return this.$viewer?.tooltip();
 		},
@@ -6608,42 +6626,42 @@ var lf = Object.fromEntries(qd.map(function(e) {
 		},
 		createViewer: function() {
 			var e = this;
-			af.has(this) || this.$isServer || this._viewerDisposed || af.set(this, Qd(this.$el, {
+			sf.has(this) || this.$isServer || this._viewerDisposed || sf.set(this, ef(this.$el, {
 				options: this.viewerOptions,
 				rebuild: this.rebuild,
 				observe: this.observe,
 				onEvent: function(t, n) {
-					cf(e), e.$emit(t, n);
+					uf(e), e.$emit(t, n);
 				},
 				onDestroy: function() {
-					return sf(e);
+					return lf(e);
 				},
 				onInit: function(t) {
-					e.$viewer = t, cf(e);
+					e.$viewer = t, uf(e);
 				}
 			}));
 		},
 		destroyViewer: function() {
 			var e;
-			(e = af.get(this)) == null || e.dispose(), af.delete(this), this.$viewer = void 0;
+			(e = sf.get(this)) == null || e.dispose(), sf.delete(this), this.$viewer = void 0;
 		},
 		updateViewer: function() {
-			af.has(this) ? af.get(this).refresh(!1) : this.createViewer();
+			sf.has(this) ? sf.get(this).refresh(!1) : this.createViewer();
 		},
 		rebuildViewer: function() {
-			af.has(this) ? af.get(this).configure({
+			sf.has(this) ? sf.get(this).configure({
 				options: this.viewerOptions,
 				rebuild: this.rebuild
 			}) : this.createViewer();
 		},
 		changeViewer: function() {
 			var e;
-			(e = af.get(this)) == null || e.configure({ rebuild: this.rebuild }, this.rebuild);
+			(e = sf.get(this)) == null || e.configure({ rebuild: this.rebuild }, this.rebuild);
 		}
 	}),
 	beforeCreate: function() {
-		of.set(this, {
-			bridge: Vd(),
+		cf.set(this, {
+			bridge: Ud(),
 			portals: /* @__PURE__ */ new Map()
 		}), this._viewerDisposed = !1;
 	},
@@ -6654,79 +6672,37 @@ var lf = Object.fromEntries(qd.map(function(e) {
 		var t;
 		return e("div", (t = this.$scopedSlots).default?.call(t, { options: this.options }) || this.$slots.default);
 	}
-}), df = nf(), ff = /* @__PURE__ */ new WeakMap(), pf = function(e, t, n) {
+}), pf = af(), mf = /* @__PURE__ */ new WeakMap(), hf = function(e, t, n) {
 	var r;
-	if ((r = ff.get(e)) == null || r(), n.context) {
+	if ((r = mf.get(e)) == null || r(), n.context) {
 		var i = n.context.$watch(function() {
 			return t.value;
 		}, function() {
-			return df.update(e, t);
+			return pf.update(e, t);
 		}, { deep: !0 });
-		ff.set(e, i);
+		mf.set(e, i);
 	}
-}, mf = {
+}, gf = {
 	inserted: function(e, t, n, r) {
-		df.mount(e, t), pf(e, t, n, r);
+		pf.mount(e, t), hf(e, t, n, r);
 	},
 	componentUpdated: function(e, t, n, r) {
-		df.update(e, t), pf(e, t, n, r);
+		pf.update(e, t), hf(e, t, n, r);
 	},
 	unbind: function(e) {
 		var t;
-		(t = ff.get(e)) == null || t(), ff.delete(e), df.unmount(e);
+		(t = mf.get(e)) == null || t(), mf.delete(e), pf.unmount(e);
 	}
-}, hf = {
+}, _f = {
 	install: function(e) {
 		var t = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {}, n = t.name, r = n === void 0 ? "viewer" : n, i = t.defaultOptions;
-		i && bd.default.setDefaults(i), e.component(r, uf), e.directive(r, mf), e.prototype[`\$${r}Api`] = rf;
+		i && Sd.default.setDefaults(i), e.component(r, ff), e.directive(r, gf), e.prototype[`\$${r}Api`] = of;
 	},
 	setDefaults: function(e) {
-		return bd.default.setDefaults(e);
+		return Sd.default.setDefaults(e);
 	}
 };
-X.use(yd), X.use(hf);
-var gf = [
-	10,
-	11,
-	12,
-	13,
-	14,
-	15
-], _f = {
-	data: () => ({
-		images: gf,
-		selected: 0,
-		active: !1,
-		pageOnly: !1,
-		teleport: !0,
-		showDetails: !1,
-		error: ""
-	}),
-	computed: { options() {
-		return {
-			target: "#target",
-			pageOnly: this.pageOnly,
-			teleport: this.teleport,
-			fullscreenClass: "demo-fullscreen",
-			callback: this.changed
-		};
-	} },
-	methods: {
-		changed(e) {
-			this.active = e, e || this.$refs.preview.hide();
-		},
-		report(e) {
-			this.active = !1, this.showDetails = !1, this.error = e.message;
-		},
-		previewImage(e) {
-			this.showDetails && this.selected === e ? this.$refs.preview.hide() : (this.selected = e, this.$refs.preview.view(e));
-		}
-	},
-	beforeDestroy() {
-		this.$fullscreen.element === this.$refs.target && this.$fullscreen.exit().catch(() => {});
-	}
-};
-_f.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"active\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"active\"> teleport</label>\n      <button id=\"enter\" :disabled=\"active\" @click=\"active = true\" >进入全屏</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <fullscreen id=\"target\" ref=\"target\" class=\"surface\" v-model=\"active\" :page-only=\"pageOnly\" :teleport=\"teleport\" :exit-on-click-wrapper=\"false\" fullscreen-class=\"demo-fullscreen\" @change=\"changed\" @error=\"report\">\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'预览图片 ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'风景图片 ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <button v-if=\"active\" id=\"exit\" class=\"exit\" @click=\"active = false\" >退出全屏</button>\n        <p v-if=\"active && showDetails && !pageOnly && !teleport\" role=\"status\">弹窗已在 body 下打开，但不属于当前原生全屏元素。</p>\n      </fullscreen>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", _f._scopeId = "data-v-playground", X.use(yd), X.use(hf);
+X.use(xd), X.use(_f);
 var vf = [
 	10,
 	11,
@@ -6738,7 +6714,7 @@ var vf = [
 	data: () => ({
 		images: vf,
 		selected: 0,
-		active: !1,
+		isFullscreen: !1,
 		pageOnly: !1,
 		teleport: !0,
 		showDetails: !1,
@@ -6755,10 +6731,10 @@ var vf = [
 	} },
 	methods: {
 		changed(e) {
-			this.active = e, e || this.$refs.preview.hide();
+			this.isFullscreen = e, e || this.$refs.preview.hide();
 		},
 		report(e) {
-			this.active = !1, this.showDetails = !1, this.error = e.message;
+			this.isFullscreen = !1, this.showDetails = !1, this.error = e.message;
 		},
 		previewImage(e) {
 			this.showDetails && this.selected === e ? this.$refs.preview.hide() : (this.selected = e, this.$refs.preview.view(e));
@@ -6768,7 +6744,7 @@ var vf = [
 		this.$fullscreen.element === this.$refs.target && this.$fullscreen.exit().catch(() => {});
 	}
 };
-yf.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"active\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"active\"> teleport</label>\n      <button id=\"enter\" :disabled=\"active\" @click=\"active = true\" >Enter fullscreen</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <fullscreen id=\"target\" ref=\"target\" class=\"surface\" v-model=\"active\" :page-only=\"pageOnly\" :teleport=\"teleport\" :exit-on-click-wrapper=\"false\" fullscreen-class=\"demo-fullscreen\" @change=\"changed\" @error=\"report\">\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'Preview image ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'Landscape ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <button v-if=\"active\" id=\"exit\" class=\"exit\" @click=\"active = false\" >Exit fullscreen</button>\n        <p v-if=\"active && showDetails && !pageOnly && !teleport\" role=\"status\">The popup is open under body, but is outside the native fullscreen element.</p>\n      </fullscreen>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", yf._scopeId = "data-v-playground", X.use(yd), X.use(hf);
+yf.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"isFullscreen\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"isFullscreen\"> teleport</label>\n      <button id=\"enter\" :disabled=\"isFullscreen\" @click=\"isFullscreen = true\" >进入全屏</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <fullscreen id=\"target\" ref=\"target\" class=\"surface\" v-model=\"isFullscreen\" :page-only=\"pageOnly\" :teleport=\"teleport\" :exit-on-click-wrapper=\"false\" fullscreen-class=\"demo-fullscreen\" @change=\"changed\" @error=\"report\">\n        <button v-if=\"isFullscreen\" id=\"exit\" class=\"exit\" @click=\"isFullscreen = false\" >退出全屏</button>\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'预览图片 ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'风景图片 ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <p v-if=\"isFullscreen && showDetails && !pageOnly && !teleport\" role=\"status\">弹窗已在 body 下打开，但不属于当前原生全屏元素。</p>\n      </fullscreen>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", yf._scopeId = "data-v-playground", X.use(xd), X.use(_f);
 var bf = [
 	10,
 	11,
@@ -6780,7 +6756,7 @@ var bf = [
 	data: () => ({
 		images: bf,
 		selected: 0,
-		active: !1,
+		isFullscreen: !1,
 		pageOnly: !1,
 		teleport: !0,
 		showDetails: !1,
@@ -6797,10 +6773,10 @@ var bf = [
 	} },
 	methods: {
 		changed(e) {
-			this.active = e, e || this.$refs.preview.hide();
+			this.isFullscreen = e, e || this.$refs.preview.hide();
 		},
 		report(e) {
-			this.active = !1, this.showDetails = !1, this.error = e.message;
+			this.isFullscreen = !1, this.showDetails = !1, this.error = e.message;
 		},
 		previewImage(e) {
 			this.showDetails && this.selected === e ? this.$refs.preview.hide() : (this.selected = e, this.$refs.preview.view(e));
@@ -6810,7 +6786,7 @@ var bf = [
 		this.$fullscreen.element === this.$refs.target && this.$fullscreen.exit().catch(() => {});
 	}
 };
-xf.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"active\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"active\"> teleport</label>\n      <button id=\"enter\" :disabled=\"active\" v-fullscreen=\"options\" @fullscreen-error=\"report($event.detail)\">点击指令按钮</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <section id=\"target\" ref=\"target\" class=\"surface\" >\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'预览图片 ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'风景图片 ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <button v-if=\"active\" id=\"exit\" class=\"exit\" v-fullscreen=\"options\" @fullscreen-error=\"report($event.detail)\">退出全屏</button>\n        <p v-if=\"active && showDetails && !pageOnly && !teleport\" role=\"status\">弹窗已在 body 下打开，但不属于当前原生全屏元素。</p>\n      </section>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", xf._scopeId = "data-v-playground", X.use(yd), X.use(hf);
+xf.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"isFullscreen\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"isFullscreen\"> teleport</label>\n      <button id=\"enter\" :disabled=\"isFullscreen\" @click=\"isFullscreen = true\" >Enter fullscreen</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <fullscreen id=\"target\" ref=\"target\" class=\"surface\" v-model=\"isFullscreen\" :page-only=\"pageOnly\" :teleport=\"teleport\" :exit-on-click-wrapper=\"false\" fullscreen-class=\"demo-fullscreen\" @change=\"changed\" @error=\"report\">\n        <button v-if=\"isFullscreen\" id=\"exit\" class=\"exit\" @click=\"isFullscreen = false\" >Exit fullscreen</button>\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'Preview image ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'Landscape ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <p v-if=\"isFullscreen && showDetails && !pageOnly && !teleport\" role=\"status\">The popup is open under body, but is outside the native fullscreen element.</p>\n      </fullscreen>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", xf._scopeId = "data-v-playground", X.use(xd), X.use(_f);
 var Sf = [
 	10,
 	11,
@@ -6822,7 +6798,7 @@ var Sf = [
 	data: () => ({
 		images: Sf,
 		selected: 0,
-		active: !1,
+		isFullscreen: !1,
 		pageOnly: !1,
 		teleport: !0,
 		showDetails: !1,
@@ -6839,10 +6815,10 @@ var Sf = [
 	} },
 	methods: {
 		changed(e) {
-			this.active = e, e || this.$refs.preview.hide();
+			this.isFullscreen = e, e || this.$refs.preview.hide();
 		},
 		report(e) {
-			this.active = !1, this.showDetails = !1, this.error = e.message;
+			this.isFullscreen = !1, this.showDetails = !1, this.error = e.message;
 		},
 		previewImage(e) {
 			this.showDetails && this.selected === e ? this.$refs.preview.hide() : (this.selected = e, this.$refs.preview.view(e));
@@ -6852,7 +6828,7 @@ var Sf = [
 		this.$fullscreen.element === this.$refs.target && this.$fullscreen.exit().catch(() => {});
 	}
 };
-Cf.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"active\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"active\"> teleport</label>\n      <button id=\"enter\" :disabled=\"active\" v-fullscreen=\"options\" @fullscreen-error=\"report($event.detail)\">Toggle with directive</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <section id=\"target\" ref=\"target\" class=\"surface\" >\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'Preview image ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'Landscape ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <button v-if=\"active\" id=\"exit\" class=\"exit\" v-fullscreen=\"options\" @fullscreen-error=\"report($event.detail)\">Exit fullscreen</button>\n        <p v-if=\"active && showDetails && !pageOnly && !teleport\" role=\"status\">The popup is open under body, but is outside the native fullscreen element.</p>\n      </section>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", Cf._scopeId = "data-v-playground", X.use(yd), X.use(hf);
+Cf.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"isFullscreen\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"isFullscreen\"> teleport</label>\n      <button id=\"enter\" :disabled=\"isFullscreen\" v-fullscreen=\"options\" @fullscreen-error=\"report($event.detail)\">点击指令按钮</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <section id=\"target\" ref=\"target\" class=\"surface\" >\n        <button v-if=\"isFullscreen\" id=\"exit\" class=\"exit\" v-fullscreen=\"options\" @fullscreen-error=\"report($event.detail)\">退出全屏</button>\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'预览图片 ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'风景图片 ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <p v-if=\"isFullscreen && showDetails && !pageOnly && !teleport\" role=\"status\">弹窗已在 body 下打开，但不属于当前原生全屏元素。</p>\n      </section>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", Cf._scopeId = "data-v-playground", X.use(xd), X.use(_f);
 var wf = [
 	10,
 	11,
@@ -6864,7 +6840,7 @@ var wf = [
 	data: () => ({
 		images: wf,
 		selected: 0,
-		active: !1,
+		isFullscreen: !1,
 		pageOnly: !1,
 		teleport: !0,
 		showDetails: !1,
@@ -6881,16 +6857,10 @@ var wf = [
 	} },
 	methods: {
 		changed(e) {
-			this.active = e, e || this.$refs.preview.hide();
+			this.isFullscreen = e, e || this.$refs.preview.hide();
 		},
 		report(e) {
-			this.active = !1, this.showDetails = !1, this.error = e.message;
-		},
-		enter() {
-			return this.$fullscreen.request("target", this.options).catch(this.report);
-		},
-		exit() {
-			return this.$fullscreen.exit().catch(this.report);
+			this.isFullscreen = !1, this.showDetails = !1, this.error = e.message;
 		},
 		previewImage(e) {
 			this.showDetails && this.selected === e ? this.$refs.preview.hide() : (this.selected = e, this.$refs.preview.view(e));
@@ -6900,7 +6870,7 @@ var wf = [
 		this.$fullscreen.element === this.$refs.target && this.$fullscreen.exit().catch(() => {});
 	}
 };
-Tf.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"active\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"active\"> teleport</label>\n      <button id=\"enter\" :disabled=\"active\" @click=\"enter\" >进入全屏</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <section id=\"target\" ref=\"target\" class=\"surface\" >\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'预览图片 ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'风景图片 ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <button v-if=\"active\" id=\"exit\" class=\"exit\" @click=\"exit\" >退出全屏</button>\n        <p v-if=\"active && showDetails && !pageOnly && !teleport\" role=\"status\">弹窗已在 body 下打开，但不属于当前原生全屏元素。</p>\n      </section>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", Tf._scopeId = "data-v-playground", X.use(yd), X.use(hf);
+Tf.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"isFullscreen\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"isFullscreen\"> teleport</label>\n      <button id=\"enter\" :disabled=\"isFullscreen\" v-fullscreen=\"options\" @fullscreen-error=\"report($event.detail)\">Toggle with directive</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <section id=\"target\" ref=\"target\" class=\"surface\" >\n        <button v-if=\"isFullscreen\" id=\"exit\" class=\"exit\" v-fullscreen=\"options\" @fullscreen-error=\"report($event.detail)\">Exit fullscreen</button>\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'Preview image ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'Landscape ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <p v-if=\"isFullscreen && showDetails && !pageOnly && !teleport\" role=\"status\">The popup is open under body, but is outside the native fullscreen element.</p>\n      </section>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", Tf._scopeId = "data-v-playground", X.use(xd), X.use(_f);
 var Ef = [
 	10,
 	11,
@@ -6912,7 +6882,7 @@ var Ef = [
 	data: () => ({
 		images: Ef,
 		selected: 0,
-		active: !1,
+		isFullscreen: !1,
 		pageOnly: !1,
 		teleport: !0,
 		showDetails: !1,
@@ -6929,13 +6899,13 @@ var Ef = [
 	} },
 	methods: {
 		changed(e) {
-			this.active = e, e || this.$refs.preview.hide();
+			this.isFullscreen = e, e || this.$refs.preview.hide();
 		},
 		report(e) {
-			this.active = !1, this.showDetails = !1, this.error = e.message;
+			this.isFullscreen = !1, this.showDetails = !1, this.error = e.message;
 		},
 		enter() {
-			return this.$fullscreen.request("target", this.options).catch(this.report);
+			return this.$fullscreen.enter("target", this.options).catch(this.report);
 		},
 		exit() {
 			return this.$fullscreen.exit().catch(this.report);
@@ -6948,42 +6918,90 @@ var Ef = [
 		this.$fullscreen.element === this.$refs.target && this.$fullscreen.exit().catch(() => {});
 	}
 };
-Df.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"active\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"active\"> teleport</label>\n      <button id=\"enter\" :disabled=\"active\" @click=\"enter\" >Enter fullscreen</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <section id=\"target\" ref=\"target\" class=\"surface\" >\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'Preview image ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'Landscape ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <button v-if=\"active\" id=\"exit\" class=\"exit\" @click=\"exit\" >Exit fullscreen</button>\n        <p v-if=\"active && showDetails && !pageOnly && !teleport\" role=\"status\">The popup is open under body, but is outside the native fullscreen element.</p>\n      </section>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", Df._scopeId = "data-v-playground";
+Df.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"isFullscreen\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"isFullscreen\"> teleport</label>\n      <button id=\"enter\" :disabled=\"isFullscreen\" @click=\"enter\" >进入全屏</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <section id=\"target\" ref=\"target\" class=\"surface\" >\n        <button v-if=\"isFullscreen\" id=\"exit\" class=\"exit\" @click=\"exit\" >退出全屏</button>\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'预览图片 ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'风景图片 ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <p v-if=\"isFullscreen && showDetails && !pageOnly && !teleport\" role=\"status\">弹窗已在 body 下打开，但不属于当前原生全屏元素。</p>\n      </section>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", Df._scopeId = "data-v-playground", X.use(xd), X.use(_f);
+var Of = [
+	10,
+	11,
+	12,
+	13,
+	14,
+	15
+], kf = {
+	data: () => ({
+		images: Of,
+		selected: 0,
+		isFullscreen: !1,
+		pageOnly: !1,
+		teleport: !0,
+		showDetails: !1,
+		error: ""
+	}),
+	computed: { options() {
+		return {
+			target: "#target",
+			pageOnly: this.pageOnly,
+			teleport: this.teleport,
+			fullscreenClass: "demo-fullscreen",
+			callback: this.changed
+		};
+	} },
+	methods: {
+		changed(e) {
+			this.isFullscreen = e, e || this.$refs.preview.hide();
+		},
+		report(e) {
+			this.isFullscreen = !1, this.showDetails = !1, this.error = e.message;
+		},
+		enter() {
+			return this.$fullscreen.enter("target", this.options).catch(this.report);
+		},
+		exit() {
+			return this.$fullscreen.exit().catch(this.report);
+		},
+		previewImage(e) {
+			this.showDetails && this.selected === e ? this.$refs.preview.hide() : (this.selected = e, this.$refs.preview.view(e));
+		}
+	},
+	beforeDestroy() {
+		this.$fullscreen.element === this.$refs.target && this.$fullscreen.exit().catch(() => {});
+	}
+};
+kf.template = "\n  <div class=\"lab\">\n    <header class=\"options\">\n      <label class=\"page-only-control\"><input v-model=\"pageOnly\" type=\"checkbox\" :disabled=\"isFullscreen\"> pageOnly</label>\n      <label><input v-model=\"teleport\" type=\"checkbox\" :disabled=\"isFullscreen\"> teleport</label>\n      <button id=\"enter\" :disabled=\"isFullscreen\" @click=\"enter\" >Enter fullscreen</button>\n    </header>\n    <div class=\"surface-placeholder\">\n      <section id=\"target\" ref=\"target\" class=\"surface\" >\n        <button v-if=\"isFullscreen\" id=\"exit\" class=\"exit\" @click=\"exit\" >Exit fullscreen</button>\n        <viewer ref=\"preview\" class=\"image-preview\" url=\"data-source\" :z-index=\"10001\" :toolbar=\"false\" :title=\"false\" :transition=\"false\" :focus=\"false\" :fullscreen=\"false\" @show=\"showDetails = true\" @hidden=\"showDetails = false\">\n          <button v-for=\"(id, index) in images\" :key=\"id\" class=\"image-trigger\" :aria-label=\"'Preview image ' + (index + 1)\" :aria-expanded=\"showDetails && selected === index ? 'true' : 'false'\" @click.stop=\"previewImage(index)\">\n            <img class=\"gallery-image demo-picture\" :src=\"'https://picsum.photos/id/' + id + '/640/360'\" :data-source=\"'https://picsum.photos/id/' + id + '/1280/720'\" :alt=\"'Landscape ' + (index + 1)\" width=\"1280\" height=\"720\">\n          </button>\n        </viewer>\n        <p v-if=\"isFullscreen && showDetails && !pageOnly && !teleport\" role=\"status\">The popup is open under body, but is outside the native fullscreen element.</p>\n      </section>\n    </div>\n    <p v-if=\"error\" role=\"alert\">{{ error }}</p>\n  </div>\n", kf._scopeId = "data-v-playground";
 //#endregion
 //#region \0virtual:fullscreen-examples
-var Of = {
-	"component zh": _f,
-	"component en": yf,
-	"directive zh": xf,
-	"directive en": Cf,
-	"api zh": Tf,
-	"api en": Df
-}, kf = "\n.lab[data-v-playground] { --sample-bg: #f6f6f7; --sample-surface: #fff; --sample-text: #3c3c43; --sample-border: #c2c2c4; --sample-accent: #5b51d8; --sample-button-text: #fff; box-sizing: border-box; font: 14px/1.7 system-ui, sans-serif; color: var(--sample-text);\n}\n.dark .lab[data-v-playground] { --sample-bg: #1b1b1f; --sample-surface: #202127; --sample-text: #dfdfe5; --sample-border: #67676c; --sample-accent: #aaa2ff; --sample-button-text: #202127;\n}\n.lab[data-v-playground] { padding: 16px; background: var(--sample-bg);\n}\nbutton[data-v-playground], input[data-v-playground] { font: inherit;\n}\nbutton[data-v-playground] { padding: 8px 16px; border: 1px solid var(--sample-accent); border-radius: 6px; background: var(--sample-accent); color: var(--sample-button-text); cursor: pointer;\n}\nbutton[data-v-playground]:hover { filter: brightness(.94);\n}\nbutton[data-v-playground]:disabled { opacity: .5; cursor: default;\n}\nbutton[data-v-playground]:focus-visible, input[data-v-playground]:focus-visible { outline: 2px solid var(--sample-accent); outline-offset: 3px;\n}\ninput[data-v-playground] { accent-color: var(--sample-accent);\n}\n.options[data-v-playground] { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding-bottom: 16px;\n}\n.options label[data-v-playground] { display: flex; gap: 6px; align-items: center;\n}\n.options button[data-v-playground] { width: 100%; padding: 12px 16px; font-size: 16px;\n}\n.surface-placeholder[data-v-playground] { height: 300px;\n}\n.surface[data-v-playground] { position: relative; height: 300px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; padding: 10px; background: var(--sample-surface); border: 1px solid var(--sample-border); border-radius: 8px;\n}\n.surface.demo-fullscreen[data-v-playground] { z-index: 10000; min-height: 100vh; height: 100vh; border-radius: 0; padding: 20px 24px 72px;\n}\n.image-preview[data-v-playground] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: start; gap: 10px; width: 100%;\n}\n.image-trigger[data-v-playground] { display: block; aspect-ratio: 16 / 10; width: 100%; padding: 0; border: 0; border-radius: 4px; overflow: hidden; background: transparent; cursor: zoom-in;\n}\n.image-trigger[data-v-playground]:hover { background: transparent; filter: none;\n}\n.gallery-image[data-v-playground] { position: static; display: block; width: 100%; height: 100%; object-fit: cover;\n}\n.exit[data-v-playground] { position: absolute; top: 16px; right: 16px;\n}\n.surface p[role=\"status\"][data-v-playground] { position: absolute; bottom: 68px; margin: 0; padding: 6px 12px; background: var(--sample-surface); font-size: 12px;\n}\n@media (max-width: 480px) {\n.image-preview[data-v-playground] { grid-template-columns: repeat(2, minmax(0, 1fr));\n}\n}\n\n", Af = new URLSearchParams(location.search), jf = (e) => {
+var Af = {
+	"component zh": yf,
+	"component en": xf,
+	"directive zh": Cf,
+	"directive en": Tf,
+	"api zh": Df,
+	"api en": kf
+}, jf = "\n.lab[data-v-playground], .surface[data-v-playground] { --sample-bg: #f6f6f7; --sample-surface: #fff; --sample-text: #3c3c43; --sample-border: #c2c2c4; --sample-accent: #5b51d8; --sample-button-text: #fff; box-sizing: border-box; font: 14px/1.7 system-ui, sans-serif; color: var(--sample-text);\n}\n.dark .lab[data-v-playground], .dark .surface[data-v-playground] { --sample-bg: #1b1b1f; --sample-surface: #202127; --sample-text: #dfdfe5; --sample-border: #67676c; --sample-accent: #aaa2ff; --sample-button-text: #202127;\n}\n.lab[data-v-playground] { padding: 16px; background: var(--sample-bg);\n}\nbutton[data-v-playground], input[data-v-playground] { font: inherit;\n}\nbutton[data-v-playground] { padding: 8px 16px; border: 1px solid var(--sample-accent); border-radius: 6px; background: var(--sample-accent); color: var(--sample-button-text); cursor: pointer;\n}\nbutton[data-v-playground]:hover { filter: brightness(.94);\n}\nbutton[data-v-playground]:disabled { opacity: .5; cursor: default;\n}\nbutton[data-v-playground]:focus-visible, input[data-v-playground]:focus-visible { outline: 2px solid var(--sample-accent); outline-offset: 3px;\n}\ninput[data-v-playground] { accent-color: var(--sample-accent);\n}\n.options[data-v-playground] { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding-bottom: 16px;\n}\n.options label[data-v-playground] { display: flex; gap: 6px; align-items: center;\n}\n.options button[data-v-playground], .exit[data-v-playground] { width: 100%; padding: 12px 16px; font-size: 16px;\n}\n.surface-placeholder[data-v-playground] { height: 300px;\n}\n.surface[data-v-playground] { position: relative; height: 300px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; padding: 10px; background: var(--sample-surface); border: 1px solid var(--sample-border); border-radius: 8px;\n}\n.surface.demo-fullscreen[data-v-playground] { z-index: 10000; min-height: 100vh; height: 100vh; overflow: auto; border-radius: 0; padding: 20px 24px;\n}\n.image-preview[data-v-playground] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: start; gap: 10px; width: 100%;\n}\n.image-trigger[data-v-playground] { display: block; aspect-ratio: 16 / 10; width: 100%; padding: 0; border: 0; border-radius: 4px; overflow: hidden; background: transparent; cursor: zoom-in;\n}\n.image-trigger[data-v-playground]:hover { background: transparent; filter: none;\n}\n.gallery-image[data-v-playground] { position: static; display: block; width: 100%; height: 100%; object-fit: cover;\n}\n.exit[data-v-playground] { flex-shrink: 0; margin-bottom: 16px;\n}\n.surface p[role=\"status\"][data-v-playground] { position: absolute; bottom: 68px; margin: 0; padding: 6px 12px; background: var(--sample-surface); font-size: 12px;\n}\n@media (max-width: 480px) {\n.image-preview[data-v-playground] { grid-template-columns: repeat(2, minmax(0, 1fr));\n}\n}\n\n", Mf = new URLSearchParams(location.search), Nf = (e) => {
 	document.documentElement.classList.toggle("dark", e), document.documentElement.style.colorScheme = e ? "dark" : "light";
 };
 try {
-	jf(parent.document.documentElement.classList.contains("dark"));
+	Nf(parent.document.documentElement.classList.contains("dark"));
 } catch {
-	jf(matchMedia("(prefers-color-scheme: dark)").matches);
+	Nf(matchMedia("(prefers-color-scheme: dark)").matches);
 }
 addEventListener("message", (e) => {
-	e.source === parent && e.origin === location.origin && e.data?.source === "fullscreen-docs-theme" && typeof e.data.dark == "boolean" && jf(e.data.dark);
+	e.source === parent && e.origin === location.origin && e.data?.source === "fullscreen-docs-theme" && typeof e.data.dark == "boolean" && Nf(e.data.dark);
 });
-var Mf = [
+var Pf = [
 	"component",
 	"directive",
 	"api"
-].includes(Af.get("kind")) ? Af.get("kind") : "component", Nf = Af.get("lang") === "en" ? "en" : "zh";
-document.documentElement.lang = Nf === "en" ? "en" : "zh-CN";
-var Pf = document.createElement("style");
-Pf.textContent = kf + "body { margin: 0; } .page-only-control { display: none !important; }", document.head.appendChild(Pf);
-var Ff = Of[`${Mf} ${Nf}`], If = Ff.data;
+].includes(Mf.get("kind")) ? Mf.get("kind") : "component", Ff = Mf.get("lang") === "en" ? "en" : "zh";
+document.documentElement.lang = Ff === "en" ? "en" : "zh-CN";
+var If = document.createElement("style");
+If.textContent = jf + "body { margin: 0; } .page-only-control { display: none !important; }", document.head.appendChild(If);
+var Lf = Af[`${Pf} ${Ff}`], Rf = Lf.data;
 new X({
-	...Ff,
+	...Lf,
 	data() {
 		return {
-			...If.call(this),
-			pageOnly: Af.has("pageOnly")
+			...Rf.call(this),
+			pageOnly: Mf.has("pageOnly")
 		};
 	}
 }).$mount("#app");
