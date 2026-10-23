@@ -684,15 +684,6 @@ for (const english of [false, true]) {
     await expectBodyViewer(popup, true)
     const previewImage = popup.locator('.viewer-canvas img')
     await expect(previewImage).toBeVisible()
-    const width = await previewImage.evaluate(
-      (el) => el.getBoundingClientRect().width,
-    )
-    await popup.getByRole('button', { name: 'Zoom In', exact: true }).click()
-    await expect
-      .poll(() =>
-        previewImage.evaluate((el) => el.getBoundingClientRect().width),
-      )
-      .toBeGreaterThan(width)
     await closeViewer(popup, image, true)
     for (const teleport of [false, true]) {
       await demo.getByLabel('teleport', { exact: true }).setChecked(teleport)
@@ -799,20 +790,11 @@ for (const english of [false, true]) {
         await expectInlineViewerSize(target, false)
         expect((await image.boundingBox())!.height).toBeGreaterThan(300)
         await expect(viewer.locator('.viewer-list > li')).toHaveCount(6)
-        await viewer.getByRole('button', { name: 'Next', exact: true }).click()
+        await viewer.locator('.viewer-list > li').nth(1).click()
         await expect(image).toHaveAttribute(
           'src',
           /picsum\.photos\/id\/11\/1280\/720$/,
         )
-        const width = await image.evaluate(
-          (el) => el.getBoundingClientRect().width,
-        )
-        await viewer
-          .getByRole('button', { name: 'Zoom In', exact: true })
-          .click()
-        await expect
-          .poll(() => image.evaluate((el) => el.getBoundingClientRect().width))
-          .toBeGreaterThan(width)
         await demo
           .getByRole('button', {
             name: english ? 'Enter fullscreen' : '进入全屏',
@@ -838,7 +820,6 @@ for (const english of [false, true]) {
           })
           .click()
         await expectInlineViewerSize(target, false)
-        await expect(demo.locator('.gallery-count')).toHaveText('2 / 6')
         await expect(page.locator('body > .viewer-container')).toHaveCount(0)
         await page.setViewportSize({ width: 390, height: 844 })
         await expectInlineViewerSize(target, false)
@@ -920,7 +901,6 @@ for (const english of [false, true]) {
         })
         .click()
       await expect(demo.locator('.gallery-thumbnails')).toBeHidden()
-      await expect(demo.locator('.gallery-count')).toHaveText('2 / 6')
       await expect(image).toHaveAttribute(
         'src',
         /picsum\.photos\/id\/11\/640\/360$/,

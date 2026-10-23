@@ -240,6 +240,8 @@ new Vue({
                     class: 'inline-gallery-sources',
                     props: {
                       inline: true,
+                      toolbar: false,
+                      title: false,
                       button: false,
                       transition: false,
                       focus: false,
@@ -264,6 +266,8 @@ new Vue({
                   ref: 'preview',
                   props: {
                     zIndex: 10001,
+                    toolbar: false,
+                    title: false,
                     transition: false,
                     focus: false,
                     fullscreen: false,

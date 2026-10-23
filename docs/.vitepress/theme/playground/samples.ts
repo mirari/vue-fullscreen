@@ -122,7 +122,7 @@ ${kind === 'api' ? 'watch(active, changed)\n' : ''}
     </header>
     <div class="surface-placeholder">
       <${tag} id="${id}" ref="target" class="surface" ${props}>
-        <${vue2 ? 'viewer' : 'Viewer'} ref="preview" class="image-preview" :z-index="10001" :transition="false" :focus="false" :fullscreen="false" @show="showDetails = true" @hidden="showDetails = false">
+        <${vue2 ? 'viewer' : 'Viewer'} ref="preview" class="image-preview" :z-index="10001" :toolbar="false" :title="false" :transition="false" :focus="false" :fullscreen="false" @show="showDetails = true" @hidden="showDetails = false">
           <button class="image-trigger" aria-label="${text.details}" :aria-expanded="showDetails ? 'true' : 'false'" @click.stop="previewImage">
             <img class="gallery-image demo-picture" src="https://picsum.photos/id/10/1280/720" alt="${text.image}" width="1280" height="720">
           </button>
@@ -153,7 +153,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--sample-acce
 input { accent-color: var(--sample-accent); }
 .options { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding-bottom: 16px; }
 .options label { display: flex; gap: 6px; align-items: center; }
-.options button { margin-left: auto; }
+.options button { width: 100%; padding: 12px 16px; font-size: 16px; }
 .surface-placeholder { height: 300px; }
 .surface { position: relative; height: 300px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; padding: 10px; background: var(--sample-surface); border: 1px solid var(--sample-border); border-radius: 8px; }
 .surface.demo-fullscreen { z-index: 10000; min-height: 100vh; height: 100vh; border-radius: 0; padding: 20px 24px 72px; }

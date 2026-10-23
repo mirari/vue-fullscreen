@@ -24,6 +24,17 @@ main button {
   margin: 0.5rem;
   cursor: pointer;
 }
+#enter {
+  display: block;
+  width: calc(100% - 1rem);
+  padding: 14px 20px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--demo-accent);
+  color: var(--demo-background);
+  font-size: 16px;
+  font-weight: 600;
+}
 #target,
 #api-target {
   padding: 2rem;

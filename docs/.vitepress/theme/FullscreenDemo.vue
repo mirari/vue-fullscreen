@@ -82,9 +82,6 @@ function movePhoto(offset: number) {
   else if (offset < 0) preview.value?.prev(true)
   else preview.value?.next(true)
 }
-function photoViewed(event: CustomEvent) {
-  selected.value = event.detail.index
-}
 const { lang } = useData()
 const english = computed(() => lang.value.startsWith('en'))
 const text = computed(() =>
@@ -206,23 +203,27 @@ onBeforeUnmount(() => {
       @error="report"
       @change="fullscreenChanged"
     >
-      <div class="gallery-topbar">
-        <span>{{ english ? photo.en : photo.zh }}</span>
-        <span class="gallery-count" aria-live="polite"
-          >{{ selected + 1 }} / {{ photos.length }}</span
+      <div v-if="simple || active" class="gallery-topbar">
+        <button
+          v-if="simple && !active"
+          class="demo-button gallery-fullscreen-action"
+          @click="enter"
         >
-        <button v-if="simple && !active" class="gallery-exit" @click="enter">
           {{ text.enter }}
         </button>
         <button
           v-if="active && kind === 'directive'"
           v-fullscreen="options"
-          class="gallery-exit"
+          class="demo-button gallery-fullscreen-action"
           @fullscreen-error="report($event.detail)"
         >
           {{ text.exit }}
         </button>
-        <button v-else-if="active" class="gallery-exit" @click="exit">
+        <button
+          v-else-if="active"
+          class="demo-button gallery-fullscreen-action"
+          @click="exit"
+        >
           {{ text.exit }}
         </button>
       </div>
@@ -241,6 +242,8 @@ onBeforeUnmount(() => {
           ref="preview"
           class="gallery-preview"
           :z-index="10001"
+          :toolbar="false"
+          :title="false"
           :transition="false"
           :focus="false"
           :fullscreen="false"
@@ -270,11 +273,12 @@ onBeforeUnmount(() => {
           class="inline-gallery-sources"
           inline
           :button="false"
+          :toolbar="false"
+          :title="false"
           :transition="false"
           :focus="false"
           :fullscreen="false"
           url="data-source"
-          @viewed="photoViewed"
         >
           <img
             v-for="item in photos"
