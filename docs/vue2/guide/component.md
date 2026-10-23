@@ -2,10 +2,6 @@
 
 使用 `v-model` 控制全屏状态。它对应 `value` 属性和 `input` 事件；按 Esc 退出时，绑定值会同步更新。
 
-::: warning 旧版本升级提醒
-4.x 是重构后的新主版本，保留全局插件注册。组件状态使用 `v-model`，见[迁移示例](#migration)。
-:::
-
 ## 演练场 {#playground}
 
 [演练场](/vue2/playground?example=component)

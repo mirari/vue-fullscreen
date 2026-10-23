@@ -2,6 +2,10 @@
 
 Import the component, directive or API where you need it.
 
+::: warning Upgrading existing projects
+5.x uses named imports and no longer provides a global plugin. See the [migration example](/en/guide/component#migration).
+:::
+
 ## 1. Install
 
 ```sh

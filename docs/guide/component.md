@@ -2,10 +2,6 @@
 
 把内容放进组件，用 `v-model` 控制。用户按 Esc 退出时，绑定的状态会自动变回 `false`。
 
-::: warning 旧版本升级提醒
-5.x 改用按需导入，不再提供全局插件注册。旧项目请参阅[迁移示例](#migration)。
-:::
-
 ## 演练场 {#playground}
 
 [演练场](/playground?example=component)

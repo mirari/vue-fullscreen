@@ -2,10 +2,6 @@
 
 Wrap content in the component and use `v-model` to control fullscreen. When the user exits with Esc, the bound value returns to `false`.
 
-::: warning Upgrading existing projects
-5.x uses named imports and no longer provides a global plugin. See the [migration example](#migration).
-:::
-
 ## Playground {#playground}
 
 [Playground](/en/playground?example=component)

@@ -2,10 +2,6 @@
 
 Use `v-model` to control fullscreen. It binds the `value` prop and `input` event. Exiting with Esc updates the bound value.
 
-::: warning Upgrading existing projects
-4.x is a new major release and retains the Vue plugin. Use `v-model` for component state; see the [migration example](#migration).
-:::
-
 ## Playground {#playground}
 
 [Playground](/en/vue2/playground?example=component)

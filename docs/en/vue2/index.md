@@ -2,6 +2,10 @@
 
 This section describes the Vue 2 package.
 
+::: warning Upgrading existing projects
+4.x is a new major release and retains the Vue plugin. Use `v-model` for component state; see the [migration example](/en/vue2/guide/component#migration).
+:::
+
 ## 1. Install
 
 ```sh
