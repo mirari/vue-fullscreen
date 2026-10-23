@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useData, withBase } from 'vitepress'
+import { moduleUrl } from './playground/module-url'
 import type { Example } from './playground/samples'
 
 const props = defineProps<{ kind: Example }>()
@@ -18,12 +19,7 @@ onMounted(async () => {
     const source = await response.text()
     if (disposed) return
     // This standalone bundle is a public asset, not a Vite source module.
-    const url = URL.createObjectURL(
-      new Blob([source], { type: 'text/javascript' }),
-    )
-    const { mount } = await import(/* @vite-ignore */ url).finally(() =>
-      URL.revokeObjectURL(url),
-    )
+    const { mount } = await import(/* @vite-ignore */ moduleUrl(source))
     if (disposed) return
     const hash = location.hash
     let anchor: HTMLElement | null = null

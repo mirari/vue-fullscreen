@@ -5,7 +5,8 @@ import { basicSetup, EditorView } from 'codemirror'
 import { html } from '@codemirror/lang-html'
 import { Compartment } from '@codemirror/state'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { compile, moduleUrl, previewDocument } from './compile'
+import { compile, previewDocument } from './compile'
+import { moduleUrl } from './module-url'
 import { sample, type Example } from './samples'
 
 const props = defineProps<{ vue2?: boolean }>()
