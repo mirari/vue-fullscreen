@@ -116,8 +116,8 @@ function report(error) { ${kind === 'api' ? '' : 'active.value = false; '}consol
   <div>
     <button :disabled="active" ${enterAction}>${enter}</button>
     <${tag} ${attributes}>
-      <!-- ${content} -->
       <button v-if="active" ${exitAction}>${exit}</button>
+      <!-- ${content} -->
     </${tag}>
   </div>
 </template>

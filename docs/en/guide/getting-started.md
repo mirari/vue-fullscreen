@@ -32,7 +32,8 @@ const active = ref(false)
 
 <template>
   <Fullscreen v-model="active">
-    <button @click="active = !active">Toggle fullscreen</button>
+    <button v-if="active" @click="active = false">Exit fullscreen</button>
+    <button v-else @click="active = true">Enter fullscreen</button>
   </Fullscreen>
 </template>
 ```

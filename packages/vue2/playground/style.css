@@ -24,7 +24,8 @@ main button {
   margin: 0.5rem;
   cursor: pointer;
 }
-#enter {
+#enter,
+#exit {
   display: block;
   width: calc(100% - 1rem);
   padding: 14px 20px;
@@ -64,12 +65,6 @@ output {
   overflow: hidden;
   background: transparent;
   cursor: zoom-in;
-}
-.picture-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
 }
 .image-trigger:focus-visible {
   outline: 2px solid var(--demo-accent);

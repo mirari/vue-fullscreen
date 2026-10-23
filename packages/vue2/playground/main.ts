@@ -36,7 +36,6 @@ const text = zh
       pageStatus: 'pageOnly: true · 保留浏览器工具栏',
       nativeStatus: 'pageOnly: false · 浏览器隐藏工具栏',
       enter: '进入组件全屏',
-      content: '全屏内容',
       details: '预览图片',
       image: '图片',
       hiddenPopup:
@@ -55,7 +54,6 @@ const text = zh
       pageStatus: 'pageOnly: true · the browser toolbar stays visible',
       nativeStatus: 'pageOnly: false · the browser hides its toolbar',
       enter: 'Enter component fullscreen',
-      content: 'Fullscreen content',
       details: 'Preview image',
       image: 'Image',
       hiddenPopup:
@@ -208,17 +206,16 @@ new Vue({
           },
         },
         [
-          h('div', { class: 'picture-topbar' }, [
-            h('p', text.content),
-            h(
-              'button',
-              {
-                attrs: { id: 'exit' },
-                on: { click: this.exit },
-              },
-              text.exit,
-            ),
-          ]),
+          this.active
+            ? h(
+                'button',
+                {
+                  attrs: { id: 'exit' },
+                  on: { click: this.exit },
+                },
+                text.exit,
+              )
+            : null,
           comparison === 'pageOnly' && this.active
             ? h(
                 'p',

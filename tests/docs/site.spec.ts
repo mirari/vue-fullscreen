@@ -64,6 +64,32 @@ async function expectSurfaceTheme(target: Locator) {
   )
 }
 
+async function expectExitAction(target: Locator) {
+  const button = target.locator('#exit')
+  await expect(button).toBeVisible()
+  await expect(button).toHaveCSS('position', 'static')
+  expect(
+    await button.evaluate((el) => {
+      const style = getComputedStyle(el)
+      const parent = el.parentElement!
+      const parentStyle = getComputedStyle(parent)
+      const width =
+        parent.clientWidth -
+        parseFloat(parentStyle.paddingLeft) -
+        parseFloat(parentStyle.paddingRight) -
+        parseFloat(style.marginLeft) -
+        parseFloat(style.marginRight)
+      return Math.abs(el.getBoundingClientRect().width - width)
+    }),
+  ).toBeLessThan(2)
+  const content = target.locator(
+    '.image-preview, .inline-gallery-stage, .popup-gallery',
+  )
+  const actionBox = await button.boundingBox()
+  const contentBox = await content.boundingBox()
+  expect(contentBox!.y).toBeGreaterThanOrEqual(actionBox!.y + actionBox!.height)
+}
+
 for (const teleport of [false, true]) {
   for (const browserExit of [false, true]) {
     test(`native fullscreen preserves reading position: teleport=${teleport}, ${browserExit ? 'browser exit' : 'exit button'}`, async ({
@@ -134,6 +160,7 @@ for (const english of [false, true]) {
       for (const pageOnly of [false, true]) {
         await demo.getByLabel('pageOnly', { exact: true }).setChecked(pageOnly)
         for (const teleport of [false, true]) {
+          await expect(frame.locator('#exit')).toHaveCount(0)
           await frame
             .getByLabel('teleport', { exact: true })
             .setChecked(teleport)
@@ -142,6 +169,7 @@ for (const english of [false, true]) {
           await expect(frame.locator('#enter')).toBeDisabled()
           await expect(target).toHaveClass(/fullscreen/)
           await expectSurfaceTheme(target)
+          await expectExitAction(target)
           expect(
             await target.evaluate((el) => el.parentElement === document.body),
           ).toBe(teleport)
@@ -164,6 +192,7 @@ for (const english of [false, true]) {
           await frame.locator('#exit').click()
           await expect(frame.locator('#enter')).toBeEnabled()
           await expect(target).not.toHaveClass(/fullscreen/)
+          await expect(target.locator('#exit')).toHaveCount(0)
           expect(
             await target.evaluate(() => document.fullscreenElement),
           ).toBeNull()
@@ -249,6 +278,7 @@ for (const english of [false, true]) {
         )
         const code = page.locator('.vp-doc div.language-vue').first()
         await expect(code).toContainText('teleport')
+        await expect(code).toContainText('v-if="active"')
         await expect(code).toContainText(
           kind === 'component' ? 'page-only' : 'pageOnly',
         )
@@ -326,16 +356,19 @@ for (const english of [false, true]) {
       const popup = frame.locator('body > .viewer-container')
       const image = frame.locator('.image-trigger').first()
       for (const teleport of [false, true]) {
+        await expect(frame.locator('#exit')).toHaveCount(0)
         await frame.getByLabel('teleport', { exact: true }).setChecked(teleport)
         await frame.locator('#enter').click()
         await expect(frame.locator('#demo-component, #target')).toHaveClass(
           /demo-fullscreen/,
         )
         await expectSurfaceTheme(frame.locator('#demo-component, #target'))
+        await expectExitAction(frame.locator('#demo-component, #target'))
         await image.click({ position: { x: 8, y: 8 } })
         await expectBodyViewer(popup, teleport)
         await closeViewer(popup, image, teleport)
         await frame.locator('#exit').click()
+        await expect(frame.locator('#exit')).toHaveCount(0)
       }
       // Rerunning replaces the iframe and removes the previous viewer session.
       await image.click({ position: { x: 8, y: 8 } })
@@ -499,6 +532,7 @@ for (const english of [false, true]) {
           )
         }
         for (const teleport of [false, true]) {
+          await expect(demo.locator('#exit')).toHaveCount(0)
           await demo
             .getByLabel('teleport', { exact: true })
             .setChecked(teleport)
@@ -510,6 +544,7 @@ for (const english of [false, true]) {
           const target = page.locator(`#demo-${kind}`)
           await expect(target).toHaveClass(/demo-fullscreen/)
           await expectSurfaceTheme(target)
+          await expectExitAction(target)
           const fullImage = target.locator('.gallery-image').first()
           await expect(fullImage).toHaveCSS('object-fit', 'cover')
           await expect
@@ -545,6 +580,7 @@ for (const english of [false, true]) {
           await closeViewer(popup, details, !native || teleport)
           await target.getByRole('button', { name: text.exit }).click()
           await expect(target).not.toHaveClass(/demo-fullscreen/)
+          await expect(target.locator('#exit')).toHaveCount(0)
           await expect(demo.locator(`#demo-${kind}`)).toBeVisible()
           expect(
             await page.evaluate(() => document.fullscreenElement),
@@ -640,9 +676,11 @@ for (const english of [false, true]) {
         'lang',
         english ? 'en' : 'zh-CN',
       )
+      await expect(frame.locator('#exit')).toHaveCount(0)
       await frame.locator('#enter').click()
       await expect(frame.locator('#state')).toHaveText('true')
       await expectInlineViewerSize(frame.locator('#target'), true)
+      await expectExitAction(frame.locator('#target'))
       expect(
         await frame
           .locator('#target')
@@ -660,6 +698,7 @@ for (const english of [false, true]) {
       await expect(frame.getByLabel('teleport', { exact: true })).toHaveCount(0)
       await frame.locator('#exit').click()
       await expect(frame.locator('#state')).toHaveText('false')
+      await expect(frame.locator('#exit')).toHaveCount(0)
       await expectInlineViewerSize(frame.locator('#target'), false)
     })
   }

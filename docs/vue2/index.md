@@ -48,7 +48,8 @@ Vue.use(VueFullscreen, { name: 'fs' })
 ```vue
 <template>
   <fullscreen v-model="active">
-    <button @click="active = !active">切换全屏</button>
+    <button v-if="active" @click="active = false">退出全屏</button>
+    <button v-else @click="active = true">进入全屏</button>
   </fullscreen>
 </template>
 

@@ -50,7 +50,8 @@ Bind a state value with `v-model`. See [component usage](/en/vue2/guide/componen
 ```vue
 <template>
   <fullscreen v-model="active">
-    <button @click="active = !active">Toggle fullscreen</button>
+    <button v-if="active" @click="active = false">Exit fullscreen</button>
+    <button v-else @click="active = true">Enter fullscreen</button>
   </fullscreen>
 </template>
 

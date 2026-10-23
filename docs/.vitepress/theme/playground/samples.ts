@@ -131,12 +131,12 @@ ${kind === 'api' ? 'watch(active, changed)\n' : ''}
     </header>
     <div class="surface-placeholder">
       <${tag} id="${id}" ref="target" class="surface" ${props}>
+        <button v-if="active" id="exit" class="exit" ${exit} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.exit}</button>
         <${vue2 ? 'viewer' : 'Viewer'} ref="preview" class="image-preview" url="data-source" :z-index="10001" :toolbar="false" :title="false" :transition="false" :focus="false" :fullscreen="false" @show="showDetails = true" @hidden="showDetails = false">
           <button v-for="(id, index) in images" :key="id" class="image-trigger" :aria-label="'${text.details} ' + (index + 1)" :aria-expanded="showDetails && selected === index ? 'true' : 'false'" @click.stop="previewImage(index)">
             <img class="gallery-image demo-picture" :src="'https://picsum.photos/id/' + id + '/640/360'" :data-source="'https://picsum.photos/id/' + id + '/1280/720'" :alt="'${text.image} ' + (index + 1)" width="1280" height="720">
           </button>
         </${vue2 ? 'viewer' : 'Viewer'}>
-        <button v-if="active" id="exit" class="exit" ${exit} ${kind === 'directive' ? '@fullscreen-error="report($event.detail)"' : ''}>${text.exit}</button>
         <p v-if="active && showDetails && !pageOnly && !teleport" role="status">${text.hidden}</p>
       </${tag}>
     </div>
@@ -162,15 +162,15 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--sample-acce
 input { accent-color: var(--sample-accent); }
 .options { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding-bottom: 16px; }
 .options label { display: flex; gap: 6px; align-items: center; }
-.options button { width: 100%; padding: 12px 16px; font-size: 16px; }
+.options button, .exit { width: 100%; padding: 12px 16px; font-size: 16px; }
 .surface-placeholder { height: 300px; }
 .surface { position: relative; height: 300px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; padding: 10px; background: var(--sample-surface); border: 1px solid var(--sample-border); border-radius: 8px; }
-.surface.demo-fullscreen { z-index: 10000; min-height: 100vh; height: 100vh; border-radius: 0; padding: 20px 24px 72px; }
+.surface.demo-fullscreen { z-index: 10000; min-height: 100vh; height: 100vh; overflow: auto; border-radius: 0; padding: 20px 24px; }
 .image-preview { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: start; gap: 10px; width: 100%; }
 .image-trigger { display: block; aspect-ratio: 16 / 10; width: 100%; padding: 0; border: 0; border-radius: 4px; overflow: hidden; background: transparent; cursor: zoom-in; }
 .image-trigger:hover { background: transparent; filter: none; }
 .gallery-image { position: static; display: block; width: 100%; height: 100%; object-fit: cover; }
-.exit { position: absolute; top: 16px; right: 16px; }
+.exit { flex-shrink: 0; margin-bottom: 16px; }
 .surface p[role="status"] { position: absolute; bottom: 68px; margin: 0; padding: 6px 12px; background: var(--sample-surface); font-size: 12px; }
 @media (max-width: 480px) { .image-preview { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 `
