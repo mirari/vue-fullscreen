@@ -10,7 +10,7 @@
 
 Fullscreen for Vue, with native and page-only modes.
 
-**[English documentation](https://vue-fullscreen.mirari.cc/en/)** · **[中文文档](https://vue-fullscreen.mirari.cc/)**
+**[English documentation](https://vue-fullscreen.mirari.cc/en/)** · **[中文文档](https://vue-fullscreen.mirari.cc/)** · **[Live demo / 在线演示](https://vue-fullscreen.mirari.cc/playground)**
 
 ## Install
 
