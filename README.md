@@ -1,6 +1,7 @@
 # vue-fullscreen
 
 [![npm version](https://img.shields.io/npm/v/vue-fullscreen?label=npm)](https://www.npmjs.com/package/vue-fullscreen)
+[![npm legacy version](https://img.shields.io/npm/v/vue-fullscreen/legacy?label=Vue%202)](https://www.npmjs.com/package/vue-fullscreen?activeTab=versions)
 [![npm downloads](https://img.shields.io/npm/dm/vue-fullscreen)](https://www.npmjs.com/package/vue-fullscreen)
 [![CI](https://github.com/mirari/vue-fullscreen/actions/workflows/ci.yml/badge.svg)](https://github.com/mirari/vue-fullscreen/actions/workflows/ci.yml)
 [![Vue](https://img.shields.io/badge/Vue-3%20%7C%202-42b883?logo=vuedotjs)](https://vue-fullscreen.mirari.cc/en/guide/compatibility)
