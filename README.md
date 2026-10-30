@@ -7,13 +7,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/mirari/vue-fullscreen)](https://github.com/mirari/vue-fullscreen/stargazers)
 
-Fullscreen components and directives for **Vue 2 and Vue 3**, with reactive `useFullscreen()` controls for Vue 3 and a promise-based API for Vue 2. Supports native fullscreen, `pageOnly` and `teleport`.
+Fullscreen for Vue, with native and page-only modes.
 
 **[English documentation](https://vue-fullscreen.mirari.cc/en/)** · **[中文文档](https://vue-fullscreen.mirari.cc/)** · [Documentation source](https://github.com/mirari/vue-fullscreen/tree/master/docs) · [Contributing](https://github.com/mirari/vue-fullscreen/blob/master/CONTRIBUTING.md)
 
-**5.x supports Vue 3**; **4.x supports Vue 2.4+** through the `legacy` channel. Both are new major versions of the rewritten library; upgrade explicitly from the previous 2.x/3.x releases.
-
 ## Install
+
+**5.x supports Vue 3**; **4.x supports Vue 2.4+** through the `legacy` channel. Both are new major versions of the rewritten library; upgrade explicitly from the previous 2.x/3.x releases.
 
 ```sh
 npm install vue-fullscreen         # Vue 3
