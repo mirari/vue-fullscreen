@@ -4,9 +4,14 @@
   "type": "module",
   "dependencies": {
     "@vitejs/plugin-vue": "6.0.7",
-    "nuxt": "4.6.2",
+    "nuxt": "4.6.4",
     "vite": "8.3.4",
     "vue": "3.5.44",
     "vue2": "npm:vue@2.7.16"
+  },
+  "overrides": {
+    "archiver": {
+      "readdir-glob": "4.0.0"
+    }
   }
 }

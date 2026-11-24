@@ -61,14 +61,15 @@ cd tests/consumers/fixture
 npm audit --registry=https://registry.npmjs.org
 ```
 
-The remaining upstream advisories are listed below. They are recorded for review, rather than treated as fixed or automatically dismissed. npm may also report parent packages affected by `node-forge`; those entries refer to the same underlying advisory.
+The fixture uses Nuxt 4.6.4 and patched transitive dependencies, including node-forge 1.4.4 or later. Its scoped `archiver > readdir-glob` override selects 4.0.0 to use patched minimatch 11. The upstream 3-to-4 change only updates minimatch and raises the Node requirement to 20, below this repository's Node 22/24 baseline. Keep the override until archiver accepts a patched readdir-glob directly; validate archive creation as well as the consumer suite when changing it.
 
-| Package      | Advisory                                                                                      | Exposure in this fixture                                                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `node-forge` | [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv); no patched release  | Nitro's `listhen` dependency for TLS certificate handling. The consumer servers use local HTTP and do not verify untrusted RSA signatures. |
-| Vue 2        | [GHSA-5j4c-8p2g-v4jx](https://github.com/advisories/GHSA-5j4c-8p2g-v4jx); no public Vue 2 fix | The `vue2` alias deliberately tests 2.7.16. Its template compiler processes repository-authored HTML; do not compile untrusted templates.  |
+The remaining upstream advisory is listed below. It is recorded for review, rather than treated as fixed or automatically dismissed.
 
-Recheck these advisories when updating the fixture and after an upstream fix is released. Replacing the Vue 2 alias with Vue 3 would remove Vue 2 coverage. Avoid `npm audit fix --force`: its suggested Nuxt downgrade and Vue major upgrade do not preserve the consumer test matrix.
+| Package | Advisory                                                                                      | Exposure in this fixture                                                                                                                  |
+| ------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Vue 2   | [GHSA-5j4c-8p2g-v4jx](https://github.com/advisories/GHSA-5j4c-8p2g-v4jx); no public Vue 2 fix | The `vue2` alias deliberately tests 2.7.16. Its template compiler processes repository-authored HTML; do not compile untrusted templates. |
+
+Recheck this advisory when updating either lockfile and after an upstream fix is released. The workspace's Vue 2 development dependency has the same advisory. Replacing either Vue 2 dependency with Vue 3 would remove Vue 2 coverage. Avoid `npm audit fix --force`: its suggested Vue major upgrade does not preserve the consumer test matrix.
 
 ## First-time GitHub/npm configuration
 
@@ -160,6 +161,6 @@ The image-preview libraries are development dependencies for the examples. Keep 
 - `pnpm run docs:preview`: serve the production build.
 - `pnpm run test:docs`: build and test the production site with Chromium, including custom-domain root-path navigation and fullscreen examples.
 
-VitePress is pinned to stable 1.6.4. A scoped `vitepress>vite` override uses Vite 6.4.4 to include the [Windows dev-server security fixes](https://github.com/advisories/GHSA-587h-7wmj-h5pm) missing from its Vite 5 dependency. Keep this override until VitePress supports a patched version directly, and verify documentation development, builds and browser tests when changing it. The library still builds with Vite 8. The root Vue 3 dependency supplies the docs runtime, while the Vue 2 workspace keeps its own runtime. Demo imports resolve to the local Vue 3 adapter.
+VitePress is pinned to stable 1.6.4. A scoped `vitepress>vite` override uses Vite 6.4.5 to include the [Windows dev-server security fixes](https://github.com/advisories/GHSA-587h-7wmj-h5pm) missing from its Vite 5 dependency and the subsequent [file-deny query bypass fix](https://github.com/advisories/GHSA-8g5g-mxqh-grgj). Keep this override until VitePress supports a patched version directly, and verify documentation development, builds and browser tests when changing it. The library still builds with Vite 8. The root Vue 3 dependency supplies the docs runtime, while the Vue 2 workspace keeps its own runtime. Demo imports resolve to the local Vue 3 adapter.
 
 The default base is `/`, matching `vue-fullscreen.mirari.cc`. For a separate project-subpath deployment use `DOCS_BASE=/vue-fullscreen/ pnpm run docs:build`. Keep the base consistent when serving previews. Browser tests exercise the production root path.
